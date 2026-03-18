@@ -16,21 +16,44 @@
 - `targetSdk`: **34**
 - `minSdk`: **26** (Android 8.0)，意味着本应用最低支持 Android 8.0 设备。
 
+## 2. 环境自动化配置脚本
+
+为了帮助新成员快速配置开发环境（Java版本、Git Hooks、Android SDK路径等），提供了跨平台的自动化脚本。
+
+**Mac / Linux 用户：**
+在终端执行：
+```bash
+./setup_env.sh
+```
+
+**Windows 用户：**
+直接双击运行项目根目录下的 `setup_env.bat`，或者在 CMD/PowerShell 中执行：
+```cmd
+setup_env.bat
+```
+
+该脚本会自动执行以下检查和配置：
+1. **检查 JDK 版本**：确保使用的是 JDK 17。
+2. **检查 Android SDK**：验证 `ANDROID_HOME` 环境变量。
+3. **配置 Git Hooks**：自动执行 `git config core.hooksPath .githooks`，防止误推代码到 master。
+4. **生成配置**：如果缺失，自动根据环境变量生成 `local.properties`。
+
+
 ---
 
-## 2. 项目整体架构
+## 3. 项目整体架构
 
 本项目采用 **组件化 / 模块化** 架构，并结合 **MVVM** 模式进行开发。
 整个工程自下而上分为三层：
 
-### 2.1 Foundation 层 (基础层)
+### 3.1 Foundation 层 (基础层)
 提供最底层、最通用的技术支撑，不包含任何具体的业务逻辑。所有上层业务模块都可以依赖这一层。
 - **`foundation:common`**：核心基础库，包含 BaseActivity、BaseFragment、各种 Utils 工具类（图片、尺寸、日期、权限等）和通用的自定义 View（TopBar、LoadingDialog）。
 - **`foundation:network`**：网络请求模块，封装了 Retrofit + OkHttp + RxJava，统一管理 API 接口、拦截器和证书配置。
 - **`foundation:storage`**：本地存储模块，基于 MMKV 封装，支持高性能、分场景的键值对存储。
 - **`foundation:webview`**：网页容器模块，封装了通用的 WebViewActivity 和配置工具。
 
-### 2.2 Business 层 (业务层)
+### 3.2 Business 层 (业务层)
 根据产品功能划分的独立业务模块。为了彻底解耦，每个业务模块被拆分为 `api` 和 `impl` 两个子模块：
 - **`api`**：暴露给其他模块的接口（Interface）和数据模型。例如 `UserService`。
 - **`impl`**：具体的业务实现和 UI 页面。例如 `LoginActivity` 和 `UserServiceImpl`。
@@ -46,7 +69,7 @@
 
 ---
 
-## 3. 模块依赖关系原则
+## 4. 模块依赖关系原则
 
 为了避免模块间的强耦合和循环依赖，团队必须遵守以下依赖原则：
 
@@ -57,7 +80,7 @@
 
 ---
 
-## 4. 如何新增一个业务模块
+## 5. 如何新增一个业务模块
 
 假设我们要新增一个商城模块（`mall`），请按以下步骤操作：
 
@@ -115,7 +138,7 @@ dependencies {
 
 ---
 
-## 5. 开发规范
+## 6. 开发规范
 
 - **包名规范**：统一使用 `com.模块名`。例如 `com.user`，`com.detection`。
 - **UI 规范**：

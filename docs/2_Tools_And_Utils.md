@@ -147,5 +147,3 @@ NetworkManager.api.getUserInfo()
 1. 确保在 Android Studio 中安装了 CodeLocator 桌面插件。
 2. 运行 App（必须是 Debug 包）。
 3. 点击 AS 侧边栏的 CodeLocator 面板，点击抓取。
-4. 你可以直接在面板上查看 View 的层级、间距，甚至实时修改文本和颜色，极大提升 UI 调试效率！
-
