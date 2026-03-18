@@ -45,6 +45,9 @@ captures/
 .idea/libraries
 .idea/caches
 
+# VS Code
+.vscode/
+
 # Keystore files
 *.jks
 *.keystore
