@@ -110,8 +110,79 @@ git stash pop                   # 恢复刚才暂存的代码
 
 ## 4. 🚨 团队红线行为 (绝对禁止)
 
-1. **禁止直接向** **`master`** **分支 push 代码。**
-2. **禁止使用** **`git push -f`** **(强制推送) 覆盖公共分支。** 如果由于操作失误覆盖了别人的代码，后果非常严重。
+1. **禁止直接向 `master` 分支 push 代码。**
+2. **禁止使用 `git push -f` (强制推送) 覆盖公共分支。** 如果由于操作失误覆盖了别人的代码，后果非常严重。
 3. **禁止提交包含密钥、密码、真实 Token 的明文代码。**
 4. **禁止提交 IDE 自动生成的缓存文件。** （`.idea/`, `build/`, `*.iml` 等必须被 `.gitignore` 过滤，如果在 PR 中看到了这些文件，请立刻剔除）。
+
+---
+
+## 5. 如何防止误 Push 到 master 分支？
+
+为了从根本上防止开发人员将代码直接 push 到 `master` 分支，团队应该采取以下双重防护措施：
+
+### 5.1 远端仓库保护 (最有效的方式)
+这是最根本的防护方式，直接在代码托管平台（GitHub/GitLab/Gitee）上进行设置：
+- **GitHub**: 进入仓库 `Settings` -> `Branches` -> `Branch protection rules`，添加 `master` 分支的保护规则。勾选 `Require a pull request before merging` 和 `Do not allow bypassing the above settings`。
+- **GitLab**: 进入项目 `Settings` -> `Repository` -> `Protected branches`，将 `master` 分支设置为 `Protected`，并将 `Allowed to push` 设置为 `No one`，只允许通过 Merge Request 合并代码。
+
+### 5.2 本地 Git Hook 拦截
+可以通过在本地 Git 仓库中配置 `pre-push` 钩子，在代码推送到远程前进行拦截。
+
+**注意：** 默认情况下，`.git/hooks/` 目录下的文件是**不会被 Git 追踪**的，它只存在于当前电脑的本地仓库中。为了让整个团队都能共享这个拦截脚本，我们需要做如下改造：
+
+1. 在项目根目录下新建一个名为 `.githooks` 的文件夹（这个文件夹会被 Git 追踪）。
+2. 在该文件夹下新建 `pre-push` 文件，写入以下代码：
+
+```bash
+#!/bin/bash
+
+protected_branch='master'
+current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+
+if [ $protected_branch = $current_branch ]
+then
+    echo "\033[31m[错误] 绝对禁止直接向 $protected_branch 分支 push 代码！\033[0m"
+    echo "请创建 feature 或 bugfix 分支，提交 PR/MR 进行合并。"
+    exit 1 # 退出码非0，阻止 push 动作
+fi
+
+exit 0
+```
+3. 给这个脚本加上执行权限并提交到远程仓库：
+```bash
+chmod +x .githooks/pre-push
+git add .githooks/pre-push
+git commit -m "chore: 添加 pre-push hook 防止误推 master"
+```
+
+4. **团队成员配置（只需执行一次）：**
+当新成员克隆完代码后，只需要在项目根目录下执行以下命令，告诉 Git 把钩子目录指向我们刚才创建的 `.githooks` 文件夹即可：
+```bash
+git config core.hooksPath .githooks
+```
+这样，当任何人在本地尝试执行 `git push origin master` 时，终端会直接报错并终止推送操作。
+
+### 5.3 如何移除或禁用 Hook？
+
+如果需要临时禁用或彻底移除该拦截脚本，可以使用以下方法：
+
+#### 1. 临时跳过检查 (Emergency)
+如果你确认当前操作是安全的，并且急需推送（例如紧急修复），可以使用 `--no-verify` 参数跳过钩子检查：
+```bash
+git push origin master --no-verify
+```
+
+#### 2. 本地不再使用该脚本 (Disable Locally)
+如果你想在本地取消这个钩子的绑定，恢复 Git 的默认行为：
+```bash
+git config --unset core.hooksPath
+```
+
+#### 3. 彻底从项目中移除 (Remove from Project)
+如果团队决定不再使用该机制，请删除 `.githooks` 文件夹并提交代码：
+```bash
+git rm -r .githooks
+git commit -m "chore: 移除 git hooks"
+```
 

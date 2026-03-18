@@ -1,0 +1,13 @@
+#!/bin/bash
+
+protected_branch='master'
+current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+
+if [ $protected_branch = $current_branch ]
+then
+    echo "\033[31m[错误] 绝对禁止直接向 $protected_branch 分支 push 代码！\033[0m"
+    echo "请创建 feature 或 bugfix 分支，提交 PR/MR 进行合并。"
+    exit 1 # 退出码非0，阻止 push 动作
+fi
+
+exit 0
