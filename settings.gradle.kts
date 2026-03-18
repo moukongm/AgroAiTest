@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        jcenter()
     }
 }
 dependencyResolutionManagement {
@@ -16,8 +17,33 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        jcenter()
     }
 }
 
 rootProject.name = "AgroAi"
 include(":app")
+
+// Foundation
+include(":foundation:common")
+include(":foundation:network")
+include(":foundation:storage")
+include(":foundation:webview")
+
+// Business - Main
+include(":business:main:api")
+include(":business:main:impl")
+
+// Business - Detection
+include(":business:detection:api")
+include(":business:detection:impl")
+
+// Business - Community
+include(":business:community:api")
+include(":business:community:impl")
+
+// Business - User
+include(":business:user:api")
+include(":business:user:impl")

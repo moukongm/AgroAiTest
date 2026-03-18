@@ -1,0 +1,2 @@
+com.community
+layout activity_community

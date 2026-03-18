@@ -1,4 +1,4 @@
-package com.example.agroai
+package com.agroai
 
 import org.junit.Test
 

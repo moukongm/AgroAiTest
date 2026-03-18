@@ -1,0 +1,3 @@
+com.user
+layout activity_login
+layout activity_profile

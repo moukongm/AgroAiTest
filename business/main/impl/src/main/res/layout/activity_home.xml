@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center_horizontal"
+    android:fitsSystemWindows="true">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AgroAi Demo"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="用户模块：登录状态"/>
+
+    <Button
+        android:id="@+id/btn_detection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="检测模块：启动检测"/>
+
+    <Button
+        android:id="@+id/btn_community"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="社区模块：最新帖子"/>
+
+    <Button
+        android:id="@+id/btn_network"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="工具：网络请求 Demo"/>
+
+    <Button
+        android:id="@+id/btn_mmkv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="工具：MMKV 存储 Demo"/>
+
+    <Button
+        android:id="@+id/btn_webview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="工具：WebView Demo"/>
+
+    <Button
+        android:id="@+id/btn_image_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="工具：图片选择器 Demo"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btn_image_loader"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="加载网络图片"/>
+
+        <Button
+            android:id="@+id/btn_local_image_loader"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="加载本地图片"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_demo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:background="#EEE"
+        android:scaleType="centerCrop"/>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>

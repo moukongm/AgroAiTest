@@ -1,0 +1,33 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:2:1-6:12
+	package
+		INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+		ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:2:1-6:12
+		INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:3:5-5:19
+activity#com.main.HomeActivity
+ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:4:9-82
+	android:exported
+		ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:4:56-80
+	android:name
+		ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml:4:19-55
+uses-sdk
+INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+		ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+		INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+		ADDED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml
+		INJECTED from /Users/bytedance/Desktop/bishe/code/AgroAi/business/main/impl/src/main/AndroidManifest.xml

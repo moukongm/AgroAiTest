@@ -1,0 +1,2 @@
+com.detection
+layout activity_detection

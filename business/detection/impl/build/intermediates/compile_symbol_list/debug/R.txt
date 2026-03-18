@@ -1,0 +1,1 @@
+int layout activity_detection 0x0

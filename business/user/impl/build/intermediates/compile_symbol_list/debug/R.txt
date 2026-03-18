@@ -1,0 +1,2 @@
+int layout activity_login 0x0
+int layout activity_profile 0x0
