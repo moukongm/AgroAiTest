@@ -1,5 +1,0 @@
-com.common.webview
-id progress_bar
-id top_bar
-id web_view
-layout activity_web_view
