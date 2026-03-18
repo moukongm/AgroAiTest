@@ -179,6 +179,7 @@ git push origin master --no-verify
 git config --unset core.hooksPath
 ```
 
+
 #### 3. 彻底从项目中移除 (Remove from Project)
 如果团队决定不再使用该机制，请删除 `.githooks` 文件夹并提交代码：
 ```bash
