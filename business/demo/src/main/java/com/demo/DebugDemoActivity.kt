@@ -25,6 +25,9 @@ import com.common.utils.setOnDebouncedClickListener
 import com.common.utils.toggleVisibility
 import com.common.utils.visible
 import com.common.utils.gone
+import com.common.utils.PermissionUtils
+import androidx.lifecycle.MutableLiveData
+import com.common.utils.observeNonNull
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -34,6 +37,9 @@ import java.util.UUID
 class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
 
     private lateinit var imagePickerUtil: ImagePickerUtil
+    
+    // 用于演示 LiveDataExt
+    private val demoLiveData = MutableLiveData<String>()
 
     override fun getViewBinding(): ActivityDebugDemoBinding {
         return ActivityDebugDemoBinding.inflate(layoutInflater)
@@ -45,28 +51,33 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             ImageLoader.load(binding.ivDemo, uri.toString())
             ToastUtils.showShort(this, "图片选择成功")
         }
+        
+        // 演示 LiveData 扩展，监听非空数据
+        demoLiveData.observeNonNull(this) { value ->
+            ToastUtils.showShort(this, "LiveData 收到非空数据: $value")
+        }
 
-        binding.btnLogin.setOnClickListener {
+        binding.btnLogin.setOnDebouncedClickListener {
             val userService = UserService.api()
             val isLogin = userService.isLogin()
             ToastUtils.showShort(this, "Is Login: $isLogin, User: ${userService.getUserName()}")
             ARouter.getInstance().build(RouterPath.USER_LOGIN_ACTIVITY).navigation()
         }
 
-        binding.btnDetection.setOnClickListener {
+        binding.btnDetection.setOnDebouncedClickListener {
             val detectionService = DetectionService.api()
             detectionService.startDetection("test_image_url")
             ARouter.getInstance().build(RouterPath.DETECTION_ACTIVITY).navigation()
         }
 
-        binding.btnCommunity.setOnClickListener {
+        binding.btnCommunity.setOnDebouncedClickListener {
             val communityService = CommunityService.api()
             val posts = communityService.getLatestPosts(3)
             ToastUtils.showShort(this, "Latest Posts: $posts")
             ARouter.getInstance().build(RouterPath.COMMUNITY_ACTIVITY).navigation()
         }
 
-        binding.btnNetwork.setOnClickListener {
+        binding.btnNetwork.setOnDebouncedClickListener {
             ToastUtils.showShort(this, "正在请求网络数据...")
             NetworkManager.api
                 .getZen()
@@ -79,22 +90,22 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
                 })
         }
 
-        binding.btnMmkv.setOnClickListener {
+        binding.btnMmkv.setOnDebouncedClickListener {
             val userStorage = MMKVUtils.custom("user_settings")
             val clickCount = userStorage.getInt("demo_click_count", 0) + 1
             userStorage.put("demo_click_count", clickCount)
             ToastUtils.showShort(this, "分场景存储：这是你第 $clickCount 次点击")
         }
 
-        binding.btnWebview.setOnClickListener {
+        binding.btnWebview.setOnDebouncedClickListener {
             WebViewActivity.start(this, "https://www.baidu.com", "WebView Demo")
         }
 
-        binding.btnImagePicker.setOnClickListener {
+        binding.btnImagePicker.setOnDebouncedClickListener {
             imagePickerUtil.showImageSourceDialog()
         }
         
-        binding.btnDatabase.setOnClickListener {
+        binding.btnDatabase.setOnDebouncedClickListener {
             Single.fromCallable {
                 val db = AppDatabase.getInstance(this)
                 // Insert a demo recognition record
@@ -125,7 +136,7 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             })
         }
 
-        binding.btnThread.setOnClickListener {
+        binding.btnThread.setOnDebouncedClickListener {
             // 1. IO 密集型任务示例
             ThreadUtils.executeByIo {
                 val threadName = Thread.currentThread().name
@@ -152,8 +163,21 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
                 }
             }, 2000)
         }
+        
+        binding.btnPermission.setOnDebouncedClickListener {
+            PermissionUtils.request(
+                this,
+                listOf(android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                onGranted = {
+                    ToastUtils.showShort(this, "相机与存储权限申请成功！")
+                },
+                onDenied = { deniedList ->
+                    ToastUtils.showShort(this, "被拒绝的权限: $deniedList")
+                }
+            )
+        }
 
-        binding.btnLog.setOnClickListener {
+        binding.btnLog.setOnDebouncedClickListener {
             LogUtils.v("这是一条 Verbose 日志 (自动生成 TAG)")
             LogUtils.d("这是一条 Debug 日志 (自动生成 TAG)")
             LogUtils.i("CustomTag", "这是一条指定 TAG 的 Info 日志")
@@ -174,17 +198,27 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             binding.ivDemo.toggleVisibility()
         }
 
-        binding.btnRvDemo.setOnClickListener {
+        binding.btnRvDemo.setOnDebouncedClickListener {
             val intent = android.content.Intent(this, RvDemoActivity::class.java)
             startActivity(intent)
         }
+        
+        binding.btnLivedataDemo.setOnDebouncedClickListener {
+            // 发送数据，上面 observeNonNull 处会收到回调
+            demoLiveData.value = "Hello LiveData at ${System.currentTimeMillis()}"
+        }
 
-        binding.btnImageLoader.setOnClickListener {
+        binding.btnFragmentDemo.setOnDebouncedClickListener {
+            val intent = android.content.Intent(this, FragmentDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnImageLoader.setOnDebouncedClickListener {
             ImageLoader.loadRounded(binding.ivDemo, "https://github.com/lukecc00/PicImg/blob/main/202308082028393.png", 20f)
             ToastUtils.showShort(this, "正在加载网络图片...")
         }
 
-        binding.btnLocalImageLoader.setOnClickListener {
+        binding.btnLocalImageLoader.setOnDebouncedClickListener {
             ImageLoader.loadLocal(binding.ivDemo, android.R.drawable.sym_def_app_icon)
             ToastUtils.showShort(this, "正在加载本地图片...")
         }
