@@ -19,7 +19,12 @@ class MyActivity : BaseActivity<ActivityMyBinding>() {
     override fun initView() {
         // 初始化视图
         showLoading("正在处理...") // 显示加载框
-        hideLoading() // 隐藏加载框
+        
+        ThreadUtils.executeDelayed({
+            ThreadUtils.runOnUiThread {
+                hideLoading() // 隐藏加载框
+            }
+        }, 2000)
     }
 
     override fun initData() {
@@ -163,7 +168,24 @@ viewModel.data.observeNonNull(this) { data ->
 val toastEvent = SingleLiveEvent<String>()
 ```
 
-### 2.7 其他工具类
+### 2.7 权限申请 (PermissionUtils)
+
+基于 `PermissionX` 封装的极简权限申请工具，完美适配 Android 13/14 各种最新权限行为变更。
+
+```kotlin
+PermissionUtils.request(
+    activity,
+    listOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE),
+    onGranted = {
+        // 所有权限都已获取
+    },
+    onDenied = { deniedList ->
+        // 部分或全部被拒绝
+    }
+)
+```
+
+### 2.8 其他工具类
 
 - **`ToastUtils`**：全局安全的 Toast，防止内存泄漏。
 - **`DateUtils`**：时间格式化（支持转换为“刚刚”、“x分钟前”）。
@@ -294,7 +316,7 @@ binding.viewPager.offscreenPageLimit = 1
 ### 5.1 实体与 Dao
 数据库定义在 `AppDatabase` 中，包含 `RecognitionDao` 和 `ChatDao`。
 
-### 3.2 使用示例
+### 5.2 使用示例
 结合 RxJava 或者 `ThreadUtils` 进行异步读写：
 
 ```kotlin

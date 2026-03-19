@@ -49,8 +49,9 @@ setup_env.bat
 - **架构模式**: 组件化 + MVVM
 - **路由组件**: [ARouter](https://github.com/alibaba/ARouter)
 - **网络请求**: [Retrofit](https://github.com/square/retrofit) + [OkHttp](https://github.com/square/okhttp) + [RxJava3](https://github.com/ReactiveX/RxJava)
-- **本地存储**: [MMKV](https://github.com/Tencent/MMKV) (多实例分场景存储)
+- **本地存储**: [MMKV](https://github.com/Tencent/MMKV) (多实例分场景存储) + [Room](https://developer.android.com/training/data-storage/room) (结构化数据库)
 - **图片加载**: [Coil](https://github.com/coil-kt/coil)
+- **列表框架**: [BRVAH](https://github.com/CymChad/BaseRecyclerViewAdapterHelper)
 - **调试利器**: [CodeLocator](https://github.com/bytedance/CodeLocator)
 
 ---
@@ -64,11 +65,13 @@ AgroAi/
 │   ├── community/        # 社区交流模块 (api / impl)
 │   ├── detection/        # 病虫害检测模块 (api / impl)
 │   ├── main/             # 主框架与首页模块 (api / impl)
-│   └── user/             # 用户中心模块 (api / impl)
+│   ├── user/             # 用户中心模块 (api / impl)
+│   └── demo/             # 调试与工具演示模块
 ├── foundation/           # 基础通用层
-│   ├── common/           # 核心工具类、基类、通用 UI 组件
+│   ├── common/           # 核心工具类、基类
+│   ├── uikit/            # 基础 UI 组件库、列表与弹窗基类
 │   ├── network/          # 全局网络请求封装
-│   ├── storage/          # MMKV 存储封装
+│   ├── storage/          # MMKV 存储与 Room 数据库封装
 │   └── webview/          # 通用网页容器模块
 ├── docs/                 # 团队开发与规范文档
 ├── .githooks/            # 团队共享的 Git 拦截脚本

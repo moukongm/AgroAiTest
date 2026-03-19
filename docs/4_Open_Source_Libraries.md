@@ -139,7 +139,17 @@
 
 ---
 
-## 7. 调试与开发工具
+## 7. UI 与列表框架
+
+### **BRVAH (BaseRecyclerViewAdapterHelper)**
+- **GitHub**: [CymChad/BaseRecyclerViewAdapterHelper](https://github.com/CymChad/BaseRecyclerViewAdapterHelper)
+- **作用**: 强大而灵活的 RecyclerView Adapter 封装库，极大地简化了 Adapter 的编写，支持多类型、动画、空布局等。
+- **使用示例**:
+  项目中已基于此库封装了 `BaseBindingAdapter` 和 `BaseBindingMultiAdapter`，请直接参考 [2_Tools_And_Utils.md](2_Tools_And_Utils.md) 第 3 节。
+
+---
+
+## 8. 调试与开发工具
 
 ### **CodeLocator**
 - **GitHub**: [bytedance/CodeLocator](https://github.com/bytedance/CodeLocator)
