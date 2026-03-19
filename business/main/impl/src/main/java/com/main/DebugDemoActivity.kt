@@ -19,6 +19,12 @@ import com.network.NetworkManager
 import com.common.storage.database.AppDatabase
 import com.common.storage.database.ChatMessage
 import com.common.storage.database.RecognitionRecord
+import com.common.utils.LogUtils
+import com.common.utils.ThreadUtils
+import com.common.utils.setOnDebouncedClickListener
+import com.common.utils.toggleVisibility
+import com.common.utils.visible
+import com.common.utils.gone
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -117,6 +123,55 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             }, { error ->
                 ToastUtils.showShort(this, "数据库操作失败: ${error.message}")
             })
+        }
+
+        binding.btnThread.setOnClickListener {
+            // 1. IO 密集型任务示例
+            ThreadUtils.executeByIo {
+                val threadName = Thread.currentThread().name
+                ThreadUtils.runOnUiThread {
+                    ToastUtils.showShort(this, "IO 任务执行在：$threadName")
+                }
+            }
+
+            // 2. CPU 密集型任务示例
+            ThreadUtils.executeByCpu {
+                var result = 0L
+                for (i in 0..10000) { result += i }
+                val threadName = Thread.currentThread().name
+                
+                ThreadUtils.runOnUiThreadDelayed({
+                    ToastUtils.showShort(this, "CPU 任务执行在：$threadName, 结果:$result")
+                }, 1000) // 延迟1秒在主线程弹窗
+            }
+
+            // 3. 周期性调度任务示例
+            ThreadUtils.executeDelayed({
+                ThreadUtils.runOnUiThread {
+                    ToastUtils.showShort(this, "这是一个延迟 2 秒后执行的调度任务")
+                }
+            }, 2000)
+        }
+
+        binding.btnLog.setOnClickListener {
+            LogUtils.v("这是一条 Verbose 日志 (自动生成 TAG)")
+            LogUtils.d("这是一条 Debug 日志 (自动生成 TAG)")
+            LogUtils.i("CustomTag", "这是一条指定 TAG 的 Info 日志")
+            LogUtils.w("这是一条 Warn 日志", Exception("模拟的一个警告异常"))
+            LogUtils.e("这是一条 Error 日志", RuntimeException("模拟的一个严重异常"))
+            
+            // 模拟超长日志测试
+            val longString = buildString {
+                for (i in 1..500) append("这是超长日志填充文本内容 $i;")
+            }
+            LogUtils.d("LongLogTest", longString)
+            ToastUtils.showShort(this, "已输出各类日志，请查看 Logcat")
+        }
+        
+        binding.btnViewExt.setOnDebouncedClickListener {
+            ToastUtils.showShort(this, "防抖点击触发！你可以快速连点试试")
+            // 切换下方 iv_demo 的可见性
+            binding.ivDemo.toggleVisibility()
         }
 
         binding.btnImageLoader.setOnClickListener {

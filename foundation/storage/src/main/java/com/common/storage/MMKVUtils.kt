@@ -33,8 +33,6 @@ object MMKVUtils {
         return MMKVInstance(MMKV.mmkvWithID(mmapID)!!)
     }
 
-    // --- 兼容旧代码，默认使用 default 实例 ---
-
     fun put(key: String, value: Any?) = default.put(key, value)
     fun getString(key: String, defaultValue: String = "") = default.getString(key, defaultValue)
     fun getInt(key: String, defaultValue: Int = 0) = default.getInt(key, defaultValue)

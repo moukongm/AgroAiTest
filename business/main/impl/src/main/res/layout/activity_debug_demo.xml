@@ -67,6 +67,24 @@
             android:layout_height="wrap_content"
             android:text="工具：Room 数据库 Demo"/>
 
+        <Button
+            android:id="@+id/btn_thread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：线程池与调度 Demo"/>
+
+        <Button
+            android:id="@+id/btn_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：Log 日志输出 Demo"/>
+            
+        <Button
+            android:id="@+id/btn_view_ext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：View 防抖点击与可见性 Demo"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
