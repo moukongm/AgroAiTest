@@ -19,6 +19,14 @@
             android:textStyle="bold"
             android:layout_marginBottom="32dp"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="====== 模块跳转演示 ======"
+            android:textColor="#999999"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+
         <Button
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
@@ -37,6 +45,14 @@
             android:layout_height="wrap_content"
             android:text="社区模块：最新帖子"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="====== 基础能力演示 ======"
+            android:textColor="#999999"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"/>
+
         <Button
             android:id="@+id/btn_network"
             android:layout_width="match_parent"
@@ -49,18 +65,6 @@
             android:layout_height="wrap_content"
             android:text="工具：MMKV 存储 Demo"/>
 
-        <Button
-            android:id="@+id/btn_webview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="工具：WebView Demo"/>
-
-        <Button
-            android:id="@+id/btn_image_picker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="工具：图片选择器 Demo"/>
-            
         <Button
             android:id="@+id/btn_database"
             android:layout_width="match_parent"
@@ -78,12 +82,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="工具：Log 日志输出 Demo"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="====== UI &amp; 交互演示 ======"
+            android:textColor="#999999"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btn_webview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：WebView Demo"/>
+
+        <Button
+            android:id="@+id/btn_image_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：图片选择器 Demo"/>
             
         <Button
             android:id="@+id/btn_view_ext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="工具：View 防抖点击与可见性 Demo"/>
+
+        <Button
+            android:id="@+id/btn_rv_demo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：RecyclerView 极简列表 Demo"/>
 
         <LinearLayout
             android:layout_width="match_parent"

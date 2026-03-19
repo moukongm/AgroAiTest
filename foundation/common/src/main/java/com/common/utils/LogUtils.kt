@@ -27,9 +27,9 @@ object LogUtils {
      */
     private fun generateTag(): String {
         val stackTrace = Thread.currentThread().stackTrace
-        // 索引 4 通常是调用 LogUtils 的位置
-        if (stackTrace.size >= 5) {
-            val element = stackTrace[4]
+        // 索引 5 通常是调用 LogUtils 业务类的位置 (因为调用层级：业务类 -> LogUtils.v() -> printLog() -> generateTag())
+        if (stackTrace.size >= 6) {
+            val element = stackTrace[5]
             var className = element.className
             
             val moduleName = extractModuleName(className)

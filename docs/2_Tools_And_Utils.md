@@ -171,7 +171,101 @@ val toastEvent = SingleLiveEvent<String>()
 
 ***
 
-## 3. 本地数据库 (位于 `foundation:storage/database`)
+## 3. 列表开发利器 (BaseBindingAdapter & BRVAH)
+
+项目深度集成了目前 Android 最主流的 [BRVAH](https://github.com/CymChad/BaseRecyclerViewAdapterHelper) 框架（3.x 版本），并基于此封装了支持 `ViewBinding` 的 `BaseBindingAdapter`。
+
+以后开发列表（RecyclerView）无需再手写繁琐的 `Adapter` 和 `ViewHolder`。
+
+### 3.1 极简列表实现
+只需要继承 `BaseBindingAdapter`，传入数据模型 `T` 和对应的布局 `ViewBinding` 即可：
+
+```kotlin
+// 1. 定义你的 Adapter，泛型 1 为数据实体，泛型 2 为对应的 Item XML Binding 类
+class DiseaseRecordAdapter : BaseBindingAdapter<RecognitionRecord, ItemDiseaseRecordBinding>() {
+
+    // 2. 重写 convert，直接通过 binding 操作 UI
+    override fun convert(binding: ItemDiseaseRecordBinding, item: RecognitionRecord, position: Int) {
+        binding.tvDiseaseName.text = item.diseaseName
+        binding.tvConfidence.text = "可信度：${item.confidence}%"
+        
+        ImageLoader.loadRounded(binding.ivCover, item.imagePath, 8f)
+    }
+}
+```
+
+### 3.2 列表常用操作
+借助于 BRVAH 的能力，你可以在 Activity/Fragment 中轻松实现各种常规场景：
+
+```kotlin
+val mAdapter = DiseaseRecordAdapter()
+binding.recyclerView.adapter = mAdapter
+
+// 1. 刷新数据
+mAdapter.setList(newList)
+
+// 2. 添加更多数据 (上拉加载场景)
+mAdapter.addData(moreList)
+
+// 3. 极简点击事件
+mAdapter.setOnItemClickListener { adapter, view, position ->
+    val item = mAdapter.getItem(position)
+    ToastUtils.showShort(context, "点击了：${item.diseaseName}")
+}
+
+// 4. 空布局 (数据为空时显示的占位图)
+mAdapter.setEmptyView(R.layout.layout_empty_view)
+
+// 5. 动画效果
+mAdapter.setAnimationWithDefault(BaseQuickAdapter.AnimationType.SlideInBottom)
+```
+
+### 3.3 多类型列表实现 (BaseBindingMultiAdapter)
+当你的一个列表中需要混排不同的 UI 样式（例如：头部是 Banner、中间是文字通知、底部是图文卡片），请使用 `BaseBindingMultiAdapter`。
+
+**要求：** 你的数据模型必须实现 `MultiItemEntity` 接口，并返回 `itemType`。
+
+```kotlin
+// 1. 定义数据实体，实现 MultiItemEntity
+data class HomeMultiItem(
+    override val itemType: Int, // BRVAH 需要根据这个区分类型
+    val content: String = "",
+    val imageUrl: String = ""
+) : MultiItemEntity {
+    companion object {
+        const val TYPE_TEXT = 1
+        const val TYPE_IMAGE = 2
+    }
+}
+
+// 2. 继承多类型基类
+class HomeMultiAdapter : BaseBindingMultiAdapter<HomeMultiItem>() {
+    
+    init {
+        // 3. 在初始化时，注册 type 对应的 ViewBinding inflate 方法
+        addItemBinding(HomeMultiItem.TYPE_TEXT, ItemHomeTextBinding::inflate)
+        addItemBinding(HomeMultiItem.TYPE_IMAGE, ItemHomeImageBinding::inflate)
+    }
+
+    // 4. 在 convert 中根据类型强转并绑定数据
+    override fun convert(binding: ViewBinding, item: HomeMultiItem, itemType: Int, position: Int) {
+        when (itemType) {
+            HomeMultiItem.TYPE_TEXT -> {
+                val textBinding = binding as ItemHomeTextBinding
+                textBinding.tvTitle.text = item.content
+            }
+            HomeMultiItem.TYPE_IMAGE -> {
+                val imageBinding = binding as ItemHomeImageBinding
+                ImageLoader.load(imageBinding.ivCover, item.imageUrl)
+            }
+        }
+    }
+}
+```
+
+***
+
+## 4. 本地数据库 (位于 `foundation:storage/database`)
 
 项目集成了 **Room** 数据库，用于存储结构化数据（识别记录、AI 对话等）。所有数据库操作必须在 **IO 线程** 中执行。
 
@@ -204,7 +298,7 @@ Single.fromCallable {
 
 ***
 
-## 4. 网络请求 (位于 `foundation:network`)
+## 5. 网络请求 (位于 `foundation:network`)
 
 采用 Retrofit + RxJava 架构。
 如果需要增加新的网络请求，请直接在 `ApiService.kt` 中添加接口：
@@ -231,7 +325,7 @@ NetworkManager.api.getUserInfo()
 
 ***
 
-## 5. 调试工具 CodeLocator
+## 6. 调试工具 CodeLocator
 
 项目已集成字节跳动开源的 `CodeLocator` 插件。
 **如何使用：**

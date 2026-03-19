@@ -25,6 +25,7 @@ import com.common.utils.setOnDebouncedClickListener
 import com.common.utils.toggleVisibility
 import com.common.utils.visible
 import com.common.utils.gone
+import com.main.demo.RvDemoActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -172,6 +173,11 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             ToastUtils.showShort(this, "防抖点击触发！你可以快速连点试试")
             // 切换下方 iv_demo 的可见性
             binding.ivDemo.toggleVisibility()
+        }
+
+        binding.btnRvDemo.setOnClickListener {
+            val intent = android.content.Intent(this, RvDemoActivity::class.java)
+            startActivity(intent)
         }
 
         binding.btnImageLoader.setOnClickListener {

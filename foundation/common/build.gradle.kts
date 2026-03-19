@@ -58,6 +58,8 @@ dependencies {
     api(libs.rxandroid)
     
     api(libs.permissionx)
+    api(libs.brvah)
+    api(libs.androidx.recyclerview)
     
     api(project(":foundation:storage"))
 }

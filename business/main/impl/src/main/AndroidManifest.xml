@@ -3,5 +3,6 @@
     <application>
         <activity android:name="com.main.HomeActivity" android:exported="false"/>
         <activity android:name="com.main.DebugDemoActivity" android:exported="false"/>
+        <activity android:name="com.main.demo.RvDemoActivity" android:exported="false"/>
     </application>
 </manifest>
