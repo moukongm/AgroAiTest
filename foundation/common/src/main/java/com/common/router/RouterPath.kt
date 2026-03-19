@@ -8,6 +8,7 @@ object RouterPath {
     // 首页模块 (Main Module)
     const val MAIN_ACTIVITY = "/main/activity" // 首页 Activity
     const val MAIN_SERVICE = "/main/service"   // 首页对外服务接口
+    const val DEBUG_DEMO_ACTIVITY = "/main/debug_demo" // 调试工具页面
 
     // 检测模块 (Detection Module)
     const val DETECTION_ACTIVITY = "/detection/activity" // 识别检测页面
