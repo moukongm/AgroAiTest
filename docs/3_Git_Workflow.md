@@ -18,8 +18,8 @@
 - **`feature/xxx`** **(功能分支)**
   - 作用：开发新需求。
   - 命名规范：`feature/你的名字-功能名`（如：`feature/zhangsan-login`）。
-  - 来源：基于 `develop` 分支拉取。
-  - 归宿：开发完成后合并回 `develop` 分支。
+  - 来源：基于 `master` 分支拉取。
+  - 归宿：开发完成后合并回 `master` 分支。
 - **`bugfix/xxx`** **或** **`hotfix/xxx`** **(修复分支)**
   - 作用：修复测试环境或线上的 Bug。
 
@@ -36,7 +36,7 @@ git checkout master
 git pull origin master
 ```
 
-基于最新的 `develop` 分支，创建并切换到你的功能分支：
+基于最新的 `master` 分支，创建并切换到你的功能分支：
 
 ```bash
 git checkout -b feature/zhangsan-community
@@ -69,7 +69,7 @@ git commit -m "feat: 新增了社区列表展示功能"
 git push origin feature/zhangsan-community
 ```
 
-然后去代码托管平台（如 GitLab / GitHub / Gitee）发起一个从 `feature/zhangsan-community` 合并到 `develop` 的 Merge Request。
+然后去代码托管平台（如 GitLab / GitHub / Gitee）发起一个从 `feature/zhangsan-community` 合并到 `master` 的 Merge Request。
 由 Code Reviewer（代码审查人）审核通过后，才能合并。
 
 ***
