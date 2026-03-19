@@ -52,7 +52,7 @@ setup_env.bat
 - **本地存储**: [MMKV](https://github.com/Tencent/MMKV) (多实例分场景存储) + [Room](https://developer.android.com/training/data-storage/room) (结构化数据库)
 - **图片加载**: [Coil](https://github.com/coil-kt/coil)
 - **列表框架**: [BRVAH](https://github.com/CymChad/BaseRecyclerViewAdapterHelper)
-- **调试利器**: [CodeLocator](https://github.com/bytedance/CodeLocator)
+- **调试利器**: [CodeLocator](https://github.com/bytedance/CodeLocator) + [LeakCanary](https://github.com/square/leakcanary)
 
 ---
 

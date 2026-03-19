@@ -71,4 +71,7 @@ dependencies {
     // CodeLocator Lancet has compatibility issues with AGP 8.0+ and Jetifier
     // Temporarily disabled until properly configured
     // debugImplementation(libs.codelocator.lancet.all)
+    
+    // LeakCanary - 只在 debug 模式下检测内存泄漏
+    debugImplementation(libs.leakcanary.android)
 }

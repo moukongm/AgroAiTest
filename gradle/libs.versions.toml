@@ -45,6 +45,9 @@ brvah = "3.0.11"
 # CodeLocator
 codelocator = "2.0.4"
 
+# LeakCanary
+leakcanary = "2.13"
+
 [libraries]
 # Android Core
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -98,6 +101,9 @@ brvah = { group = "com.github.CymChad", name = "BaseRecyclerViewAdapterHelper", 
 # CodeLocator
 codelocator-core = { group = "com.bytedance.tools.codelocator", name = "codelocator-core", version.ref = "codelocator" }
 codelocator-lancet-all = { group = "com.bytedance.tools.codelocator", name = "codelocator-lancet-all", version.ref = "codelocator" }
+
+# LeakCanary
+leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -156,3 +156,9 @@
 - **作用**: 字节跳动开源的极其强大的 Android UI 调试工具集。支持抓取 View 树、实时修改 UI、查看应用信息等。
 - **使用方法**:
   在 Android Studio 中安装 CodeLocator 插件，运行项目的 Debug 包，点击 AS 侧边栏的 CodeLocator 抓取当前页面即可。
+
+### **LeakCanary**
+- **GitHub**: [square/leakcanary](https://github.com/square/leakcanary)
+- **作用**: Square 开源的 Android 内存泄漏检测工具。
+- **使用方法**:
+  在 Debug 模式下运行 App 时会自动生效。当发生 Activity 或 Fragment 的内存泄漏时，会在通知栏弹出通知，点击即可查看详细的泄漏引用链。
