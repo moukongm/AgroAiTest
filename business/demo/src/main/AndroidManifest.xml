@@ -4,5 +4,6 @@
         <activity android:name=".DebugDemoActivity" android:exported="false"/>
         <activity android:name=".RvDemoActivity" android:exported="false"/>
         <activity android:name=".FragmentDemoActivity" android:exported="false"/>
+        <activity android:name=".ViewPagerDemoActivity" android:exported="false"/>
     </application>
 </manifest>

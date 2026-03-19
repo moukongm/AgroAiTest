@@ -213,6 +213,25 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             startActivity(intent)
         }
 
+        binding.btnViewpagerDemo.setOnDebouncedClickListener {
+            val intent = android.content.Intent(this, ViewPagerDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnLoadingDemo.setOnDebouncedClickListener {
+            // 显示 Loading
+            showLoading("正在加载数据，请稍候...")
+            
+            // 模拟一个 3 秒的耗时任务
+            ThreadUtils.executeDelayed({
+                ThreadUtils.runOnUiThread {
+                    // 隐藏 Loading
+                    hideLoading()
+                    ToastUtils.showShort(this, "加载完成！")
+                }
+            }, 3000)
+        }
+
         binding.btnImageLoader.setOnDebouncedClickListener {
             ImageLoader.loadRounded(binding.ivDemo, "https://github.com/lukecc00/PicImg/blob/main/202308082028393.png", 20f)
             ToastUtils.showShort(this, "正在加载网络图片...")

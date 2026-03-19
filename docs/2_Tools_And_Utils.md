@@ -265,11 +265,33 @@ class HomeMultiAdapter : BaseBindingMultiAdapter<HomeMultiItem>() {
 
 ***
 
-## 4. 本地数据库 (位于 `foundation:storage/database`)
+## 4. Fragment 与 ViewPager 极简开发
+
+### 4.1 ViewPager2 适配器 (BaseFragmentPagerAdapter)
+在 `foundation:uikit` 中，我们提供了专为 `ViewPager2` 打造的 `BaseFragmentPagerAdapter`。它解决了传统 `FragmentStatePagerAdapter` 容易导致 Fragment 重复创建、滑动卡顿的问题。
+
+```kotlin
+// 1. 初始化，传入 Activity/Fragment 作为生命周期宿主
+val pagerAdapter = BaseFragmentPagerAdapter(this)
+
+// 2. 准备 Fragment 列表
+val fragments = listOf(HomeFragment(), MineFragment())
+
+// 3. 绑定 ViewPager2
+pagerAdapter.setFragments(fragments)
+binding.viewPager.adapter = pagerAdapter
+
+// 优化：根据需求设置预加载页数
+binding.viewPager.offscreenPageLimit = 1
+```
+
+***
+
+## 5. 本地数据库 (位于 `foundation:storage/database`)
 
 项目集成了 **Room** 数据库，用于存储结构化数据（识别记录、AI 对话等）。所有数据库操作必须在 **IO 线程** 中执行。
 
-### 3.1 实体与 Dao
+### 5.1 实体与 Dao
 数据库定义在 `AppDatabase` 中，包含 `RecognitionDao` 和 `ChatDao`。
 
 ### 3.2 使用示例
@@ -298,7 +320,7 @@ Single.fromCallable {
 
 ***
 
-## 5. 网络请求 (位于 `foundation:network`)
+## 6. 网络请求 (位于 `foundation:network`)
 
 采用 Retrofit + RxJava 架构。
 如果需要增加新的网络请求，请直接在 `ApiService.kt` 中添加接口：
@@ -325,7 +347,7 @@ NetworkManager.api.getUserInfo()
 
 ***
 
-## 6. 调试工具 CodeLocator
+## 7. 调试工具 CodeLocator
 
 项目已集成字节跳动开源的 `CodeLocator` 插件。
 **如何使用：**

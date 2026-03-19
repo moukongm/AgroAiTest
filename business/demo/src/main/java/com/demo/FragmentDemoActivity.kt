@@ -1,8 +1,8 @@
 package com.demo
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import com.common.base.BaseActivity
+import com.common.base.BaseFragment
 import com.common.utils.ToastUtils
 import com.common.utils.setOnDebouncedClickListener
 import com.demo.databinding.ActivityFragmentDemoBinding
@@ -14,16 +14,15 @@ import android.view.ViewGroup
 /**
  * 演示如何动态添加和移除 Fragment
  */
-class FragmentDemoActivity : AppCompatActivity() {
+class FragmentDemoActivity : BaseActivity<ActivityFragmentDemoBinding>() {
 
-    private lateinit var binding: ActivityFragmentDemoBinding
     private var demoFragment: DemoFragment? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityFragmentDemoBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun getViewBinding(): ActivityFragmentDemoBinding {
+        return ActivityFragmentDemoBinding.inflate(layoutInflater)
+    }
 
+    override fun initView() {
         binding.btnAddFragment.setOnDebouncedClickListener {
             if (demoFragment == null) {
                 demoFragment = DemoFragment()
@@ -48,32 +47,29 @@ class FragmentDemoActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun initData() {
+    }
 }
 
 /**
  * 一个简单的演示 Fragment
  */
-class DemoFragment : Fragment() {
-    private var _binding: FragmentDemoBinding? = null
-    private val binding get() = _binding!!
+class DemoFragment : BaseFragment<FragmentDemoBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentDemoBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentDemoBinding {
+        return FragmentDemoBinding.inflate(inflater, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun initView() {
         binding.tvFragmentContent.setOnDebouncedClickListener {
             ToastUtils.showShort(requireContext(), "点击了 Fragment 内部的内容")
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun initData() {
     }
 }

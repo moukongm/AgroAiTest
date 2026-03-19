@@ -45,6 +45,7 @@ dependencies {
     // 基础 UI 相关
     api(libs.brvah)
     api(libs.androidx.recyclerview)
+    api(libs.androidx.viewpager2)
     
     kapt(libs.arouter.compiler)
 }
