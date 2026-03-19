@@ -106,6 +106,41 @@ git checkout feature/A
 git stash pop                   # 恢复刚才暂存的代码
 ```
 
+### 3.4 使用 Rebase 合并或修改多个 Commit
+
+为了保持主分支历史记录的整洁，在提交 PR/MR 之前，如果你的分支包含大量琐碎的提交（例如 "fix typo", "update", "test"），建议将它们合并为一个完整的 commit。
+
+**1. 启动交互式 rebase**
+假设你要合并最近的 3 次提交：
+```bash
+git rebase -i HEAD~3
+```
+
+**2. 在编辑器中修改命令**
+执行上述命令后，会打开一个文本编辑器，显示类似如下内容：
+```text
+pick 1a2b3c4 feat: 第一步完成
+pick 5d6e7f8 fix: 修复了一个小bug
+pick 9a0b1c2 chore: 更新了一些注释
+```
+将需要合并的提交前面的 `pick` 改为 `squash` (或简写为 `s`)：
+```text
+pick 1a2b3c4 feat: 完整的社区功能
+squash 5d6e7f8 fix: 修复了一个小bug
+squash 9a0b1c2 chore: 更新了一些注释
+```
+保存并退出编辑器。
+
+**3. 编辑合并后的 Commit Message**
+随后会弹出第二个编辑器让你编写合并后的最终提交信息。保留你需要的信息，删除多余的，然后保存退出。
+
+**4. 强制推送到自己的分支**
+由于你修改了历史记录，如果这些 commit 已经推送过，需要强制推送：
+```bash
+git push origin <你的分支名> -f
+```
+> **⚠️ 警告：** 只能在自己独立的开发分支上使用 `git push -f`，**绝对禁止**在 `master` 等公共分支上执行此操作！
+
 ***
 
 ## 4. 🚨 团队红线行为 (绝对禁止)
