@@ -31,6 +31,10 @@ include(":foundation:common")
 include(":foundation:network")
 include(":foundation:storage")
 include(":foundation:webview")
+include(":foundation:uikit")
+
+// Business - Demo
+include(":business:demo")
 
 // Business - Main
 include(":business:main:api")

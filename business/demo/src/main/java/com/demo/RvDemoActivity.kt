@@ -1,4 +1,4 @@
-package com.main.demo
+package com.demo
 
 import android.os.Bundle
 import android.view.View
@@ -6,12 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.chad.library.adapter.base.entity.MultiItemEntity
-import com.common.base.BaseBindingMultiAdapter
+import com.uikit.base.BaseBindingMultiAdapter
 import com.common.utils.ImageLoader
 import com.common.utils.ToastUtils
-import com.main.impl.databinding.ActivityRvDemoBinding
-import com.main.impl.databinding.ItemRvDemoImageBinding
-import com.main.impl.databinding.ItemRvDemoTextBinding
+import com.demo.databinding.ActivityRvDemoBinding
+import com.demo.databinding.ItemRvDemoImageBinding
+import com.demo.databinding.ItemRvDemoTextBinding
 
 /**
  * ============================================

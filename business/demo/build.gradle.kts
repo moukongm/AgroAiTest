@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.common"
+    namespace = "com.demo"
     compileSdk = 34
 
     defaultConfig {
@@ -40,24 +40,16 @@ android {
 }
 
 dependencies {
-    api(libs.androidx.core.ktx)
-    api(libs.androidx.appcompat)
-    api(libs.material)
-    api(libs.androidx.activity)
-    api(libs.androidx.constraintlayout)
-    api(libs.androidx.lifecycle.runtime.ktx)
-    api(libs.androidx.lifecycle.viewmodel.ktx)
-    api(libs.androidx.fragment.ktx)
-
-    api(libs.arouter.api)
+    implementation(project(":foundation:common"))
+    implementation(project(":foundation:network"))
     implementation(project(":foundation:storage"))
-    kapt(libs.arouter.compiler)
+    implementation(project(":foundation:webview"))
+    implementation(project(":foundation:uikit"))
+    
+    // 如果 demo 需要依赖其他业务模块进行跳转测试
+    implementation(project(":business:user:api"))
+    implementation(project(":business:detection:api"))
+    implementation(project(":business:community:api"))
 
-    api(libs.coil)
-    api(libs.rxjava)
-    api(libs.rxandroid)
-    
-    api(libs.permissionx)
-    
-    api(project(":foundation:storage"))
+    kapt(libs.arouter.compiler)
 }

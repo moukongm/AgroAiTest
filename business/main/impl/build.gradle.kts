@@ -42,7 +42,10 @@ android {
 dependencies {
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
+    implementation(project(":foundation:storage"))
     implementation(project(":foundation:webview"))
+    implementation(project(":foundation:uikit"))
+    
     implementation(project(":business:main:api"))
     implementation(project(":business:detection:api"))
     implementation(project(":business:community:api"))

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.common"
+    namespace = "com.uikit"
     compileSdk = 34
 
     defaultConfig {
@@ -40,24 +40,11 @@ android {
 }
 
 dependencies {
-    api(libs.androidx.core.ktx)
-    api(libs.androidx.appcompat)
-    api(libs.material)
-    api(libs.androidx.activity)
-    api(libs.androidx.constraintlayout)
-    api(libs.androidx.lifecycle.runtime.ktx)
-    api(libs.androidx.lifecycle.viewmodel.ktx)
-    api(libs.androidx.fragment.ktx)
-
-    api(libs.arouter.api)
-    implementation(project(":foundation:storage"))
+    api(project(":foundation:common"))
+    
+    // 基础 UI 相关
+    api(libs.brvah)
+    api(libs.androidx.recyclerview)
+    
     kapt(libs.arouter.compiler)
-
-    api(libs.coil)
-    api(libs.rxjava)
-    api(libs.rxandroid)
-    
-    api(libs.permissionx)
-    
-    api(project(":foundation:storage"))
 }

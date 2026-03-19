@@ -48,9 +48,10 @@ setup_env.bat
 
 ### 3.1 Foundation 层 (基础层)
 提供最底层、最通用的技术支撑，不包含任何具体的业务逻辑。所有上层业务模块都可以依赖这一层。
-- **`foundation:common`**：核心基础库，包含 BaseActivity、BaseFragment、各种 Utils 工具类（图片、尺寸、日期、权限等）和通用的自定义 View（TopBar、LoadingDialog）。
+- **`foundation:common`**：核心基础库，包含 BaseActivity、BaseFragment、各种 Utils 工具类（日志、线程、图片、权限等）等纯逻辑和环境相关的通用封装。
+- **`foundation:uikit`**：基础 UI 组件库，包含所有通用的自定义 View、RecyclerView 的高级封装（BaseBindingAdapter）以及 UI 强相关的第三方依赖库（如 BRVAH）。
 - **`foundation:network`**：网络请求模块，封装了 Retrofit + OkHttp + RxJava，统一管理 API 接口、拦截器和证书配置。
-- **`foundation:storage`**：本地存储模块，基于 MMKV 封装，支持高性能、分场景的键值对存储。
+- **`foundation:storage`**：本地存储模块，基于 MMKV 的键值对存储和 Room 数据库的结构化存储。
 - **`foundation:webview`**：网页容器模块，封装了通用的 WebViewActivity 和配置工具。
 
 ### 3.2 Business 层 (业务层)
@@ -63,6 +64,7 @@ setup_env.bat
 - **`business:user`**：用户模块（登录、注册、个人中心）。
 - **`business:detection`**：核心病虫害检测模块。
 - **`business:community`**：社区交流模块。
+- **`business:demo`**：专门用于存放各模块、各基础组件测试与演示代码的模块，与实际主业务代码完全隔离。
 
 ### 2.3 App 层 (壳工程)
 - **`app`**：项目的最终入口。它负责将所有的业务模块（`impl`）打包组合在一起，并进行全局的初始化操作（如在 `App.kt` 中初始化 ARouter、MMKV、网络等）。

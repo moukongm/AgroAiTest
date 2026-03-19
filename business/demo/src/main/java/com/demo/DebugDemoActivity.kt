@@ -1,4 +1,4 @@
-package com.main
+package com.demo
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -14,7 +14,7 @@ import com.common.webview.WebViewActivity
 import com.user.UserService
 import com.detection.DetectionService
 import com.community.CommunityService
-import com.main.impl.databinding.ActivityDebugDemoBinding
+import com.demo.databinding.ActivityDebugDemoBinding
 import com.network.NetworkManager
 import com.common.storage.database.AppDatabase
 import com.common.storage.database.ChatMessage
@@ -25,7 +25,6 @@ import com.common.utils.setOnDebouncedClickListener
 import com.common.utils.toggleVisibility
 import com.common.utils.visible
 import com.common.utils.gone
-import com.main.demo.RvDemoActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers

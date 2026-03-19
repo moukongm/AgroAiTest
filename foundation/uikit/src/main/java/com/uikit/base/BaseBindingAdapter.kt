@@ -1,4 +1,4 @@
-package com.common.base
+package com.uikit.base
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
