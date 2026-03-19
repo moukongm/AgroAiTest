@@ -102,7 +102,68 @@ binding.btnSelect.setOnClickListener {
 }
 ```
 
-### 2.4 其他工具类
+### 2.4 LogUtils (规范化日志工具)
+
+全局统一日志工具，用于替代原生的 `android.util.Log`。
+- **自动 TAG**：无需硬编码，自动提取当前类所在模块及类名作为前缀（如 `main-DebugDemoActivity`）。
+- **超长文本**：自动分段输出，打破 Logcat 4000 字符限制。
+
+```kotlin
+LogUtils.d("这是一条 Debug 日志，无需传 TAG")
+LogUtils.e("发生错误", RuntimeException("error detail"))
+```
+
+### 2.5 ThreadUtils & ThreadPoolManager (多线程调度)
+
+封装了全局线程池和主线程切换，防 OOM 和线程饥饿，替代原生的 `Thread {}.start()`。
+
+```kotlin
+// 切换到主线程
+ThreadUtils.runOnUiThread { binding.tvName.text = "Update" }
+
+// 延迟任务
+ThreadUtils.executeDelayed({ /* 2秒后执行 */ }, 2000)
+
+// 提交耗时 IO 任务 (网络/数据库/文件)
+ThreadUtils.executeByIo { 
+    val data = db.query() 
+    ThreadUtils.runOnUiThread { updateUI(data) }
+}
+
+// 提交 CPU 密集型任务 (计算/大图处理)
+ThreadUtils.executeByCpu { compressImage() }
+```
+
+### 2.6 ViewExt & LiveDataExt (高级扩展函数)
+
+提升开发效率的扩展：
+
+**View 扩展：**
+```kotlin
+// 防抖点击（默认 500ms 内拦截连击）
+binding.btnSubmit.setOnDebouncedClickListener { submit() }
+
+// 可见性切换
+binding.view.visible()
+binding.view.gone()
+binding.view.toggleVisibility()
+
+// 获取真实宽高
+binding.view.afterMeasured { v -> LogUtils.d("Width: ${v.measuredWidth}") }
+```
+
+**LiveData 扩展：**
+```kotlin
+// 自动拦截 null 值
+viewModel.data.observeNonNull(this) { data -> 
+    // data 必定非空
+}
+
+// SingleLiveEvent 解决数据倒灌问题（常用于 Toast/弹窗 等一次性事件）
+val toastEvent = SingleLiveEvent<String>()
+```
+
+### 2.7 其他工具类
 
 - **`ToastUtils`**：全局安全的 Toast，防止内存泄漏。
 - **`DateUtils`**：时间格式化（支持转换为“刚刚”、“x分钟前”）。
@@ -110,7 +171,40 @@ binding.btnSelect.setOnClickListener {
 
 ***
 
-## 3. 网络请求 (位于 `foundation:network`)
+## 3. 本地数据库 (位于 `foundation:storage/database`)
+
+项目集成了 **Room** 数据库，用于存储结构化数据（识别记录、AI 对话等）。所有数据库操作必须在 **IO 线程** 中执行。
+
+### 3.1 实体与 Dao
+数据库定义在 `AppDatabase` 中，包含 `RecognitionDao` 和 `ChatDao`。
+
+### 3.2 使用示例
+结合 RxJava 或者 `ThreadUtils` 进行异步读写：
+
+```kotlin
+// 插入数据示例
+Single.fromCallable {
+    val db = AppDatabase.getInstance(context)
+    val record = RecognitionRecord(
+        imagePath = "/path/to/img",
+        diseaseName = "苹果黑星病",
+        confidence = 0.95f,
+        treatment = "..."
+    )
+    db.recognitionDao().insert(record)
+}
+.subscribeOn(Schedulers.io())
+.observeOn(AndroidSchedulers.mainThread())
+.subscribe({ 
+    ToastUtils.showShort(context, "保存成功") 
+}, { error ->
+    LogUtils.e("保存失败", error)
+})
+```
+
+***
+
+## 4. 网络请求 (位于 `foundation:network`)
 
 采用 Retrofit + RxJava 架构。
 如果需要增加新的网络请求，请直接在 `ApiService.kt` 中添加接口：
@@ -137,7 +231,7 @@ NetworkManager.api.getUserInfo()
 
 ***
 
-## 4. 调试工具 CodeLocator
+## 5. 调试工具 CodeLocator
 
 项目已集成字节跳动开源的 `CodeLocator` 插件。
 **如何使用：**
