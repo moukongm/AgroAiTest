@@ -3,6 +3,7 @@ package com.user
 import androidx.lifecycle.MutableLiveData
 import com.common.base.BaseViewModel
 import com.network.NetworkManager
+import com.agri.pest.client.api.ServiceCode
 import com.agri.pest.client.model.request.LoginRequest
 import com.agri.pest.client.model.request.RegisterRequest
 import com.agri.pest.client.model.response.ResultAuthResponse
@@ -33,7 +34,7 @@ class LoginViewModel : BaseViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ response ->
-                if (response.code == 200 && response.data != null) {
+                if (response.code == ServiceCode.SUCCESS && response.data != null) {
                     // 登录成功，更新 Token
                     response.data!!.token?.let { NetworkManager.setToken(it) }
                 }
@@ -58,9 +59,9 @@ class LoginViewModel : BaseViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ response ->
-                if (response.code == 200 && response.data != null) {
+                if (response.code == ServiceCode.SUCCESS && response.data != null) {
                     // 注册成功，更新 Token
-                    response.data!!.token?.let { NetworkManager.setToken(it) }
+                    response.data?.token?.let { NetworkManager.setToken(it) }
                 }
                 registerResultLiveData.value = response
             }, { error ->

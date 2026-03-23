@@ -60,6 +60,12 @@
             android:text="工具：网络请求 Demo"/>
 
         <Button
+            android:id="@+id/btn_upload_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：文件上传 Demo (上传选择的图片)"/>
+
+        <Button
             android:id="@+id/btn_mmkv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

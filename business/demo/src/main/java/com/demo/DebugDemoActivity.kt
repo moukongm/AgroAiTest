@@ -7,6 +7,7 @@ import com.alibaba.android.arouter.launcher.ARouter
 import com.common.base.BaseActivity
 import com.common.router.RouterPath
 import com.common.storage.MMKVUtils
+import com.common.utils.FileUtils
 import com.common.utils.ImageLoader
 import com.common.utils.ImagePickerUtil
 import com.common.utils.ToastUtils
@@ -16,6 +17,7 @@ import com.detection.DetectionService
 import com.community.CommunityService
 import com.demo.databinding.ActivityDebugDemoBinding
 import com.network.NetworkManager
+import com.agri.pest.client.api.ServiceCode
 import com.common.storage.database.AppDatabase
 import com.common.storage.database.ChatMessage
 import com.common.storage.database.RecognitionRecord
@@ -32,11 +34,18 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.UUID
+import android.net.Uri
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
 @Route(path = RouterPath.DEBUG_DEMO_ACTIVITY)
 class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
 
     private lateinit var imagePickerUtil: ImagePickerUtil
+    private var selectedImageUri: Uri? = null
+    private var lastUploadedImageUrl: String? = null
     
     // 用于演示 LiveDataExt
     private val demoLiveData = MutableLiveData<String>()
@@ -48,8 +57,19 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
     @SuppressLint("CheckResult")
     override fun initView() {
         imagePickerUtil = ImagePickerUtil(this) { uri ->
+            selectedImageUri = uri
             ImageLoader.load(binding.ivDemo, uri.toString())
             ToastUtils.showShort(this, "图片选择成功")
+        }
+
+        binding.btnUploadFile.setOnDebouncedClickListener {
+            val uri = selectedImageUri
+            if (uri == null) {
+                ToastUtils.showShort(this, "请先点击下方的图片选择器选择一张图片")
+                return@setOnDebouncedClickListener
+            }
+
+            uploadImage(uri)
         }
         
         // 演示 LiveData 扩展，监听非空数据
@@ -233,8 +253,10 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
         }
 
         binding.btnImageLoader.setOnDebouncedClickListener {
-            ImageLoader.loadRounded(binding.ivDemo, "https://github.com/lukecc00/PicImg/blob/main/202308082028393.png", 20f)
-            ToastUtils.showShort(this, "正在加载网络图片...")
+            val url = lastUploadedImageUrl ?: "https://github.com/lukecc00/PicImg/blob/main/202308082028393.png"
+            ImageLoader.loadRounded(binding.ivDemo, url, 20f)
+            val msg = if (lastUploadedImageUrl != null) "正在加载刚才上传的图片..." else "加载默认网络图片..."
+            ToastUtils.showShort(this, msg)
         }
 
         binding.btnLocalImageLoader.setOnDebouncedClickListener {
@@ -244,5 +266,54 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
     }
 
     override fun initData() {
+    }
+
+    /**
+     * 文件上传 Demo
+     */
+    private fun uploadImage(uri: Uri) {
+        showLoading("正在上传图片...")
+        
+        // 1. 将 Uri 转换为 File (通常在后台线程执行，避免阻塞 UI)
+        ThreadUtils.executeByIo {
+            val file = FileUtils.uriToFile(this, uri)
+            if (file == null || !file.exists()) {
+                ThreadUtils.runOnUiThread {
+                    hideLoading()
+                    ToastUtils.showShort(this, "文件解析失败")
+                }
+                return@executeByIo
+            }
+
+            // 2. 构造 MultipartBody.Part
+            // 注意: "file" 是后端约定的字段名，必须与接口定义一致
+            val requestFile = file.asRequestBody(FileUtils.getMimeType(file).toMediaTypeOrNull())
+            val part = MultipartBody.Part.createFormData("file", file.name, requestFile)
+
+            // 3. 调用 SDK 接口上传
+             val uploadObservable = NetworkManager.api
+                .uploadFile(part, "uploads/demo/") // prefix 为可选的前缀
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ response ->
+                    hideLoading()
+                    if (response.code == ServiceCode.SUCCESS) {
+                        lastUploadedImageUrl = response.data
+                        LogUtils.d("上传成功: ${response.data}")
+                        ToastUtils.showShort(this, "上传成功！点击下方【加载网络图片】即可查看")
+                    } else {
+                        ToastUtils.showShort(this, "上传失败: ${response.message}")
+                    }
+                }, { error ->
+                    hideLoading()
+                    LogUtils.e("上传异常", error)
+                    ToastUtils.showShort(this, "上传异常: ${error.message}")
+                })
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // 可选：清理上传时产生的临时文件
     }
 }

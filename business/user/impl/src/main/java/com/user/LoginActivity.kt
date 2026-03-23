@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.common.base.BaseActivity
 import com.common.router.RouterPath
+import com.agri.pest.client.api.ServiceCode
 import com.user.databinding.ActivityLoginBinding
 
 @Route(path = RouterPath.USER_LOGIN_ACTIVITY)
@@ -46,7 +47,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
     override fun initData() {
         // 观察登录结果
         viewModel.loginResultLiveData.observe(this) { response ->
-            if (response.code == 200) {
+            if (response.code == ServiceCode.SUCCESS) {
                 binding.tvResult.text = "登录成功！\nToken: ${response.data?.token}\nUserId: ${response.data?.userId}"
                 Toast.makeText(this, "登录成功: ${response.message}", Toast.LENGTH_SHORT).show()
             } else {
@@ -57,7 +58,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
         // 观察注册结果
         viewModel.registerResultLiveData.observe(this) { response ->
-            if (response.code == 200) {
+            if (response.code == ServiceCode.SUCCESS) {
                 binding.tvResult.text = "注册成功！\nToken: ${response.data?.token}\nUserId: ${response.data?.userId}"
                 Toast.makeText(this, "注册成功: ${response.message}", Toast.LENGTH_SHORT).show()
             } else {
