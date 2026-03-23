@@ -19,6 +19,7 @@ arouterCompiler = "1.5.2"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
 gson = "2.10.1"
+agriPestSdkVersion = "v1.0.21"
 
 # Image Loading
 coil = "2.6.0"
@@ -72,6 +73,8 @@ retrofit-adapter-rxjava3 = { group = "com.squareup.retrofit2", name = "adapter-r
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+agriPestSdk = { group = "com.github.lukecc00", name = "AgriPest-Android-SDK", version.ref = "agriPestSdkVersion" }
+
 
 # Image Loading
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }

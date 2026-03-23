@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroAi 登录注册测试 Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 350px; }
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; color: #666; }
+        .tab.active { color: #4CAF50; border-bottom: 2px solid #4CAF50; font-weight: bold; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #333; font-size: 14px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #45a049; }
+        .result { margin-top: 15px; padding: 10px; border-radius: 4px; font-size: 13px; word-wrap: break-word; white-space: pre-wrap; display: none; }
+        .success { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .error { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('login')">登录</div>
+        <div class="tab" onclick="switchTab('register')">注册</div>
+    </div>
+
+    <!-- 登录表单 -->
+    <div id="loginForm">
+        <div class="form-group">
+            <label>用户名/手机号</label>
+            <input type="text" id="loginAccount" placeholder="请输入手机号或用户名" value="13800138134">
+        </div>
+        <div class="form-group">
+            <label>密码</label>
+            <input type="password" id="loginPassword" placeholder="请输入密码" value="P@ssw0rd123">
+        </div>
+        <button onclick="doLogin()">登 录</button>
+    </div>
+
+    <!-- 注册表单 -->
+    <div id="registerForm" style="display: none;">
+        <div class="form-group">
+            <label>用户名 (选填)</label>
+            <input type="text" id="regUsername" placeholder="不填则自动生成">
+        </div>
+        <div class="form-group">
+            <label>手机号</label>
+            <input type="text" id="regPhone" placeholder="请输入手机号" value="13800138134">
+        </div>
+        <div class="form-group">
+            <label>密码</label>
+            <input type="password" id="regPassword" placeholder="请输入密码" value="P@ssw0rd123">
+        </div>
+        <button onclick="doRegister()">注 册</button>
+    </div>
+
+    <div id="resultBox" class="result"></div>
+</div>
+
+<script>
+    const BASE_URL = 'http://115.191.67.35:8080';
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+        document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+        document.getElementById('resultBox').style.display = 'none';
+    }
+
+    function showResult(isSuccess, data) {
+        const box = document.getElementById('resultBox');
+        box.style.display = 'block';
+        box.className = 'result ' + (isSuccess ? 'success' : 'error');
+        box.textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function doLogin() {
+        const account = document.getElementById('loginAccount').value;
+        const password = document.getElementById('loginPassword').value;
+        try {
+            const res = await fetch(`${BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usernameOrPhone: account, password: password })
+            });
+            const data = await res.json();
+            showResult(data.code === 200, data);
+        } catch (e) {
+            showResult(false, { error: e.message });
+        }
+    }
+
+    async function doRegister() {
+        const username = document.getElementById('regUsername').value;
+        const phone = document.getElementById('regPhone').value;
+        const password = document.getElementById('regPassword').value;
+        
+        const payload = { phone, password };
+        if (username.trim() !== '') payload.username = username;
+
+        try {
+            const res = await fetch(`${BASE_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            showResult(data.code === 200, data);
+        } catch (e) {
+            showResult(false, { error: e.message });
+        }
+    }
+</script>
+</body>
+</html>

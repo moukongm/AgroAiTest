@@ -38,4 +38,5 @@ dependencies {
     api(libs.okhttp)
     api(libs.okhttp.logging.interceptor)
     api(libs.gson)
+    api(libs.agriPestSdk)
 }

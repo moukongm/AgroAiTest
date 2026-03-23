@@ -78,15 +78,15 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
         }
 
         binding.btnNetwork.setOnDebouncedClickListener {
-            ToastUtils.showShort(this, "正在请求网络数据...")
+            ToastUtils.showShort(this, "正在请求健康检查接口...")
             NetworkManager.api
-                .getZen()
+                .health()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ response ->
-                    ToastUtils.showShort(this, "网络请求成功! 标题: ${response.title}")
+                    ToastUtils.showShort(this, "健康检查成功! 状态: ${response.data}")
                 }, { error ->
-                    ToastUtils.showShort(this, "网络请求失败: ${error.message}")
+                    ToastUtils.showShort(this, "健康检查失败: ${error.message}")
                 })
         }
 
