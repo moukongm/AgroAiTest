@@ -1,9 +1,11 @@
 package com.user.profile.viewmodel;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -127,12 +129,14 @@ public class ProfileViewModel extends BaseViewModel {
         return userProfileMes;
     }
 
-    public void unLogin() {
+    public void unLogin(Fragment fragment) {
         repository.unLogin();
         ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
             @Override
             public void run() {
+//                fragment.requireActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 ARouter.getInstance().build(RouterPath.USER_LOGIN_ACTIVITY).navigation();
+                fragment.getActivity().finish();
             }
         }, 1000);
 
@@ -261,14 +265,14 @@ public class ProfileViewModel extends BaseViewModel {
     }
 
     //修改密码
-    public void updatePassword(String password) {
+    public void updatePassword(String password,Fragment fragment) {
         Disposable disposable = repository.updatePassword(password).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         response -> {
                             if (response.getCode() == ServiceCode.SUCCESS) {
                                 passwordLivedata.setValue("修改成功，请重新登录");
-                                unLogin();
+                                unLogin(fragment);
                             } else {
                                 passwordLivedata.setValue("修改失败");
                             }

@@ -24,7 +24,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -42,7 +45,7 @@ android {
 dependencies {
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
-    implementation(project(":business:user:api"))
+    api(project(":business:user:api"))
     implementation(project(":foundation:uikit"))
     kapt(libs.arouter.compiler)
 }

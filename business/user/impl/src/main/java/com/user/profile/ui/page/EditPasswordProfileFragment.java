@@ -35,7 +35,7 @@ public class EditPasswordProfileFragment extends BaseFragment<FragmentEditnamePr
 
         binding.tvEditnameOk.setOnClickListener(view -> {
             binding.tvEditnameOk.setEnabled(false);
-            viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()));
+            viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()),this);
         });
 
         LiveDataExtKt.observeNonNull(viewModel.getPasswordLivedata(), this, mes -> {

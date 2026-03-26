@@ -31,7 +31,7 @@ public class SettingProfileFragment extends BaseFragment<FragmentSettingProfileB
             viewModel.popBackstackFragment(this);
         });
         binding.btnSettingUnlogin.setOnClickListener(v -> {
-            viewModel.unLogin();
+            viewModel.unLogin(this);
         });
     }
 
