@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:id = "@+id/replace_fragment"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_mainp_header">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_settitle_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="43dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:backgroundTint="#60ffffff"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="24dp">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="11dp"
+                    android:layout_height="19dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:background="@drawable/ic_etp_back">
+
+                </ImageView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tv_settitle_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="修改昵称"
+            android:textColor="#FFFFFF"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/cv_settitle_back"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/cv_settitle_back" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/alterid_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="87.5dp"
+            android:background="@drawable/shape_stp_bgmain"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id = "@+id/tv_settitle_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="24dp"
+                android:text="请输入你的昵称"
+                android:textColor="#333333"
+                android:textSize="18.3dp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_settitle_editcontainer"
+                android:layout_width="match_parent"
+                android:layout_height="44.1dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="41.6dp"
+                android:layout_marginBottom="1dp"
+                app:cardCornerRadius="14.1dp"
+                app:cardBackgroundColor="#CCFFFFFF"
+                app:cardElevation="0dp"
+                app:layout_constraintTop_toTopOf="@+id/tv_settitle_hint">
+                <EditText
+                    android:id="@+id/et_settitle_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="44.1dp"
+                    android:background="#CCFFFFFF"
+                    android:paddingLeft="12.5dp"
+                    android:textColor="#000000"
+                    android:textSize="18.3dp"
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.cardview.widget.CardView>
+
+
+            <TextView
+                android:id = "@+id/tv_editname_ok"
+                android:layout_width="match_parent"
+                android:layout_height="41.6dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="14.1dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/shape_enp_ok"
+                android:gravity="center"
+                android:text="确认"
+                android:textColor="#ffffff"
+                android:textSize="17.5dp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cv_settitle_editcontainer" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <ProgressBar
+
+            android:id="@+id/editname_profile"
+            android:layout_width="66dp"
+            android:layout_height="66dp"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ProgressBar>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

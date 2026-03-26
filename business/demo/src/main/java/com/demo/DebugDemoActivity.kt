@@ -81,7 +81,7 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             val userService = UserService.api()
             val isLogin = userService.isLogin()
             ToastUtils.showShort(this, "Is Login: $isLogin, User: ${userService.getUserName()}")
-            ARouter.getInstance().build(RouterPath.USER_LOGIN_ACTIVITY).navigation()
+            ARouter.getInstance().build(RouterPath.USER_PROFILE_ACTIVITY).navigation()
         }
 
         binding.btnDetection.setOnDebouncedClickListener {

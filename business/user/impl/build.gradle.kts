@@ -43,6 +43,6 @@ dependencies {
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
     implementation(project(":business:user:api"))
-    
+    implementation(project(":foundation:uikit"))
     kapt(libs.arouter.compiler)
 }
