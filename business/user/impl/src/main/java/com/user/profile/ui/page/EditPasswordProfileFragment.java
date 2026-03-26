@@ -18,38 +18,38 @@ import org.jetbrains.annotations.Nullable;
 public class EditPasswordProfileFragment extends BaseFragment<FragmentEditnameProfileBinding> {
     FragmentEditnameProfileBinding binding;
     ProfileViewModel viewModel;
+
     @NonNull
     @Override
     public FragmentEditnameProfileBinding getViewBinding(@NotNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentEditnameProfileBinding.inflate(inflater,container,false);
+        return FragmentEditnameProfileBinding.inflate(inflater, container, false);
     }
 
     @Override
     public void initView() {
-         binding = getBinding();
-         binding.tvSettitleTitle.setText("修改密码");
-         binding.tvSettitleHint.setText("请输入您的密码");
+        binding = getBinding();
+        binding.tvSettitleTitle.setText("修改密码");
+        binding.tvSettitleHint.setText("请输入您的密码");
 
-         viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
+        viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
 
         binding.tvEditnameOk.setOnClickListener(view -> {
             binding.tvEditnameOk.setEnabled(false);
-             viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()));
+            viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()));
         });
 
-        LiveDataExtKt.observeNonNull(viewModel.getPasswordLivedata(),this, mes -> {
+        LiveDataExtKt.observeNonNull(viewModel.getPasswordLivedata(), this, mes -> {
             binding.tvEditnameOk.setEnabled(true);
-            viewModel.showDialog(getContext(),mes);
-            if("修改成功".equals(mes)){
+            viewModel.showDialog(getContext(), mes);
+            if ("修改成功".equals(mes)) {
                 getParentFragmentManager().popBackStack();
-                Log.d("xzr",mes);
-            }
-            else{
+                Log.d("xzr", mes);
+            } else {
                 binding.etSettitleEdit.setText("");
             }
             return null;
         });
-        binding.cvSettitleBack.setOnClickListener(v ->{
+        binding.cvSettitleBack.setOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
         });
     }

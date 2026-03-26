@@ -25,7 +25,8 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     private ImagePickerUtil imagePicker;
 
 
-    EditnameProfileFragment  editnameProfileFragment;
+    EditnameProfileFragment editnameProfileFragment;
+
     @NonNull
     @Override
     public FragmentEditProfileBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
@@ -37,8 +38,8 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
 
         binding = getBinding();
         viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
-        imagePicker = new ImagePickerUtil(requireActivity(),uri -> {
-            viewModel.getUnloadAvatar(getContext(),uri);
+        imagePicker = new ImagePickerUtil(requireActivity(), uri -> {
+            viewModel.getUnloadAvatar(getContext(), uri);
 //            viewModel.updateImageProfile(getContext(),uri);
             //给服务端发送，然后服务端返回再设置url
 //            ImageLoader.INSTANCE.load(binding.ivSettingTitle, String.valueOf(uri));
@@ -54,7 +55,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
                     .replace(R.id.fl_editprofile, new EditnameProfileFragment())
                     .addToBackStack(null)
                     .commit();
-            LogUtils.INSTANCE.d("ljx","到底能不能点");
+            LogUtils.INSTANCE.d("ljx", "到底能不能点");
 
         });
         binding.tvNewpasswordValue.setOnClickListener(v -> {
@@ -82,33 +83,33 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         });
 
         //修改照片成功
-        LiveDataExtKt.observeNonNull(viewModel.getAvatarLivedata(),this,observer -> {
+        LiveDataExtKt.observeNonNull(viewModel.getAvatarLivedata(), this, observer -> {
             //记得通知其他有用到头像的地方
             //本地数据库也没改
-            Log.d("ljx",observer);
-            ImageLoader.INSTANCE.load(binding.ivSettingTitle,observer);
+            Log.d("ljx", observer);
+            ImageLoader.INSTANCE.load(binding.ivSettingTitle, observer);
 //            binding.editProfile.hide();
             return null;
         });
 
-         //修改结果
-        LiveDataExtKt.observeNonNull(viewModel.getMesEtAvatarLivedata(),this,observer -> {
-            viewModel.showDialog(getContext(),observer);
+        //修改结果
+        LiveDataExtKt.observeNonNull(viewModel.getMesEtAvatarLivedata(), this, observer -> {
+            viewModel.showDialog(getContext(), observer);
             return null;
         });
 
-        LiveDataExtKt.observeNonNull(viewModel.getNickNameLivedata(),this,mes -> {
+        LiveDataExtKt.observeNonNull(viewModel.getNickNameLivedata(), this, mes -> {
             binding.tvNicknameValue.setText(mes);
             return null;
         });
 
-        LiveDataExtKt.observeNonNull(viewModel.getPhoneValueLivedata(),this, mes -> {
+        LiveDataExtKt.observeNonNull(viewModel.getPhoneValueLivedata(), this, mes -> {
             binding.tvPhoneValue.setText(mes);
             return null;
         });
 
 
-        LiveDataExtKt.observeNonNull(viewModel.getCropsValueLivedata(),this, mes -> {
+        LiveDataExtKt.observeNonNull(viewModel.getCropsValueLivedata(), this, mes -> {
             binding.tvCropValue.setText(mes);
             return null;
         });

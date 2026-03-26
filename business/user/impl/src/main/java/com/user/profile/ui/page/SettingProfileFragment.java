@@ -14,11 +14,13 @@ import com.user.profile.viewmodel.ProfileViewModel;
 public class SettingProfileFragment extends BaseFragment<FragmentSettingProfileBinding> {
     FragmentSettingProfileBinding binding;
     ProfileViewModel viewModel;
+
     @NonNull
     @Override
     public FragmentSettingProfileBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentSettingProfileBinding.inflate(inflater,container,false);
+        return FragmentSettingProfileBinding.inflate(inflater, container, false);
     }
+
     @Override
     public void initData() {
 

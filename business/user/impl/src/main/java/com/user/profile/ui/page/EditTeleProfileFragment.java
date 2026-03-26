@@ -19,10 +19,11 @@ import org.jetbrains.annotations.Nullable;
 public class EditTeleProfileFragment extends BaseFragment<FragmentEditnameProfileBinding> {
     FragmentEditnameProfileBinding binding;
     ProfileViewModel viewModel;
+
     @NonNull
     @Override
     public FragmentEditnameProfileBinding getViewBinding(@NotNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentEditnameProfileBinding.inflate(inflater,container,false);
+        return FragmentEditnameProfileBinding.inflate(inflater, container, false);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class EditTeleProfileFragment extends BaseFragment<FragmentEditnameProfil
 
         viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
 
-        binding.cvSettitleBack.setOnClickListener(v ->{
+        binding.cvSettitleBack.setOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
         });
 
@@ -43,14 +44,13 @@ public class EditTeleProfileFragment extends BaseFragment<FragmentEditnameProfil
             viewModel.updatePhone(request);
         });
 
-        LiveDataExtKt.observeNonNull(viewModel.getPhoneLivedata(),this, mes -> {
+        LiveDataExtKt.observeNonNull(viewModel.getPhoneLivedata(), this, mes -> {
             binding.tvEditnameOk.setEnabled(true);
-            viewModel.showDialog(getContext(),mes);
-            if("修改成功".equals(mes)){
+            viewModel.showDialog(getContext(), mes);
+            if ("修改成功".equals(mes)) {
                 getParentFragmentManager().popBackStack();
-                Log.d("xzr",mes);
-            }
-            else{
+                Log.d("xzr", mes);
+            } else {
                 binding.etSettitleEdit.setText("");
             }
             return null;

@@ -15,31 +15,30 @@ import okhttp3.MultipartBody;
 public class UserRemoteDataSource {
 //    private final ApiService api = NetworkManager.INSTANCE.getApi();
 
-    public Single<ResultUserProfileDto> updateUser(ProfileUpdateRequest profileUpdateRequest){
+    public Single<ResultUserProfileDto> updateUser(ProfileUpdateRequest profileUpdateRequest) {
         //写定义好的接口
 
         return NetworkManager.INSTANCE.getApi().updateProfile(profileUpdateRequest);
     }
 
-    public  Single<ResultString> uploadAvatar(MultipartBody.Part part,String fileName){
+    public Single<ResultString> uploadAvatar(MultipartBody.Part part, String fileName) {
         //写定义好的接口
-       return NetworkManager.INSTANCE.getApi().uploadFile(part,fileName);
+        return NetworkManager.INSTANCE.getApi().uploadFile(part, fileName);
     }
 
-    public Single<ResultUserProfileDto> getUserMes(){
+    public Single<ResultUserProfileDto> getUserMes() {
 
         return NetworkManager.INSTANCE.getApi().getCurrentUserProfile();
     }
 
-    public Single<ResultVoid> updatePassword(String mima){
+    public Single<ResultVoid> updatePassword(String mima) {
         return NetworkManager.INSTANCE.getApi().updatePassword(mima);
     }
 
-    public Single<ResultVoid> updatePhone(ChangePhoneRequest request){
+    public Single<ResultVoid> updatePhone(ChangePhoneRequest request) {
         LogUtils.INSTANCE.d("ljxphone", "phone");
         return NetworkManager.INSTANCE.getApi().changePhone(request);
     }
-
 
 
 }

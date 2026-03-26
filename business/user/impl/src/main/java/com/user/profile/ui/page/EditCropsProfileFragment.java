@@ -16,10 +16,11 @@ import org.jetbrains.annotations.Nullable;
 public class EditCropsProfileFragment extends BaseFragment<FragmentEditnameProfileBinding> {
     FragmentEditnameProfileBinding binding;
     ProfileViewModel viewModel;
+
     @NonNull
     @Override
     public FragmentEditnameProfileBinding getViewBinding(@NotNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentEditnameProfileBinding.inflate(inflater,container,false);
+        return FragmentEditnameProfileBinding.inflate(inflater, container, false);
     }
 
     @Override

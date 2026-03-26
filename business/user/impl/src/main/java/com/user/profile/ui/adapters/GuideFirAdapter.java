@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class GuideFirAdapter extends BaseBindingAdapter<String,ItemGuideRegisterBinding> {
+public class GuideFirAdapter extends BaseBindingAdapter<String, ItemGuideRegisterBinding> {
     public GuideFirAdapter(int customLayoutResId, @Nullable List<String> data) {
         super(customLayoutResId, data);
     }

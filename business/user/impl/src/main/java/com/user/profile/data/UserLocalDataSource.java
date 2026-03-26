@@ -7,7 +7,7 @@ import com.tencent.mmkv.MMKV;
 public class UserLocalDataSource {
     private final MMKVInstance mmkv = MMKVUtils.INSTANCE.custom("user_module");
 
-    public void unLogin(){
+    public void unLogin() {
         mmkv.clear();
     }
 
