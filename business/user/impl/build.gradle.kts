@@ -42,8 +42,7 @@ android {
 dependencies {
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
-
-    api(project(":business:user:api"))
-    
+    implementation(project(":business:user:api"))
+    implementation(project(":foundation:uikit"))
     kapt(libs.arouter.compiler)
 }
