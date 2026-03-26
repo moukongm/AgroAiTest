@@ -25,4 +25,5 @@ object RouterPath {
     const val USER_LOGIN_ACTIVITY = "/user/login"     // 登录页面
     const val USER_PROFILE_ACTIVITY = "/user/profile" // 个人中心页面
     const val USER_SERVICE = "/user/service"          // 用户服务接口
+    const val TOKEN_SERVICE = "/user/token"
 }
