@@ -29,12 +29,16 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         binding.btnStartRecord.setOnDebouncedClickListener {
             PermissionUtils.request(
                 this,
-                listOf(android.Manifest.permission.RECORD_AUDIO),
+                listOf(
+                    android.Manifest.permission.RECORD_AUDIO,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ),
                 onGranted = {
                     startRecording()
                 },
                 onDenied = {
-                    ToastUtils.showShort(this, "需要录音权限才能使用语音功能")
+                    ToastUtils.showShort(this, "需要录音和存储权限才能使用语音功能")
                 }
             )
         }
@@ -115,10 +119,9 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
 
         appendLog("----- 开始录音 -----")
         // 启动连接与会话
-        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
         engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_CONNECTION, "")
         engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_SESSION, "")
-        val ret = 0 // engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "") // 避免重复调用
         appendLog("启动引擎结果: $ret")
     }
 
