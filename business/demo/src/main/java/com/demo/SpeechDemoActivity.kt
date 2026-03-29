@@ -114,8 +114,11 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         }
 
         appendLog("----- 开始录音 -----")
-        // 只需发送这一个指令即可，SDK 内部会自动处理连接和会话
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
+        // 启动连接与会话
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_CONNECTION, "")
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_SESSION, "")
+        val ret = 0 // engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "") // 避免重复调用
         appendLog("启动引擎结果: $ret")
     }
 
@@ -124,6 +127,7 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         if (engine == null) return
         appendLog("----- 停止录音 (结束说话) -----")
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_FINISH_TALKING, "")
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_FINISH_SESSION, "")
         appendLog("结束说话结果: $ret")
     }
     
@@ -132,6 +136,8 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         if (engine == null) return
         appendLog("----- 取消录音 -----")
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_STOP_ENGINE, "")
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_CANCEL_SESSION, "")
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_FINISH_CONNECTION, "")
         appendLog("取消录音结果: $ret")
     }
 
