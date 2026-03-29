@@ -30,15 +30,13 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
             PermissionUtils.request(
                 this,
                 listOf(
-                    android.Manifest.permission.RECORD_AUDIO,
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    android.Manifest.permission.RECORD_AUDIO
                 ),
                 onGranted = {
                     startRecording()
                 },
                 onDenied = {
-                    ToastUtils.showShort(this, "需要录音和存储权限才能使用语音功能")
+                    ToastUtils.showShort(this, "需要录音权限才能使用语音功能")
                 }
             )
         }

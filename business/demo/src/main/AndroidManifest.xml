@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- 为了防止在某些设备/版本中因为模块合并导致权限丢失，直接在 demo 模块中也声明一遍 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application>
         <activity android:name=".DebugDemoActivity" android:exported="false"/>
         <activity android:name=".RvDemoActivity" android:exported="false"/>
