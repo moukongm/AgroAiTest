@@ -129,7 +129,21 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
             }
         """.trimIndent()
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, startJson)
+        if (ret != SpeechEngineDefines.ERR_NO_ERROR) {
+            appendLog("启动引擎失败: $ret")
+            return
+        }
+        
         appendLog("启动引擎结果: $ret")
+        
+        // 增加开场白
+        val helloJson = "{\"content\": \"我是小农，有什么病虫害相关的问题你都可以问我呀，我会帮你解答的。\"}"
+        val helloRet = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_EVENT_SAY_HELLO, helloJson)
+        if (helloRet != SpeechEngineDefines.ERR_NO_ERROR) {
+            appendLog("播报开场白失败，返回值: $helloRet")
+        } else {
+            appendLog("播报开场白指令发送成功")
+        }
     }
 
     private fun stopRecording() {
