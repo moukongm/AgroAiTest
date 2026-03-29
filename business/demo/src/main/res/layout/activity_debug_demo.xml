@@ -60,6 +60,12 @@
             android:text="工具：网络请求 Demo"/>
 
         <Button
+            android:id="@+id/btn_speech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="工具：豆包语音 Demo"/>
+
+        <Button
             android:id="@+id/btn_upload_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

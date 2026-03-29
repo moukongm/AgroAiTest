@@ -110,6 +110,10 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
                 })
         }
 
+        binding.btnSpeech.setOnDebouncedClickListener {
+            ARouter.getInstance().build(RouterPath.SPEECH_DEMO_ACTIVITY).navigation()
+        }
+
         binding.btnMmkv.setOnDebouncedClickListener {
             val userStorage = MMKVUtils.custom("user_settings")
             val clickCount = userStorage.getInt("demo_click_count", 0) + 1

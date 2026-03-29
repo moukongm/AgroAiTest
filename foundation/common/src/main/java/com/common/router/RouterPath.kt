@@ -12,6 +12,7 @@ object RouterPath {
     // 调试模块 (Demo Module)
     const val DEBUG_DEMO_ACTIVITY = "/demo/debug_demo" // 调试工具页面
     const val RV_DEMO_ACTIVITY = "/demo/rv_demo"       // 列表工具页面
+    const val SPEECH_DEMO_ACTIVITY = "/demo/speech_demo" // 语音测试页面
 
     // 检测模块 (Detection Module)
     const val DETECTION_ACTIVITY = "/detection/activity" // 识别检测页面

@@ -49,6 +49,9 @@ codelocator = "2.0.4"
 # LeakCanary
 leakcanary = "2.13"
 
+# Voice
+speechengine = "0.0.14.1-bugfix"
+
 [libraries]
 # Android Core
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -107,6 +110,9 @@ codelocator-lancet-all = { group = "com.bytedance.tools.codelocator", name = "co
 
 # LeakCanary
 leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
+
+# Voice
+speechengine-tob = { group = "com.bytedance.speechengine", name = "speechengine_tob", version.ref = "speechengine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
