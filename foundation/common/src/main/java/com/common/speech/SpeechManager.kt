@@ -66,6 +66,10 @@ object SpeechManager {
         speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_PLAYER_PATH_STRING, "") // 空代表使用系统扬声器
         speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL, true)
         
+        // 【关键】告知引擎：自动连接并启动会话
+        speechEngine.setOptionBoolean("dialog_enable_auto_connection", true)
+        speechEngine.setOptionBoolean("dialog_enable_auto_session", true)
+        
         // 开启回声消除 (AEC)
         speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL, false)
         

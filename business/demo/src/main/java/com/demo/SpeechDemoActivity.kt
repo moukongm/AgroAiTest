@@ -116,7 +116,7 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         }
 
         appendLog("----- 开始录音 -----")
-        // Dialog 引擎的启动指令为： DIRECTIVE_START_ENGINE
+        // 如果开启了 auto_connection 和 auto_session，只需要发 DIRECTIVE_START_ENGINE 即可
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
         appendLog("启动引擎结果: $ret")
     }
