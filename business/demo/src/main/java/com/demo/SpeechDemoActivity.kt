@@ -124,7 +124,7 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         val startJson = """
             {
                 "dialog": {
-                    "bot_name": "AgroAi_Bot"
+                    "bot_name": "小农"
                 }
             }
         """.trimIndent()
