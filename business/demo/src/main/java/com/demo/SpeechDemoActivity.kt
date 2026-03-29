@@ -30,7 +30,8 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
             PermissionUtils.request(
                 this,
                 listOf(
-                    android.Manifest.permission.RECORD_AUDIO
+                    android.Manifest.permission.RECORD_AUDIO,
+                    android.Manifest.permission.READ_PHONE_STATE
                 ),
                 onGranted = {
                     startRecording()
@@ -116,8 +117,11 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         }
 
         appendLog("----- 开始录音 -----")
-        // 如果开启了 auto_connection 和 auto_session，只需要发 DIRECTIVE_START_ENGINE 即可
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
+        // 同步停止上一次
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_SYNC_STOP_ENGINE, "")
+        // 发送启动指令
+        val startJson = "{\"dialog\":{\"bot_name\":\"\"}}"
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, startJson)
         appendLog("启动引擎结果: $ret")
     }
 
