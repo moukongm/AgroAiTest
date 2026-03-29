@@ -48,9 +48,9 @@ object SpeechManager {
         //【必需配置】User ID
         speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_UID_STRING, "uid_agro_ai")
 
-        // 【必需配置】地址相关，如果不需要特殊定制，可以考虑不传让SDK使用默认内置域名
-        // speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_ADDRESS_STRING, "wss://openspeech.bytedance.com")
-        // speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_URI_STRING, "/api/v2/dialog")
+        // 【必需配置】地址相关，不能使用 wss://，必须显式传递并使用 https:// 或 http:// 协议头，底层 OkHttpWsClient 会进行转换
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_ADDRESS_STRING, "https://openspeech.bytedance.com")
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_URI_STRING, "/api/v2/dialog")
         
         // 配置日志路径
         val logPath = application.getExternalFilesDir("speech_log")?.absolutePath ?: ""
