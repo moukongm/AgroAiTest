@@ -47,6 +47,10 @@ object SpeechManager {
         
         //【必需配置】User ID
         speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_UID_STRING, "uid_agro_ai")
+
+        // 【必需配置】地址相关：注意这里不能使用 "wss://" 或 "https://" 而是使用特定的 "wss://"
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_ADDRESS_STRING, "wss://openspeech.bytedance.com")
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_URI_STRING, "/api/v2/dialog")
         
         // 配置日志路径
         val logPath = application.getExternalFilesDir("speech_log")?.absolutePath ?: ""
