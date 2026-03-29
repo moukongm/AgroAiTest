@@ -9,6 +9,7 @@ import com.bytedance.speech.speechengine.SpeechEngineGenerator
 object SpeechManager {
     private const val TAG = "SpeechManager"
     private var engine: SpeechEngine? = null
+    private lateinit var application: Application
 
     // 服务接口认证信息
     private const val APP_ID = "6719567355"
@@ -16,6 +17,7 @@ object SpeechManager {
     private const val SECRET_KEY = "RVFJy50ApFUShN-_iBXeA3fRdbV1PWYy"
     
     fun init(application: Application) {
+        this.application = application
         try {
             SpeechEngineGenerator.PrepareEnvironment(application.applicationContext, application)
             engine = SpeechEngineGenerator.getInstance()
@@ -46,6 +48,11 @@ object SpeechManager {
         //【必需配置】User ID
         speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_UID_STRING, "uid_agro_ai")
         
+        // 配置日志路径
+        val logPath = application.getExternalFilesDir("speech_log")?.absolutePath ?: ""
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DEBUG_PATH_STRING, logPath)
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_LOG_LEVEL_STRING, SpeechEngineDefines.LOG_LEVEL_TRACE)
+
         // 配置为在线模式
         speechEngine.setOptionInt(SpeechEngineDefines.PARAMS_KEY_DIALOG_WORK_MODE_INT, SpeechEngineDefines.DIALOG_WORK_MODE_DEFAULT)
 
