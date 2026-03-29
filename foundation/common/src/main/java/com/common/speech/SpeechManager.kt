@@ -14,7 +14,8 @@ object SpeechManager {
     // 服务接口认证信息
     private const val APP_ID = "6719567355"
     private const val ACCESS_TOKEN = "tJ3r4vC1ul8oaCnbDdfSGLYZwkz7zZx0"
-    private const val SECRET_KEY = "RVFJy50ApFUShN-_iBXeA3fRdbV1PWYy"
+    // TODO: 使用日志中服务端期望的正确 AppKey
+    private const val SECRET_KEY = "PlgvMymc7f3tQnJ6"
     
     fun init(application: Application) {
         this.application = application
