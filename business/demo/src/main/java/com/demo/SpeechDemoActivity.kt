@@ -84,22 +84,13 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
                     SpeechEngineDefines.MESSAGE_TYPE_DIALOG_CHAT_RESPONSE -> {
                         try {
                             val resultStr = String(data)
+                            // AI 返回的对话文本和中间状态都是在 content 字段下
+                            // LogUtils.d("SpeechEngine", "CHAT_RESPONSE: $resultStr")
                             val jsonObj = JSONObject(resultStr)
-                            // AI 返回的对话文本
-                            val text = jsonObj.optString("text", "")
-                            // 对话的角色信息
-                            val role = jsonObj.optString("role", "")
-                            val reqId = jsonObj.optString("reqid", "")
                             
-                            // 仅在有文本时展示
-                            if (text.isNotEmpty()) {
-                                // 区分是用户的提问识别还是 AI 的回答
-                                val roleName = if (role == "user") "我" else "小农"
-                                appendLog("[$roleName]: $text")
-                            } else {
-                                // 打印全量结果以便调试
-                                // appendLog("对话结果(空文本): reqId=$reqId")
-                            }
+                            // 豆包 API v3 的返回结构中，实际对话文本可能嵌套在 choices -> messages 或者其他字段中
+                            // 我们可以直接打印整个回调看看数据结构，以便正确解析
+                            appendLog("=> AI: $resultStr")
                         } catch (e: Exception) {
                             appendLog("解析结果异常: ${e.message}")
                         }
@@ -108,19 +99,8 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
                         try {
                             val resultStr = String(data)
                             val jsonObj = JSONObject(resultStr)
-                            val text = jsonObj.optString("text", "")
-                            val isDefinitive = jsonObj.optBoolean("is_definitive", false)
-                            
-                            // ASR（语音识别）的中间状态展示
-                            if (text.isNotEmpty()) {
-                                if (isDefinitive) {
-                                    // 最终识别结果
-                                    appendLog("[识别完成]: $text")
-                                } else {
-                                    // 实时识别过程，为了不刷屏，可以选择不打印或覆盖打印
-                                    // LogUtils.d("SpeechEngine", "识别中: $text")
-                                }
-                            }
+                            // ASR 结果也是，我们先打印出来看看
+                            appendLog("=> ASR: $resultStr")
                         } catch (e: Exception) {
                             // ignore
                         }
