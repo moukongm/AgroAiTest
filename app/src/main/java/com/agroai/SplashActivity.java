@@ -10,6 +10,7 @@ import com.common.base.BaseActivity;
 import com.common.router.RouterPath;
 import com.common.storage.MMKVUtils;
 import com.common.utils.ToastUtils;
+import com.network.NetworkManager;
 import com.user.TokenService;
 import com.user.TokenServiceImpl;
 
@@ -40,6 +41,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
 
     private void checkLogin() {
         if (TokenService.api().isTokenValid()) {
+            NetworkManager.INSTANCE.setToken(MMKVUtils.INSTANCE.custom("user_module").getString("token","1314520"));
             ARouter.getInstance()
                     .build(RouterPath.MAIN_ACTIVITY)
                     .navigation();

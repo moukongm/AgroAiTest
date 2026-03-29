@@ -3,11 +3,13 @@ package com.user.profile.data;
 
 import com.agri.pest.client.model.request.ChangePhoneRequest;
 import com.agri.pest.client.model.request.ProfileUpdateRequest;
+import com.agri.pest.client.model.response.ResultPageResultPostResponseDto;
 import com.agri.pest.client.model.response.ResultString;
 import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.network.NetworkManager;
 
+import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import okhttp3.MultipartBody;
@@ -38,6 +40,9 @@ public class Repository {
         return remoteDataSource.getUserMes();
     }
 
+    public Single<ResultPageResultPostResponseDto> getFavoritesPosts(int page){
+        return remoteDataSource.getFavoritesPosts(page);
+    }
 
     public Single<ResultVoid> updatePassword(String mima) {
         return remoteDataSource.updatePassword(mima);
@@ -45,5 +50,9 @@ public class Repository {
 
     public Single<ResultVoid> updatePhone(ChangePhoneRequest request) {
         return remoteDataSource.updatePhone(request);
+    }
+
+    public Single<ResultPageResultPostResponseDto> getMinePosts(int page){
+        return remoteDataSource.getMinePosts(page);
     }
 }

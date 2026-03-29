@@ -7,6 +7,7 @@ import com.alibaba.android.arouter.launcher.ARouter
 import com.common.base.BaseActivity
 import com.common.router.RouterPath
 import com.main.impl.databinding.ActivityHomeBinding
+import com.main.viewmodel.HomeViewModel
 
 @Route(path = RouterPath.MAIN_ACTIVITY)
 class HomeActivity : BaseActivity<ActivityHomeBinding>() {
@@ -24,10 +25,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
             ARouter.getInstance().build(RouterPath.DEBUG_DEMO_ACTIVITY).navigation()
         }
 
-        // Load HomeFragment
-        supportFragmentManager.beginTransaction()
-            .replace(com.main.impl.R.id.fragment_container, HomeFragment())
-            .commit()
+//        // Load HomeFragment
+//        supportFragmentManager.beginTransaction()
+//            .replace(com.main.impl.R.id.fragment_container, HomeFragment())
+//            .commit()
     }
 
     override fun initData() {

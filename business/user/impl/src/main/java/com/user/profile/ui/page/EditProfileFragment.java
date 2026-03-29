@@ -1,5 +1,6 @@
 package com.user.profile.ui.page;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -38,11 +39,11 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
 
         binding = getBinding();
         viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
+
+        ProfileViewModel vm = viewModel;
+        final Context appContext = requireActivity().getApplicationContext();
         imagePicker = new ImagePickerUtil(requireActivity(), uri -> {
-            viewModel.getUnloadAvatar(getContext(), uri);
-//            viewModel.updateImageProfile(getContext(),uri);
-            //给服务端发送，然后服务端返回再设置url
-//            ImageLoader.INSTANCE.load(binding.ivSettingTitle, String.valueOf(uri));
+            vm.getUnloadAvatar(appContext, uri);
             return null;
         });
 
@@ -58,19 +59,19 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
             LogUtils.INSTANCE.d("ljx", "到底能不能点");
 
         });
-        binding.tvNewpasswordValue.setOnClickListener(v -> {
+        binding.passwordContainer.setOnClickListener(v -> {
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.fl_editprofile, new EditPasswordProfileFragment())
                     .addToBackStack(null)
                     .commit();
         });
-        binding.tvCropValue.setOnClickListener(v -> {
+        binding.cropContainer.setOnClickListener(v -> {
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.fl_editprofile, new GuideFragment())
                     .addToBackStack(null)
                     .commit();
         });
-        binding.tvPhoneValue.setOnClickListener(v -> {
+        binding.phoneContainer.setOnClickListener(v -> {
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.fl_editprofile, new EditTeleProfileFragment())
                     .addToBackStack(null)
@@ -113,11 +114,6 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
             binding.tvCropValue.setText(mes);
             return null;
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override

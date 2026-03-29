@@ -1,11 +1,19 @@
 package com.user.login.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 
 import com.agri.pest.client.api.ServiceCode;
+import com.agri.pest.client.model.request.PostCreateRequest;
 import com.agri.pest.client.model.response.ResultAuthResponse;
 import com.common.base.BaseViewModel;
+import com.common.utils.LogUtils;
+import com.network.NetworkManager;
 import com.user.login.data.LoginRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -23,6 +31,7 @@ public class LoginViewModel extends BaseViewModel {
     private MutableLiveData<Boolean> agreeChecked = new MutableLiveData<>(false);
 
     private final LoginRepository repository = new LoginRepository();
+
 
     public void login(String usernameOrPhone, String password) {
         String phoneError = repository.validatePhone(usernameOrPhone);

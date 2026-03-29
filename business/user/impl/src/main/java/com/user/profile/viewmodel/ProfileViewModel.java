@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.MutableLiveData;
 
+import com.agri.pest.client.model.request.PostCreateRequest;
+import com.agri.pest.client.model.response.PostResponseDto;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.common.base.BaseViewModel;
 import com.common.router.RouterPath;
@@ -16,6 +18,7 @@ import com.common.utils.SingleLiveEvent;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.agri.pest.client.api.ServiceCode;
@@ -25,6 +28,7 @@ import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.common.utils.LogUtils;
 import com.common.utils.ThreadUtils;
 import com.common.utils.ToastUtils;
+import com.network.NetworkManager;
 import com.user.R;
 import com.user.profile.data.Repository;
 
@@ -32,6 +36,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -54,79 +60,100 @@ public class ProfileViewModel extends BaseViewModel {
 
     private final MutableLiveData<String> phoneValueLivedata = new MutableLiveData<>();
     private final MutableLiveData<String> cropsValueLivedata = new MutableLiveData<>();
+    private final MutableLiveData<List<PostResponseDto>> minePostsLivedata = new MutableLiveData<>();
+    private final MutableLiveData<List<PostResponseDto>> mineFavoritePostsLivedata = new MutableLiveData<>();
+    private final MutableLiveData<Integer> favoritesCountLivedata = new MutableLiveData<>();
     private final SingleLiveEvent<String> cropsLivedata = new SingleLiveEvent<>();
 
-    private final MutableLiveData<ResultUserProfileDto> userProfileMes = new MutableLiveData<>();
+    private int currentPagePost = 0;
+    private boolean isLoaddingPost = false;
 
-    public SingleLiveEvent<String> getMesEtLivedata() {
-        return mesEtLivedata;
+    private boolean isHasNext = true;
+
+    private int currentPageFavoritePost = 0;
+    private boolean isLoaddingFavoritePost = false;
+
+    private boolean isHasFavoriteNext = true;
+
+    public int getCurrentPageFavoritePost() {
+        return currentPageFavoritePost;
     }
 
-    public MutableLiveData<String> getCropsLivedata() {
-        return cropsLivedata;
-    }
-
-    public MutableLiveData<String> getCropsValueLivedata() {
-        return cropsValueLivedata;
-    }
-
-    public MutableLiveData<String> getPhoneValueLivedata() {
-        return phoneValueLivedata;
-    }
-
-
-    public ProfileViewModel() {
-        repository = new Repository();
-    }
-
-    public SingleLiveEvent<String> getPhoneLivedata() {
-        return phoneLivedata;
-    }
-
-    public SingleLiveEvent<String> getMesEtAvatarLivedata() {
-        return mesEtAvatarLivedata;
-    }
-
-    public SingleLiveEvent<String> getMesEtnameLivedata() {
-        return mesEtLivedata;
-    }
-
-    public SingleLiveEvent<String> getMesNameLivedata() {
-        return mesNameLivedata;
-    }
-
-    public MutableLiveData<String> getAvatarLivedata() {
-        return avatarLivedata;
-    }
-
-    public MutableLiveData<String> getNickNameLivedata() {
-        return nickNameLivedata;
-    }
-
-    //    //修改昵称
-//    public void updateNickname(String phoneNumber, String newName) {
-//        if (isNicknameVaild(newName)) {
-//            Disposable disposable = repository.updateNickname(phoneNumber, newName)
-//                    .subscribeOn(Schedulers.io()).
-//                    observeOn(AndroidSchedulers.mainThread()).
-//                    subscribe(reponse -> {
-//                        if (reponse.isSuccess()) {
-//                            Log.d("ljx", "setvalue");
-//                            mesEtLivedata.setValue("修改成功");
-//                            nickNameLivedata.setValue(newName);
-//                        } else {
-//                            mesEtLivedata.setValue("修改失败");
+    private List<PostResponseDto> list = new ArrayList<>();
+    private List<PostResponseDto> favoriteList = new ArrayList<>();
+//    public void setpost(){
+//        Log.d("xzr","fabu");
+//        List<String> list1 = new ArrayList<>();
+//        list1.add("https://th.bing.com/th/id/R.f5ae2e9a9976bee71d118dd402d80658?rik=nJChOY5iJSFRhQ&riu=http%3a%2f%2fimg3.redocn.com%2f20140308%2fRedocn_2014030311195180.jpg&ehk=9QqSiDRFgnBUaxV3u38ZMjQcWmYatan1pQzsCfbLFao%3d&risl=&pid=ImgRaw&r=0");
+//        list1.add("https://tse4.mm.bing.net/th/id/OIP.RsyXumNgAOqnJ0EsYgEmXwHaE8?rs=1&pid=ImgDetMain&o=7&rm=3");
+//        List<String> list2 = new ArrayList<>();
+//        list2.add("水稻");
+//        list2.add("高远");
+//        Disposable subscribe = NetworkManager.INSTANCE.getApi().createPost(new PostCreateRequest("不高兴和没头脑", "就是虚招如和刘耀恒", list1
+//                        , list2)).observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.io())
+//                .subscribe(
+//                        response -> {
+//                            if (response.getCode() == ServiceCode.SUCCESS) {
+//                                Log.d("xzr","fabuchenggong");
+//                                getFirstPosts();
+//                            } else {
+//                                Log.d("xzr","fabushibai");
+//                            }
+//
+//                        },
+//                        error -> {
+//                            Log.d("xzr","error");
+//                            LogUtils.INSTANCE.d("xzr",error.getMessage());
 //                        }
-//                    });
 //
-//            addDisposable(disposable);
-//
-    public SingleLiveEvent<String> getPasswordLivedata() {
-        return passwordLivedata;
+//                );
+//        addDisposable(subscribe);
+//    }
+
+    //第一次我的帖子
+    public void getFirstPosts() {
+        currentPagePost = 0;
+        isHasNext = true;
+        list.clear();
+        loadMinePosts();
     }
 
-    public MutableLiveData<ResultUserProfileDto> getUserProfileMes() {
-        return userProfileMes;
+    //后续加载
+    public void getMorePosts() {
+        if (isLoaddingPost) {
+            return;
+        }
+        if (!isHasNext) {
+            return;
+        }
+        loadMinePosts();
+    }
+
+    public void loadMinePosts() {
+        LogUtils.INSTANCE.d("ljxtyswy","load");
+        Disposable disposable = repository.getMinePosts(currentPagePost).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            if (response.getCode() == ServiceCode.SUCCESS) {
+                                list.addAll(response.getData().getList());
+                                isLoaddingPost = false;
+                                currentPagePost++;
+                                isHasNext = response.getData().getHasNext();
+                                minePostsLivedata.setValue(list);
+                                LogUtils.INSTANCE.d("ljxtyswy","ok");
+                            } else {
+                                LogUtils.INSTANCE.d("ljxtyswy","notok");
+                            }
+
+                        },
+                        error -> {
+                            LogUtils.INSTANCE.e("ljxtyswy",error);
+                        }
+
+                );
+        addDisposable(disposable);
     }
 
     public void unLogin(Fragment fragment) {
@@ -148,17 +175,67 @@ public class ProfileViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         response -> {
-                            LogUtils.INSTANCE.d("ljx", "nameok");
-//                            userProfileMes.setValue(response);
-                            nickNameLivedata.setValue(response.getData().getFullName());
-                            avatarLivedata.setValue(response.getData().getAvatarUrl());
-                            phoneValueLivedata.setValue(response.getData().getPhone());
-                            String cropsReslut = response.getData().getFollowedCrops().toString();
-                            cropsValueLivedata.setValue(cropsReslut.substring(1, cropsReslut.length() - 1));
+                            if (response.getCode() == ServiceCode.SUCCESS) {
+                                LogUtils.INSTANCE.d("ljx", "nameok");
+                                nickNameLivedata.setValue(response.getData().getFullName());
+                                avatarLivedata.setValue(response.getData().getAvatarUrl());
+                                phoneValueLivedata.setValue(response.getData().getPhone());
+                                String cropsReslut = response.getData().getFollowedCrops().toString();
+                                cropsValueLivedata.setValue(cropsReslut.substring(1, cropsReslut.length() - 1));
+                                phoneLivedata.setValue("修改成功");
+                            } else {
+
+                                phoneLivedata.setValue("修改失败");
+                            }
+
                         },
                         error -> {
                             LogUtils.INSTANCE.d(error.getMessage());
 
+                        }
+
+                );
+        addDisposable(disposable);
+    }
+
+    //第一次我的收藏帖子
+    public void getFirstFavoritePosts() {
+        currentPageFavoritePost = 0;
+        isHasFavoriteNext = true;
+        favoriteList.clear();
+        loadMineFavoritePosts();
+    }
+
+    //后续收藏帖子加载
+    public void getMoreFavoritePosts() {
+        if (isLoaddingFavoritePost) {
+            return;
+        }
+        if (!isHasFavoriteNext) {
+            return;
+        }
+        loadMineFavoritePosts();
+    }
+
+    //加载收藏帖子
+    public void loadMineFavoritePosts() {
+        Disposable disposable = repository.getFavoritesPosts(currentPageFavoritePost).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            if (response.getCode() == ServiceCode.SUCCESS) {
+                                favoriteList.addAll(response.getData().getList());
+                                isLoaddingFavoritePost = false;
+                                currentPageFavoritePost++;
+                                isHasFavoriteNext = response.getData().getHasNext();
+                                mineFavoritePostsLivedata.setValue(favoriteList);
+                            } else {
+
+                            }
+
+                        },
+                        error -> {
+                            LogUtils.INSTANCE.d(error.getMessage());
                         }
 
                 );
@@ -265,7 +342,7 @@ public class ProfileViewModel extends BaseViewModel {
     }
 
     //修改密码
-    public void updatePassword(String password,Fragment fragment) {
+    public void updatePassword(String password, Fragment fragment) {
         Disposable disposable = repository.updatePassword(password).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -397,6 +474,74 @@ public class ProfileViewModel extends BaseViewModel {
         if (fragment != null && fragment.getActivity() != null) {
             fragment.getActivity().getSupportFragmentManager().popBackStack();
         }
+    }
+
+
+    private final MutableLiveData<ResultUserProfileDto> userProfileMes = new MutableLiveData<>();
+
+    public SingleLiveEvent<String> getMesEtLivedata() {
+        return mesEtLivedata;
+    }
+
+    public MutableLiveData<String> getCropsLivedata() {
+        return cropsLivedata;
+    }
+
+    public MutableLiveData<String> getCropsValueLivedata() {
+        return cropsValueLivedata;
+    }
+
+    public MutableLiveData<String> getPhoneValueLivedata() {
+        return phoneValueLivedata;
+    }
+
+
+    public MutableLiveData<List<PostResponseDto>> getMinePostsLivedata() {
+        return minePostsLivedata;
+    }
+
+    public MutableLiveData<List<PostResponseDto>> getMineFavoritePostsLivedata() {
+        return mineFavoritePostsLivedata;
+    }
+
+    public ProfileViewModel() {
+        repository = new Repository();
+    }
+
+    public SingleLiveEvent<String> getPhoneLivedata() {
+        return phoneLivedata;
+    }
+
+    public SingleLiveEvent<String> getMesEtAvatarLivedata() {
+        return mesEtAvatarLivedata;
+    }
+
+    public SingleLiveEvent<String> getMesEtnameLivedata() {
+        return mesEtLivedata;
+    }
+
+    public SingleLiveEvent<String> getMesNameLivedata() {
+        return mesNameLivedata;
+    }
+
+    public MutableLiveData<String> getAvatarLivedata() {
+        return avatarLivedata;
+    }
+
+    public MutableLiveData<String> getNickNameLivedata() {
+        return nickNameLivedata;
+    }
+
+    public MutableLiveData<Integer> getFavoritesCountLivedata() {
+        return favoritesCountLivedata;
+    }
+
+    public SingleLiveEvent<String> getPasswordLivedata() {
+        return passwordLivedata;
+    }
+
+    public MutableLiveData<ResultUserProfileDto> getUserProfileMes() {
+        return userProfileMes;
     }
 
 }
