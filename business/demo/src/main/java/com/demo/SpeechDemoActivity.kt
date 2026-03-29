@@ -119,8 +119,15 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         appendLog("----- 开始录音 -----")
         // 同步停止上一次
         engine.sendDirective(SpeechEngineDefines.DIRECTIVE_SYNC_STOP_ENGINE, "")
-        // 发送启动指令
-        val startJson = "{\"dialog\":{\"bot_name\":\"\"}}"
+        // 发送启动指令，并在这里配置机器人的身份/音色等信息
+        // bot_name: 对应您在豆包火山引擎后台配置的机器人角色名称
+        val startJson = """
+            {
+                "dialog": {
+                    "bot_name": "AgroAi_Bot"
+                }
+            }
+        """.trimIndent()
         val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, startJson)
         appendLog("启动引擎结果: $ret")
     }
