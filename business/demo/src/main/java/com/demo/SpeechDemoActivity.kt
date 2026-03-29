@@ -116,9 +116,8 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         }
 
         appendLog("----- 开始录音 -----")
-        // 豆包端到端语音 SDK 要求调用 START_CONNECTION 和 START_SESSION 
-        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_CONNECTION, "")
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_SESSION, "")
+        // Dialog 引擎的启动指令为： DIRECTIVE_START_ENGINE
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
         appendLog("启动引擎结果: $ret")
     }
 
@@ -126,7 +125,7 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         val engine = SpeechManager.getEngine()
         if (engine == null) return
         appendLog("----- 停止录音 (结束说话) -----")
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_FINISH_SESSION, "")
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_FINISH_TALKING, "")
         appendLog("结束说话结果: $ret")
     }
     
@@ -134,8 +133,7 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         val engine = SpeechManager.getEngine()
         if (engine == null) return
         appendLog("----- 取消录音 -----")
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_CANCEL_SESSION, "")
-        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_FINISH_CONNECTION, "")
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_STOP_ENGINE, "")
         appendLog("取消录音结果: $ret")
     }
 
