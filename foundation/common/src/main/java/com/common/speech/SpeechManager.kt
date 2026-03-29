@@ -45,9 +45,15 @@ object SpeechManager {
         
         //【必需配置】User ID
         speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_UID_STRING, "uid_agro_ai")
+        
+        // 配置为在线模式
+        speechEngine.setOptionInt(SpeechEngineDefines.PARAMS_KEY_DIALOG_WORK_MODE_INT, SpeechEngineDefines.DIALOG_WORK_MODE_DEFAULT)
 
         // 启用内置录音机和播放器以支持实时对话
-        speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_RECORDER_AUDIO_CALLBACK_BOOL, true)
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_RECORDER_PATH_STRING, "") // 空代表使用系统麦克风
+        speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_DIALOG_PLAYER_PATH_STRING, "") // 空代表使用系统扬声器
+        // 这里必须不要设置 callback bool 为 true，否则会接管底层的数据导致无法播放和录音
+        // speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_RECORDER_AUDIO_CALLBACK_BOOL, true)
         speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL, true)
         
         // 开启回声消除 (AEC)
