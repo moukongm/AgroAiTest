@@ -116,9 +116,9 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         }
 
         appendLog("----- 开始录音 -----")
-        // 按照火山语音 SDK 对话模式的生命周期顺序：
-        // 1. 开始引擎工作
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_START_ENGINE, "")
+        // 豆包端到端语音 SDK 要求调用 START_CONNECTION 和 START_SESSION 
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_CONNECTION, "")
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_START_SESSION, "")
         appendLog("启动引擎结果: $ret")
     }
 
@@ -126,7 +126,7 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         val engine = SpeechManager.getEngine()
         if (engine == null) return
         appendLog("----- 停止录音 (结束说话) -----")
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_FINISH_TALKING, "")
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_FINISH_SESSION, "")
         appendLog("结束说话结果: $ret")
     }
     
@@ -134,7 +134,8 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
         val engine = SpeechManager.getEngine()
         if (engine == null) return
         appendLog("----- 取消录音 -----")
-        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_STOP_ENGINE, "")
+        val ret = engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_CANCEL_SESSION, "")
+        engine.sendDirective(SpeechEngineDefines.DIRECTIVE_DIALOG_FINISH_CONNECTION, "")
         appendLog("取消录音结果: $ret")
     }
 
