@@ -45,6 +45,17 @@ object SpeechManager {
         
         //【必需配置】User ID
         speechEngine.setOptionString(SpeechEngineDefines.PARAMS_KEY_UID_STRING, "uid_agro_ai")
+
+        // 启用内置录音机和播放器以支持实时对话
+        speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_RECORDER_AUDIO_CALLBACK_BOOL, true)
+        speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL, true)
+        
+        // 开启回声消除 (AEC)
+        speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL, true)
+        
+        // 初始化引擎
+        val ret = speechEngine.initEngine()
+        Log.i(TAG, "Speech engine init result: $ret")
         
         Log.i(TAG, "Speech engine setup completed")
     }
