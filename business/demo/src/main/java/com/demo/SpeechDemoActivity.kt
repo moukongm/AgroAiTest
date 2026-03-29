@@ -112,10 +112,6 @@ class SpeechDemoActivity : BaseActivity<ActivitySpeechDemoBinding>() {
             ToastUtils.showShort(this, "语音引擎未初始化")
             return
         }
-        
-        // 确保引擎已经初始化
-        val initRet = engine.initEngine()
-        appendLog("引擎Init结果: $initRet")
 
         appendLog("----- 开始录音 -----")
         // 启动连接与会话

@@ -64,7 +64,7 @@ object SpeechManager {
         speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_DIALOG_ENABLE_PLAYER_BOOL, true)
         
         // 开启回声消除 (AEC)
-        speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL, true)
+        speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL, false)
         
         // 初始化引擎
         val ret = speechEngine.initEngine()
