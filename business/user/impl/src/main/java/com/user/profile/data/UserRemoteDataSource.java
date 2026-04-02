@@ -12,6 +12,7 @@ import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.common.utils.LogUtils;
 import com.network.NetworkManager;
+import com.user.TokenService;
 import com.user.login.data.LoginRepository;
 import com.user.login.data.UserStorageConstant;
 
@@ -25,7 +26,6 @@ import okhttp3.MultipartBody;
 
 public class UserRemoteDataSource {
 
-    private final LoginRepository loginRepository = new LoginRepository();
 
     public Single<ResultUserProfileDto> updateUser(ProfileUpdateRequest profileUpdateRequest) {
         return NetworkManager.INSTANCE.getApi().updateProfile(profileUpdateRequest)
@@ -125,27 +125,12 @@ public class UserRemoteDataSource {
         return false;
     }
     private Flowable<?> refreshTokenAndRetry() {
-        return loginRepository.refresh()
-                .subscribeOn(Schedulers.io())
-                .toFlowable()
-                .flatMap(response -> {
-                    if (response.getCode() == ServiceCode.SUCCESS) {
-                        AuthResponse data = response.getData();
-                        NetworkManager.INSTANCE.setToken(data.getToken());
-                        UserStorageConstant.saveToken(data.getToken());
-                        UserStorageConstant.saveRefreshToken(data.getRefreshToken());
-                        UserStorageConstant.saveExpiresIn(data.getExpiresIn());
-                        LogUtils.INSTANCE.d("TokenRefresh", "token刷新成功");
-                        //这里返回空的之后，上层会再次发送请求；
-                        return Flowable.empty();
-                    } else {
-                        //上层会往下传递
-                        return Flowable.error(new Exception("刷新token失败"));
-                    }
-                })
-                .onErrorResumeNext(error -> {
-                    LogUtils.INSTANCE.e("TokenRefresh", error);
-                    return Flowable.error(error);
-                });
+        if(TokenService.api().refreshToken()){
+            LogUtils.INSTANCE.d("TokenRefresh", "token刷新成功");
+            return Flowable.empty();
+        }
+        else{
+            return Flowable.error(new Exception("刷新token失败"));
+        }
     }
 }

@@ -6,8 +6,9 @@ package com.common.router
  */
 object RouterPath {
     // 首页模块 (Main Module)
-    const val MAIN_ACTIVITY = "/main/activity" // 首页 Activity
+    const val MAIN_ACTIVITY = "/main/activity"
     const val MAIN_SERVICE = "/main/service"   // 首页对外服务接口
+    const val HOME_FRAGMENT = "/home/fragment" // 首页 Fragment
 
     // 调试模块 (Demo Module)
     const val DEBUG_DEMO_ACTIVITY = "/demo/debug_demo" // 调试工具页面

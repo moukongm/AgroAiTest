@@ -56,7 +56,7 @@ public class SmsLoginFragment extends BaseFragment<FragmentSmsloginBinding> {
                 ToastUtils.INSTANCE.showShort(requireContext(), "登录成功:" + response.getMessage());
                 ToastUtils.INSTANCE.showShort(requireContext(), "默认密码为:" + response.getData().getGeneratedPassword());
                 ARouter.getInstance()
-                        .build(RouterPath.MAIN_ACTIVITY)
+                        .build(RouterPath.HOME_FRAGMENT)
                         .navigation();
                 LoginActivity activity = (LoginActivity) getActivity();
                 activity.finish();

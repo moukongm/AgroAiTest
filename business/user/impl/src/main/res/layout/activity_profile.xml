@@ -8,190 +8,197 @@
     android:clickable="true"
     android:focusable="true"
     android:fitsSystemWindows="true">
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/profile_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tv_top_posts"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/profile_header"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="16dp"
-                android:text="我的帖子"
-                android:textColor="#1A1A1A"
-                android:textSize="18sp"
-                android:textStyle="bold"
+
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cv_user_head"
-                android:layout_width="66.9dp"
-                android:layout_height="66.9dp"
-                android:layout_marginTop="79.1dp"
-                app:cardCornerRadius="33.45dp"
-                app:cardElevation="0dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tv_top_posts"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="16dp"
+                    android:text="我的帖子"
+                    android:textColor="#1A1A1A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_user_head"
+                    android:layout_width="66.9dp"
+                    android:layout_height="66.9dp"
+                    android:layout_marginTop="59.1dp"
+                    app:cardCornerRadius="33.45dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                    <ImageView
-                        android:id="@+id/user_head"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/ic_etp_settitle"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/user_head"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/ic_etp_settitle"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
 
 
-            <TextView
-                android:id="@+id/user_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="用户2759"
-                android:textColor="@android:color/white"
-                android:textSize="23.3dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cv_user_head" />
+                <TextView
+                    android:id="@+id/user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="用户2759"
+                    android:textColor="@android:color/white"
+                    android:textSize="23.3dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cv_user_head" />
 
 
-            <TextView
-                android:id="@+id/user_fanscnt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="71.6dp"
-                android:layout_marginTop="219.1dp"
-                android:text="8"
-                android:textColor="@android:color/white"
-                android:textSize="15dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/user_fanscnt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="71.6dp"
+                    android:layout_marginTop="200.1dp"
+                    android:text="8"
+                    android:textColor="@android:color/white"
+                    android:textSize="15dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_fans_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="他的收藏"
-                android:textColor="@android:color/white"
-                android:textSize="15dp"
-                app:layout_constraintLeft_toLeftOf="@+id/user_fanscnt"
-                app:layout_constraintRight_toRightOf="@+id/user_fanscnt"
-                app:layout_constraintTop_toBottomOf="@+id/user_fanscnt" />
-
-
-            <TextView
-                android:id="@+id/user_historycnt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="219.1dp"
-                android:text="16"
-                android:textColor="@android:color/white"
-                android:textSize="15dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_history_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="识别记录"
-                android:textColor="@android:color/white"
-                android:textSize="15dp"
-                app:layout_constraintLeft_toLeftOf="@+id/user_historycnt"
-                app:layout_constraintRight_toRightOf="@+id/user_historycnt"
-                app:layout_constraintTop_toBottomOf="@id/user_historycnt" />
+                <TextView
+                    android:id="@+id/tv_fans_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="他的收藏"
+                    android:textColor="@android:color/white"
+                    android:textSize="15dp"
+                    app:layout_constraintLeft_toLeftOf="@+id/user_fanscnt"
+                    app:layout_constraintRight_toRightOf="@+id/user_fanscnt"
+                    app:layout_constraintTop_toBottomOf="@+id/user_fanscnt" />
 
 
-            <ImageView
-                android:id="@+id/mine_set"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:layout_marginTop="54.1dp"
-                android:layout_marginRight="60.8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/ic_mainp_setting"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/user_historycnt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="200.1dp"
+                    android:text="16"
+                    android:textColor="@android:color/white"
+                    android:textSize="15dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/mine_share"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:layout_marginTop="54.1dp"
-                android:layout_marginRight="23.75dp"
-                android:src="@drawable/ic_mainp_toother"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-            <ImageView
-                android:id="@+id/iv_editprofile"
-                android:layout_width="100dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="227.5dp"
-                android:layout_marginRight="26.6dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/ic_mainp_toedit"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tv_history_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="识别记录"
+                    android:textColor="@android:color/white"
+                    android:textSize="15dp"
+                    app:layout_constraintLeft_toLeftOf="@+id/user_historycnt"
+                    app:layout_constraintRight_toRightOf="@+id/user_historycnt"
+                    app:layout_constraintTop_toBottomOf="@id/user_historycnt" />
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/posts_container"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@drawable/shape_mainp_bgmain"
-            android:clipToPadding="false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_header">
+                <ImageView
+                    android:id="@+id/mine_set"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
+                    android:layout_marginTop="24.1dp"
+                    android:layout_marginRight="60.8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_mainp_setting"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_my_posts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="16dp"
-                android:text="我的帖子"
-                android:textColor="#1A1A1A"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/mine_share"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
+                    android:layout_marginTop="24.1dp"
+                    android:layout_marginRight="23.75dp"
+                    android:src="@drawable/ic_mainp_toother"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/user_post_rec"
+
+                <ImageView
+                    android:id="@+id/iv_editprofile"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="207.5dp"
+                    android:layout_marginRight="26.6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_mainp_toedit"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/posts_container"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="8dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_mainp_bgmain"
                 android:clipToPadding="false"
-                android:paddingBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_my_posts" />
+                app:layout_constraintTop_toBottomOf="@id/profile_header">
+
+                <TextView
+                    android:id="@+id/tv_my_posts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="16dp"
+                    android:text="我的帖子"
+                    android:textColor="#1A1A1A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/user_post_rec"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:paddingBottom="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_my_posts" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
 
 </FrameLayout>

@@ -62,7 +62,7 @@ public class ProfileViewModel extends BaseViewModel {
     private final MutableLiveData<String> cropsValueLivedata = new MutableLiveData<>();
     private final MutableLiveData<List<PostResponseDto>> minePostsLivedata = new MutableLiveData<>();
     private final MutableLiveData<List<PostResponseDto>> mineFavoritePostsLivedata = new MutableLiveData<>();
-    private final MutableLiveData<Integer> favoritesCountLivedata = new MutableLiveData<>();
+    private final MutableLiveData<Long> favoritesCountLivedata = new MutableLiveData<>();
     private final SingleLiveEvent<String> cropsLivedata = new SingleLiveEvent<>();
 
     private int currentPagePost = 0;
@@ -81,35 +81,78 @@ public class ProfileViewModel extends BaseViewModel {
 
     private List<PostResponseDto> list = new ArrayList<>();
     private List<PostResponseDto> favoriteList = new ArrayList<>();
-//    public void setpost(){
-//        Log.d("xzr","fabu");
+
+//    public void setpost() {
+//        Log.d("xzr", "fabu");
 //        List<String> list1 = new ArrayList<>();
-//        list1.add("https://th.bing.com/th/id/R.f5ae2e9a9976bee71d118dd402d80658?rik=nJChOY5iJSFRhQ&riu=http%3a%2f%2fimg3.redocn.com%2f20140308%2fRedocn_2014030311195180.jpg&ehk=9QqSiDRFgnBUaxV3u38ZMjQcWmYatan1pQzsCfbLFao%3d&risl=&pid=ImgRaw&r=0");
-//        list1.add("https://tse4.mm.bing.net/th/id/OIP.RsyXumNgAOqnJ0EsYgEmXwHaE8?rs=1&pid=ImgDetMain&o=7&rm=3");
+//        list1.add("https://s1.aigei.com/src/img/png/86/8624ec6bc43d47ae9a07990cca965d90.png?imageMogr2/auto-orient/thumbnail/!282x282r/gravity/Center/crop/282x282/quality/85/%7CimageView2/2/w/282&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:uRsVTTvJlcApVbNOMB7m5S4eD_4=");
+//        list1.add("https://s1.aigei.com/src/img/png/3a/3a3643b6c7244fdcac81503ad91d5314.png?imageMogr2/auto-orient/thumbnail/!282x320r/crop/!282x320a0a0/quality/85/%7CimageView2/2/w/282&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:edv9hg6dnIA8yyppPwrI9dEsWkM=");
+//        list1.add("https://tse1.mm.bing.net/th/id/OIP.W97UAGY1NoNMVd8icKgLsAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3");
 //        List<String> list2 = new ArrayList<>();
-//        list2.add("水稻");
-//        list2.add("高远");
+//        list2.add("玉米");
+//        list2.add("莲藕");
 //        Disposable subscribe = NetworkManager.INSTANCE.getApi().createPost(new PostCreateRequest("不高兴和没头脑", "就是虚招如和刘耀恒", list1
 //                        , list2)).observeOn(AndroidSchedulers.mainThread())
 //                .subscribeOn(Schedulers.io())
 //                .subscribe(
 //                        response -> {
 //                            if (response.getCode() == ServiceCode.SUCCESS) {
-//                                Log.d("xzr","fabuchenggong");
+//                                Log.d("xzr", "fabuchenggong");
 //                                getFirstPosts();
 //                            } else {
-//                                Log.d("xzr","fabushibai");
+//                                Log.d("xzr", "fabushibai");
 //                            }
 //
 //                        },
 //                        error -> {
-//                            Log.d("xzr","error");
-//                            LogUtils.INSTANCE.d("xzr",error.getMessage());
+//                            Log.d("xzr", "error");
+//                            LogUtils.INSTANCE.d("xzr", error.getMessage());
 //                        }
 //
 //                );
 //        addDisposable(subscribe);
 //    }
+
+    public void starPost(){
+        Disposable subscribe = NetworkManager.INSTANCE.getApi().favoritePost(35).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            if (response.getCode() == ServiceCode.SUCCESS) {
+                                Log.d("xzr", "fabuchenggong");
+                                getFirstPosts();
+                            } else {
+                                Log.d("xzr", "fabushibai");
+                            }
+
+                        },
+                        error -> {
+                            Log.d("xzr", "error");
+                            LogUtils.INSTANCE.d("xzr", error.getMessage());
+                        }
+
+                );
+        addDisposable(subscribe);
+        Disposable subscribe1 = NetworkManager.INSTANCE.getApi().favoritePost(36).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            if (response.getCode() == ServiceCode.SUCCESS) {
+                                Log.d("xzr", "fabuchenggong");
+                                getFirstPosts();
+                            } else {
+                                Log.d("xzr", "fabushibai");
+                            }
+
+                        },
+                        error -> {
+                            Log.d("xzr", "error");
+                            LogUtils.INSTANCE.d("xzr", error.getMessage());
+                        }
+
+                );
+        addDisposable(subscribe1);
+    }
 
     //第一次我的帖子
     public void getFirstPosts() {
@@ -131,7 +174,7 @@ public class ProfileViewModel extends BaseViewModel {
     }
 
     public void loadMinePosts() {
-        LogUtils.INSTANCE.d("ljxtyswy","load");
+        LogUtils.INSTANCE.d("ljxtyswy", "load");
         Disposable disposable = repository.getMinePosts(currentPagePost).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -142,14 +185,14 @@ public class ProfileViewModel extends BaseViewModel {
                                 currentPagePost++;
                                 isHasNext = response.getData().getHasNext();
                                 minePostsLivedata.setValue(list);
-                                LogUtils.INSTANCE.d("ljxtyswy","ok");
+                                LogUtils.INSTANCE.d("ljxtyswy", "ok");
                             } else {
-                                LogUtils.INSTANCE.d("ljxtyswy","notok");
+                                LogUtils.INSTANCE.d("ljxtyswy", "notok");
                             }
 
                         },
                         error -> {
-                            LogUtils.INSTANCE.e("ljxtyswy",error);
+                            LogUtils.INSTANCE.e("ljxtyswy", error);
                         }
 
                 );
@@ -227,6 +270,7 @@ public class ProfileViewModel extends BaseViewModel {
                                 favoriteList.addAll(response.getData().getList());
                                 isLoaddingFavoritePost = false;
                                 currentPageFavoritePost++;
+                                favoritesCountLivedata.setValue(response.getData().getTotal());
                                 isHasFavoriteNext = response.getData().getHasNext();
                                 mineFavoritePostsLivedata.setValue(favoriteList);
                             } else {
@@ -532,7 +576,7 @@ public class ProfileViewModel extends BaseViewModel {
         return nickNameLivedata;
     }
 
-    public MutableLiveData<Integer> getFavoritesCountLivedata() {
+    public MutableLiveData<Long> getFavoritesCountLivedata() {
         return favoritesCountLivedata;
     }
 

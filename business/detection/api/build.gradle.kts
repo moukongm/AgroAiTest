@@ -23,4 +23,6 @@ android {
 
 dependencies {
     api(project(":foundation:common"))
+    implementation(project(":foundation:uikit"))
+    api(libs.agriPestSdk)
 }

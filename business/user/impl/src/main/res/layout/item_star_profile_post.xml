@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
     app:cardBackgroundColor="@android:color/white">
 
     <androidx.cardview.widget.CardView
@@ -32,11 +31,10 @@
 
                 <ImageView
                     android:id="@+id/iv_star_post_cover"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:contentDescription="@null"
                     android:scaleType="centerCrop"
-                    app:layout_constraintDimensionRatio="16:9"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -49,9 +47,8 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:paddingStart="12dp"
-                    android:paddingTop="10dp"
+                    android:paddingTop="5dp"
                     android:paddingEnd="12dp"
-                    android:paddingBottom="4dp"
                     android:textColor="#1A1A1A"
                     android:textSize="15sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -110,8 +107,8 @@
 
                     <ImageView
                         android:id="@+id/tv_star_post_like_icon"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:includeFontPadding="false"
                         android:src="@drawable/ic_starlike_profile"
                         android:textSize="16sp" />

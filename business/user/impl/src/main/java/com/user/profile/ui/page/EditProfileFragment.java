@@ -88,6 +88,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
             //记得通知其他有用到头像的地方
             //本地数据库也没改
             Log.d("ljx", observer);
+
             ImageLoader.INSTANCE.load(binding.ivSettingTitle, observer);
 //            binding.editProfile.hide();
             return null;

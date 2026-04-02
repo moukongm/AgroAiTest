@@ -284,7 +284,6 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
                 }
                 return@executeByIo
             }
-
             // 2. 构造 MultipartBody.Part
             // 注意: "file" 是后端约定的字段名，必须与接口定义一致
             val requestFile = file.asRequestBody(FileUtils.getMimeType(file).toMediaTypeOrNull())

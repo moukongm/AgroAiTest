@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+    <include
+        android:id="@+id/bg"
+        layout="@layout/base_detection_back"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/top_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/img_result"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_result_img"/>
+
+
+    </FrameLayout>
+
+
+    <!-- 内容区域（2/3） -->
+    <LinearLayout
+        android:id="@+id/content_card"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintHeight_percent="0.63"
+        app:layout_constraintVertical_bias="1"
+        android:background="@drawable/bg_result_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btn_camera"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="7dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_result_title"
+                android:padding="4dp"
+                android:orientation="horizontal">
+
+                <TextView
+
+                    android:id = "@+id/tv_res1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/bg_result_itemres"
+                    android:background="@drawable/bg_reslut_itemresbg"
+                    android:gravity="center"
+                    android:text="结果一"
+                    android:clickable="true"
+                    android:focusable="true"
+
+                   />
+
+                <TextView
+                    android:id = "@+id/tv_res2"
+                    android:background="@drawable/bg_reslut_itemresbg"
+                    android:textColor="@color/bg_result_itemres"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="结果二"
+                    android:clickable="true"
+                    android:focusable="true"
+               />
+
+                <TextView
+                    android:id = "@+id/tv_res3"
+                    android:background="@drawable/bg_reslut_itemresbg"
+                    android:textColor="@color/bg_result_itemres"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="结果三"
+                    android:clickable="true"
+                    android:focusable="true"
+                   />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- 病害名称 -->
+        <TextView
+            android:id = "@+id/tv_bingname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="病害名称"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="#333"/>
+
+        <FrameLayout
+            android:id = "@+id/fl_bing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:id = "@+id/tv_bing"
+                android:layout_width="100dp"
+                android:layout_height="70dp"
+                android:background="@drawable/bg_result_bingname"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="炭疽病"
+                android:textColor="#FFFFFF"/>
+
+            <!-- 置信度 -->
+            <TextView
+                android:id = "@+id/bing_gailv"
+                android:layout_width="35dp"
+                android:layout_height="25dp"
+                android:text="80%"
+                android:textSize="10sp"
+                android:textColor="#FFF"
+                android:gravity="center"
+                android:background="@drawable/bg_result_binggailv"
+                android:layout_gravity="end|top"/>
+        </FrameLayout>
+
+
+        <!-- 解决方案 -->
+        <TextView
+            android:id = "@+id/tv_jiejuefangan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="解决方案"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="#333"/>
+
+        <TextView
+            android:id = "@+id/tv_jiejue"
+            android:layout_marginLeft="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:lineHeight="25dp"
+            android:text="1. 清：清病株深埋，轮作豆/花生2-3年。\n2. 管：合理密植，少氮多磷钾，雨后排水。\n3. 药：发病初期喷咪鲜胺/丙环唑，7-10天一次。"
+            android:textSize="14sp"
+            android:textColor="#555"/>
+
+
+    </LinearLayout>
+    <!-- AI助手 -->
+    <LinearLayout
+        android:id = "@+id/ll_ai"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintHeight_percent="0.1"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_result_ai"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="AI助手"
+            android:textColor="#FF9800"/>
+    </LinearLayout>
+
+    <!-- 底部按钮（固定高度，浮在底部） -->
+    <ImageView
+
+        app:layout_constraintHeight_percent="0.09"
+        android:id="@+id/btn_camera"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginRight="10dp"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintWidth_percent="0.55"
+        android:textColor="#FFF"
+        android:background="@drawable/ic_result_tpa"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

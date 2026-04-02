@@ -43,6 +43,13 @@ dependencies {
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
     implementation(project(":business:detection:api"))
+    implementation(project(":foundation:uikit"))
+    implementation(project(":business:user:api"))
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+    implementation(libs.blurview)
+
     // Can add other exports if needed
     
     kapt(libs.arouter.compiler)

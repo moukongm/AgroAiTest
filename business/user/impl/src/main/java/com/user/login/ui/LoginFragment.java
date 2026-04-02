@@ -57,7 +57,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> {
             if (response != null && response.getCode() == ServiceCode.SUCCESS) {
                 ToastUtils.INSTANCE.showShort(requireContext(), "登录成功:" + response.getMessage());
                 ARouter.getInstance()
-                        .build(RouterPath.MAIN_ACTIVITY)
+                        .build(RouterPath.HOME_FRAGMENT)
                         .navigation();
                 LoginActivity activity = (LoginActivity) getActivity();
                 activity.finish();

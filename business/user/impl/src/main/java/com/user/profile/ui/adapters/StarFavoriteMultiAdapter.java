@@ -60,7 +60,7 @@ public class StarFavoriteMultiAdapter extends BaseBindingMultiAdapter<StarFavori
             // 作者昵称
             b.tvStarPostUsername.setText(post.getAuthorName() != null ? post.getAuthorName() : "");
             // 点赞数
-            b.tvStarPostLikeCount.setText(String.valueOf(post.getFavoriteCount()));
+            b.tvStarPostLikeCount.setText(String.valueOf(post.getLikeCount()));
         }
     }
 }

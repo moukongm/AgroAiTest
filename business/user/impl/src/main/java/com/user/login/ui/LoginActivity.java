@@ -49,7 +49,7 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
                 if (success) {
                     ThreadUtils.INSTANCE.runOnUiThread(() -> {
                         ARouter.getInstance()
-                                .build(RouterPath.MAIN_ACTIVITY)
+                                .build(RouterPath.HOME_FRAGMENT)
                                 .navigation(LoginActivity.this);
                         finish();
                     });
