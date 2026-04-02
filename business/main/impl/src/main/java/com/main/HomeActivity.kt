@@ -8,7 +8,7 @@ import com.common.base.BaseActivity
 import com.common.router.RouterPath
 import com.main.impl.databinding.ActivityHomeBinding
 
-@Route(path = RouterPath.MAIN_ACTIVITY)
+//@Route(path = RouterPath.MAIN_ACTIVITY)
 class HomeActivity : BaseActivity<ActivityHomeBinding>() {
 
     private lateinit var viewModel: HomeViewModel

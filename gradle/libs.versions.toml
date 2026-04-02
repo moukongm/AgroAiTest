@@ -19,7 +19,8 @@ arouterCompiler = "1.5.2"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
 gson = "2.10.1"
-agriPestSdkVersion = "v1.0.84"
+agriPestSdkVersion = "v1.0.108"
+
 
 # Image Loading
 coil = "2.6.0"
@@ -49,8 +50,13 @@ codelocator = "2.0.4"
 # LeakCanary
 leakcanary = "2.13"
 
+
 # Voice
 speechengine = "0.0.14.1-bugfix"
+
+# Blur
+blurview = "version-2.0.6"
+
 
 [libraries]
 # Android Core
@@ -111,8 +117,12 @@ codelocator-lancet-all = { group = "com.bytedance.tools.codelocator", name = "co
 # LeakCanary
 leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 
+
 # Voice
 speechengine-tob = { group = "com.bytedance.speechengine", name = "speechengine_tob", version.ref = "speechengine" }
+
+blurview = { group = "com.github.Dimezis", name = "BlurView", version.ref = "blurview" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

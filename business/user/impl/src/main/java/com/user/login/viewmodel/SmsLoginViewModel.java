@@ -56,6 +56,8 @@ public class SmsLoginViewModel extends BaseViewModel {
                     if (response.getCode() == ServiceCode.SUCCESS) {
                         repository.saveUserInfo(response.getData());
                         repository.savePassword(response.getData().getGeneratedPassword());
+                    } else {
+                        toastMsg.setValue("登录失败" + repository.errorCode(response.getCode()));
                     }
                     loginResultLiveData.setValue(response);
                 }, error -> {
@@ -80,6 +82,8 @@ public class SmsLoginViewModel extends BaseViewModel {
                 .subscribe(response -> {
                     if (response.getCode() == ServiceCode.SUCCESS) {
                         startCountdown();
+                    } else {
+                        toastMsg.setValue("发送验证码失败" + repository.errorCode(response.getCode()));
                     }
                     sendCodeLiveData.setValue(response);
                 }, error -> {

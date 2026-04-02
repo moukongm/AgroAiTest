@@ -54,7 +54,7 @@ public class LoginRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
-                    if (response.getCode() == ServiceCode.SUCCESS) {
+                    if (response.getCode() == 200) {
                         saveUserInfo(response.getData());
                         ans = true;
                     } else {
@@ -157,7 +157,6 @@ public class LoginRepository {
 
     public void saveUserInfo(AuthResponse data) {
         if (data == null) return;
-
         NetworkManager.INSTANCE.setToken(data.getToken());
         UserStorageConstant.saveToken(data.getToken());
         UserStorageConstant.saveUserId(data.getUserId());

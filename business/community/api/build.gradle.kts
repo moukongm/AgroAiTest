@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.community.export"
+    namespace = "com.community"
     compileSdk = 34
 
     defaultConfig {

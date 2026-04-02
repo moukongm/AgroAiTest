@@ -31,6 +31,7 @@ class App : BaseApplication(), ImageLoaderFactory {
         return ImageLoader.Builder(this)
             .crossfade(true)
             .okHttpClient { NetworkManager.okHttpClient }
+            .allowHardware(false)
             .build()
     }
 }

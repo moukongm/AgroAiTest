@@ -20,6 +20,7 @@ object RouterPath {
 
     // 社区模块 (Community Module)
     const val COMMUNITY_ACTIVITY = "/community/activity" // 社区主页
+    const val COMMUNITY_POST_DETAIL = "/community/post_detail" // 帖子详情
     const val COMMUNITY_SERVICE = "/community/service"   // 社区服务接口
 
     // 用户模块 (User Module)
@@ -27,4 +28,6 @@ object RouterPath {
     const val USER_PROFILE_ACTIVITY = "/user/profile" // 个人中心页面
     const val USER_SERVICE = "/user/service"          // 用户服务接口
     const val TOKEN_SERVICE = "/user/token"
+
+    const val APP_MAIN_ACTIVITY = "/app/activity"
 }
