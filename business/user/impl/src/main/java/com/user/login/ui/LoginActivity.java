@@ -1,5 +1,6 @@
 package com.user.login.ui;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -13,7 +14,8 @@ import com.user.databinding.ActivityLoginBinding;
 
 @Route(path = RouterPath.USER_LOGIN_ACTIVITY)
 public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
-    private LoginFragment loginFragment;
+
+    private static final int CONTAINER_ID = R.id.activity_main;
 
     @Override
     public ActivityLoginBinding getViewBinding() {
@@ -27,15 +29,12 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
 
     @Override
     public void initData() {
-
     }
 
-    public void replaceFragment(Fragment fragment) {
-        if (fragment != null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.activity_main, fragment)
-                    .commit();
-        }
+    public void replaceFragment(@NonNull Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(CONTAINER_ID, fragment)
+                .commit();
     }
 
     private void autoRefreshToken() {
@@ -49,21 +48,25 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
                 if (success) {
                     ThreadUtils.INSTANCE.runOnUiThread(() -> {
                         ARouter.getInstance()
-                                .build(RouterPath.HOME_FRAGMENT)
+                                .build(RouterPath.APP_MAIN_ACTIVITY)
                                 .navigation(LoginActivity.this);
                         finish();
                     });
-                }
-                if (loginFragment == null) {
-                    loginFragment = new LoginFragment();
-                    replaceFragment(loginFragment);
+                } else {
+                    ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                        navigateToLogin();
+                    });
                 }
             });
         } else {
-            if (loginFragment == null) {
-                loginFragment = new LoginFragment();
-                replaceFragment(loginFragment);
-            }
+            navigateToLogin();
+        }
+    }
+
+    private void navigateToLogin() {
+        Fragment current = getSupportFragmentManager().findFragmentById(CONTAINER_ID);
+        if (current == null || !(current instanceof LoginFragment)) {
+            replaceFragment(new LoginFragment());
         }
     }
 }

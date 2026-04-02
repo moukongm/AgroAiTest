@@ -13,7 +13,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
         kapt {
             arguments {
                 arg("AROUTER_MODULE_NAME", "module_community")
@@ -42,7 +41,8 @@ android {
 dependencies {
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
+    implementation(project(":foundation:uikit"))
     implementation(project(":business:community:api"))
-    
+    implementation(libs.blurview)
     kapt(libs.arouter.compiler)
 }

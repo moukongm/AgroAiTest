@@ -41,9 +41,8 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
 
     private void checkLogin() {
         if (TokenService.api().isTokenValid()) {
-            NetworkManager.INSTANCE.setToken(MMKVUtils.INSTANCE.custom("user_module").getString("token","1314520"));
             ARouter.getInstance()
-                    .build(RouterPath.MAIN_ACTIVITY)
+                    .build(RouterPath.APP_MAIN_ACTIVITY)
                     .navigation();
         } else {
             ARouter.getInstance()

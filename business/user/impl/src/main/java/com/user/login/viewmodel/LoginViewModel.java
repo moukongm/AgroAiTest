@@ -57,7 +57,7 @@ public class LoginViewModel extends BaseViewModel {
                         repository.savePassword(password);
                         toastMsg.setValue("登录成功");
                     } else {
-                        toastMsg.setValue("登录失败" + response.getCode());
+                        toastMsg.setValue("登录失败" + repository.errorCode(response.getCode()));
                     }
                     loginResultLiveData.setValue(response);
                 }, error -> {

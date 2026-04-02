@@ -11,9 +11,6 @@ constraintlayout = "2.1.4"
 lifecycle = "2.7.0"
 fragment = "1.6.2"
 
-# BlurView
-blurview = "1.6.6"
-
 # ARouter
 arouterApi = "1.5.2"
 arouterCompiler = "1.5.2"
@@ -54,6 +51,14 @@ codelocator = "2.0.4"
 
 # LeakCanary
 leakcanary = "2.13"
+
+
+# Voice
+speechengine = "0.0.14.1-bugfix"
+
+# Blur
+blurview = "version-2.0.6"
+
 
 [libraries]
 # Android Core
@@ -104,9 +109,6 @@ mmkv = { group = "com.tencent", name = "mmkv", version.ref = "mmkv" }
 # Permission
 permissionx = { group = "com.guolindev.permissionx", name = "permissionx", version.ref = "permissionx" }
 
-# BlurView
-blurview = { group = "com.eightbitlab", name = "blurview", version.ref = "blurview" }
-
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -121,6 +123,13 @@ codelocator-lancet-all = { group = "com.bytedance.tools.codelocator", name = "co
 
 # LeakCanary
 leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
+
+
+# Voice
+speechengine-tob = { group = "com.bytedance.speechengine", name = "speechengine_tob", version.ref = "speechengine" }
+
+blurview = { group = "com.github.Dimezis", name = "BlurView", version.ref = "blurview" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

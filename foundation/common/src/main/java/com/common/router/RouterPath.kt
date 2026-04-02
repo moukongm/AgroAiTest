@@ -13,6 +13,7 @@ object RouterPath {
     // 调试模块 (Demo Module)
     const val DEBUG_DEMO_ACTIVITY = "/demo/debug_demo" // 调试工具页面
     const val RV_DEMO_ACTIVITY = "/demo/rv_demo"       // 列表工具页面
+    const val SPEECH_DEMO_ACTIVITY = "/demo/speech_demo" // 语音测试页面
 
     // 检测模块 (Detection Module)
     const val DETECTION_ACTIVITY = "/detection/activity" // 识别检测页面
@@ -20,6 +21,7 @@ object RouterPath {
 
     // 社区模块 (Community Module)
     const val COMMUNITY_ACTIVITY = "/community/activity" // 社区主页
+    const val COMMUNITY_POST_DETAIL = "/community/post_detail" // 帖子详情
     const val COMMUNITY_SERVICE = "/community/service"   // 社区服务接口
 
     // 用户模块 (User Module)
@@ -27,4 +29,6 @@ object RouterPath {
     const val USER_PROFILE_ACTIVITY = "/user/profile" // 个人中心页面
     const val USER_SERVICE = "/user/service"          // 用户服务接口
     const val TOKEN_SERVICE = "/user/token"
+
+    const val APP_MAIN_ACTIVITY = "/app/activity"
 }

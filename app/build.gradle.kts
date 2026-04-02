@@ -57,6 +57,8 @@ dependencies {
     implementation(project(":business:user:impl"))
     implementation(project(":business:demo"))
 
+    implementation(libs.blurview)
+
     // Base dependencies are transitively included via lib_common (api)
     // But app might need them directly sometimes. Since we use api in lib_common, app gets them.
     

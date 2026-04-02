@@ -59,5 +59,7 @@ dependencies {
     
     api(libs.permissionx)
     
+    api(libs.speechengine.tob)
+    
     api(project(":foundation:storage"))
 }

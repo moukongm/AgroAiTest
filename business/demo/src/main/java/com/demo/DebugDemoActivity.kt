@@ -14,7 +14,6 @@ import com.common.utils.ToastUtils
 import com.common.webview.WebViewActivity
 import com.user.UserService
 import com.detection.DetectionService
-import com.community.CommunityService
 import com.demo.databinding.ActivityDebugDemoBinding
 import com.network.NetworkManager
 import com.agri.pest.client.api.ServiceCode
@@ -91,9 +90,6 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
         }
 
         binding.btnCommunity.setOnDebouncedClickListener {
-            val communityService = CommunityService.api()
-            val posts = communityService.getLatestPosts(3)
-            ToastUtils.showShort(this, "Latest Posts: $posts")
             ARouter.getInstance().build(RouterPath.COMMUNITY_ACTIVITY).navigation()
         }
 
@@ -108,6 +104,10 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
                 }, { error ->
                     ToastUtils.showShort(this, "健康检查失败: ${error.message}")
                 })
+        }
+
+        binding.btnSpeech.setOnDebouncedClickListener {
+            ARouter.getInstance().build(RouterPath.SPEECH_DEMO_ACTIVITY).navigation()
         }
 
         binding.btnMmkv.setOnDebouncedClickListener {
