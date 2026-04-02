@@ -3,6 +3,7 @@ package com.common
 import android.app.Application
 import com.alibaba.android.arouter.launcher.ARouter
 import com.common.storage.MMKVUtils
+import com.common.speech.SpeechManager
 
 /**
  * 基础 Application
@@ -13,6 +14,14 @@ open class BaseApplication : Application() {
         super.onCreate()
         initARouter()
         initMMKV()
+        initSpeechEngine()
+    }
+
+    /**
+     * 初始化语音引擎
+     */
+    private fun initSpeechEngine() {
+        SpeechManager.init(this)
     }
 
     /**
