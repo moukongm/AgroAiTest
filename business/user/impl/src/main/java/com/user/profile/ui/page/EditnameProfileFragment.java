@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.agri.pest.client.model.request.ProfileUpdateRequest;
@@ -29,7 +30,14 @@ public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfil
     public void initView() {
         Log.d("ljx", "initview");
         binding = getBinding();
-        viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
+        // 从 ProfileFragment 获取 ViewModel（而不是 EditProfileFragment）
+        Fragment parent = requireParentFragment();
+        if (parent instanceof ProfileFragment) {
+            viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
+        } else {
+            // 兼容：尝试从爷爷辈获取
+            viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
+        }
 
         //得到数据库中的数据后更换这里的电话
 

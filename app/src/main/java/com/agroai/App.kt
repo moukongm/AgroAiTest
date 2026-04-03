@@ -2,26 +2,14 @@ package com.agroai
 
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import com.alibaba.android.arouter.launcher.ARouter
+import com.amap.api.location.AMapLocationClient
 import com.common.BaseApplication
-import com.common.storage.MMKVUtils
 import com.network.NetworkManager
-import android.content.pm.ApplicationInfo
 
 class App : BaseApplication(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
-
-        // 1. 初始化 ARouter
-        val isDebug = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        if (isDebug) {
-            ARouter.openLog()
-            ARouter.openDebug()
-        }
-        ARouter.init(this)
-
-        // 2. 初始化 MMKV
-        MMKVUtils.init(this)
+        // 注意: ARouter 已在 BaseApplication 中初始化，无需重复初始化
     }
 
     /**

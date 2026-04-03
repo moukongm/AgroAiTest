@@ -8,12 +8,12 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.agroai.databinding.ActivityMainBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.amap.api.location.AMapLocationClient;
 import com.common.base.BaseActivity;
 import com.common.router.RouterPath;
 import com.community.ui.CommunityFragment;
-import com.main.HomeFragment;
 import com.main.MessageFragment;
-import com.user.profile.ui.page.ProfileActivity;
+import com.main.ui.page.HomeFragment;
 import com.user.profile.ui.page.ProfileFragment;
 
 import eightbitlab.com.blurview.BlurView;
@@ -46,7 +46,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
 
     @Override
     public void initData() {
-
+// 告知用户隐私政策是否展示（参数依次为 context, 是否显示隐私弹窗, 是否显示隐私弹窗的详情）
+        AMapLocationClient.updatePrivacyShow(this, true, true);
+        // 告知用户隐私政策是否同意（参数：context, 是否同意）
+        AMapLocationClient.updatePrivacyAgree(this, true);
     }
 
     private void setupFragments() {

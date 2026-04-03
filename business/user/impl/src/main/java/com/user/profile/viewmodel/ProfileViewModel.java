@@ -185,14 +185,14 @@ public class ProfileViewModel extends BaseViewModel {
                                 currentPagePost++;
                                 isHasNext = response.getData().getHasNext();
                                 minePostsLivedata.setValue(list);
-                                LogUtils.INSTANCE.d("ljxtyswy", "ok");
+                                LogUtils.INSTANCE.d("ljxty", "ok");
                             } else {
-                                LogUtils.INSTANCE.d("ljxtyswy", "notok");
+                                LogUtils.INSTANCE.d("ljxty", "notok");
                             }
 
                         },
                         error -> {
-                            LogUtils.INSTANCE.e("ljxtyswy", error);
+                            LogUtils.INSTANCE.e("ljxty", error);
                         }
 
                 );

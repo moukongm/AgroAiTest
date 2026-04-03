@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.agri.pest.client.model.response.AgentChatHistory;
 import com.common.base.BaseFragment;
 import com.common.utils.ImageLoader;
 import com.common.utils.LiveDataExtKt;
@@ -21,14 +22,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnitionResultBinding> {
-    FragmentRecocgnitionResultBinding binding;
-    DetectionViewModel viewModel;
+    private DetectionViewModel viewModel;
 
     // 存储最多3个结果
     private String[] diseases = new String[3];
     private String[] confidences = new String[3];
     private String[] solutions = new String[3];
     String[] sections;
+    Boolean ishistory = false;
+    FragmentRecocgnitionResultBinding binding;
+    private AgentChatHistory history = null;
+    private String pendingResult = null;
+    private String pendingImageUrl = null;
     private int currentIndex = 0;
 
     @NonNull
@@ -37,26 +42,49 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
         return FragmentRecocgnitionResultBinding.inflate(inflater, container, false);
     }
 
+    public RecognitionResultFragment(AgentChatHistory history) {
+        this.history = history;
+        // 保存数据，在 initView 中处理
+        if (history != null && history.getAgentResponse() != null) {
+            this.pendingResult = history.getAgentResponse().toString();
+            this.pendingImageUrl = history.getImageUrl();
+        }
+    }
+
+    public RecognitionResultFragment() {
+    }
+
     @Override
     public void initView() {
+        viewModel = new ViewModelProvider(requireActivity()).get(DetectionViewModel.class);
         binding = getBinding();
-        viewModel = new ViewModelProvider(this).get(DetectionViewModel.class);
 
         // 设置标签点击事件
         binding.tvRes1.setOnClickListener(v -> selectTab(0));
         binding.tvRes2.setOnClickListener(v -> selectTab(1));
         binding.tvRes3.setOnClickListener(v -> selectTab(2));
 
-        LiveDataExtKt.observeNonNull(viewModel.getChatResult(), this, result -> {
-            parseResult(result);
-            LogUtils.INSTANCE.d("ljx", "原始结果: " + result);
-            return null;
-        });
+        if (history != null) {
+            // 从历史记录加载
+            if (pendingResult != null) {
+                parseResult(pendingResult);
+            }
+            if (pendingImageUrl != null) {
+                ImageLoader.INSTANCE.load(binding.imgResult, pendingImageUrl);
+            }
+        } else {
+            // 从 ViewModel 观察
+            LiveDataExtKt.observeNonNull(viewModel.getChatResult(), this, result -> {
+                parseResult(result);
+                LogUtils.INSTANCE.d("ljx", "原始结果: " + result);
+                return null;
+            });
 
-        LiveDataExtKt.observeNonNull(viewModel.getPhotoUriResult(), this, uri -> {
-            ImageLoader.INSTANCE.load(binding.imgResult, uri);
-            return null;
-        });
+            LiveDataExtKt.observeNonNull(viewModel.getPhotoUriResult(), this, uri -> {
+                ImageLoader.INSTANCE.load(binding.imgResult, uri);
+                return null;
+            });
+        }
     }
 
     // 切换标签
@@ -66,7 +94,7 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
     }
 
     private void updateUI(int index) {
-        if (index < 0 || index >= 3) return;
+        if (binding == null || index < 0 || index >= 3) return;
 
         binding.tvRes1.setSelected(index == 0);
         binding.tvRes2.setSelected(index == 1);

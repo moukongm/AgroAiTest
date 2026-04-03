@@ -4,10 +4,10 @@
     android:id="@+id/profile_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_edit_header"
+    android:background="@drawable/bg_mainp_header"
     android:clickable="true"
     android:focusable="true"
-    android:fitsSystemWindows="true">
+    >
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">

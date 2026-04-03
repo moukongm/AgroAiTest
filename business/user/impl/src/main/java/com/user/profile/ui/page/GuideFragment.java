@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
@@ -38,7 +39,13 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
     @Override
     public void initView() {
         binding = getBinding();
-        viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
+        Fragment parent = requireParentFragment();
+        if (parent instanceof ProfileFragment) {
+            viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
+        } else {
+            // 兼容：尝试从爷爷辈获取
+            viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
+        }
 
         List<String> list1 = new ArrayList<>();
         list1.add("小麦");

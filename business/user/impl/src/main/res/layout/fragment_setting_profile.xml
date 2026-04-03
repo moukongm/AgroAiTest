@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     android:clickable="true"
     android:focusable="true"
-    android:fitsSystemWindows="true"
-    android:background="@drawable/bg_edit_header">
+    android:background="@drawable/bg_mainp_header">
 
 
     <androidx.cardview.widget.CardView

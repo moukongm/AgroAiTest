@@ -11,6 +11,12 @@ android {
     defaultConfig {
         minSdk = 24
         consumerProguardFiles("consumer-rules.pro")
+
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", "module_main_api")
+            }
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -23,4 +29,5 @@ android {
 
 dependencies {
     api(project(":foundation:common"))
+    kapt(libs.arouter.compiler)
 }

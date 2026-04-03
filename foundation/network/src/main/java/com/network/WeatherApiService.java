@@ -18,10 +18,10 @@ public interface WeatherApiService {
             @Query("location") String mes);
 
     //获取预警
-
-    @GET("weatheralert/v1/current/{latitude}/{longitude}")
+    // URL: /weatheralert/v1/current/{longitude}/{latitude}
+    @GET("weatheralert/v1/current/{longitude}/{latitude}")
     Single<AlertResponse> getWarnning(
             @Header("X-QW-Api-Key") String authorization,
-            @Path("latitude") String lat,
-            @Path("longitude") String lon);
+            @Path("longitude") String lon,
+            @Path("latitude") String lat);
 }

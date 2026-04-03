@@ -38,7 +38,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     public void initView() {
 
         binding = getBinding();
-        viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
+        viewModel = new ViewModelProvider(requireParentFragment()).get(ProfileViewModel.class);
 
         ProfileViewModel vm = viewModel;
         final Context appContext = requireActivity().getApplicationContext();
@@ -48,7 +48,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         });
 
         binding.cvInformationBack.setOnClickListener(v -> {
-            viewModel.popBackstackFragment(this);
+             getParentFragmentManager().popBackStack();
         });
         //修改昵称界面
         binding.nicknameContainer.setOnClickListener(v -> {
@@ -102,6 +102,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
 
         LiveDataExtKt.observeNonNull(viewModel.getNickNameLivedata(), this, mes -> {
             binding.tvNicknameValue.setText(mes);
+            Log.d("ljx", mes);
             return null;
         });
 
@@ -119,6 +120,6 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
 
     @Override
     public void initData() {
-        //无法确定数据来源
+        
     }
 }

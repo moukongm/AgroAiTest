@@ -52,7 +52,6 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
     public void initView() {
         viewModel = new ViewModelProvider(this).get(DetectionViewModel.class);
 
-
         initCamera();
         binding.btnRecognize.setEnabled(false);
         setupClickListeners();
@@ -73,7 +72,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
                 LogUtils.INSTANCE.d("ljx",selectedFile+"");
                 if (selectedFile == null || !selectedFile.exists()) {
                     viewModel.getLoadingState().postValue(false);
-                    ToastUtils.INSTANCE.showLong(getApplicationContext(), "图片文件无效，请重新选择");
+                    ToastUtils.INSTANCE.showLong(getBaseContext(), "图片文件无效，请重新选择");
                     return null;
                 }
                 binding.previewView.setVisibility(View.GONE);
@@ -149,7 +148,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
                         return null;
                     },
                     deniedList -> {
-                        ToastUtils.INSTANCE.showShort(getApplicationContext(), "您拒绝了权限，功能无法使用");
+                        ToastUtils.INSTANCE.showShort(getBaseContext(), "您拒绝了权限，功能无法使用");
                         return null;
                     });
         });
@@ -192,7 +191,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
 
         // 错误提示
         LiveDataExtKt.observeNonNull(viewModel.getErrorMessage(), this, msg -> {
-            ToastUtils.INSTANCE.showLong(getApplicationContext(), msg);
+            ToastUtils.INSTANCE.showLong(getBaseContext(), msg);
             if(msg.equals("AI 识别失败，请重试")){
                 showPreview("");
             }
@@ -221,5 +220,6 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
 
     @Override
     public void initData() {
+
     }
 }

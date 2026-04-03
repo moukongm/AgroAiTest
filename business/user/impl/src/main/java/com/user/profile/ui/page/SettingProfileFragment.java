@@ -25,10 +25,10 @@ public class SettingProfileFragment extends BaseFragment<FragmentSettingProfileB
     public void initData() {
 
         binding = getBinding();
-        viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
+        viewModel = new ViewModelProvider(requireParentFragment()).get(ProfileViewModel.class);
 
         binding.cvSettingprofileBack.setOnClickListener(v -> {
-            viewModel.popBackstackFragment(this);
+           getParentFragmentManager().popBackStack();
         });
         binding.btnSettingUnlogin.setOnClickListener(v -> {
             viewModel.unLogin(this);

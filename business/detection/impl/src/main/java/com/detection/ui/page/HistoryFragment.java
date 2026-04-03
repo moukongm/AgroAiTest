@@ -12,10 +12,16 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.agri.pest.client.model.response.AgentChatHistory;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.common.base.BaseFragment;
 import com.common.utils.LogUtils;
+import com.common.utils.ToastUtils;
+import com.detection.R;
 import com.detection.databinding.FragmentDetectionHistoryBinding;
+import com.detection.model.HistoryItem;
 import com.detection.ui.adapter.HistoryAdapter;
+import com.detection.ui.adapter.HistoryListMapper;
 import com.detection.viewmodel.DetectionViewModel;
 import com.network.NetworkManager;
 
@@ -28,6 +34,8 @@ public class HistoryFragment extends BaseFragment<FragmentDetectionHistoryBindin
     private HistoryAdapter adapter;
     private DetectionViewModel viewModel;
     FragmentDetectionHistoryBinding binding;
+    List<AgentChatHistory> historyList;
+    List<HistoryItem> list;
 
     @NonNull
     @Override
@@ -37,12 +45,17 @@ public class HistoryFragment extends BaseFragment<FragmentDetectionHistoryBindin
 
     @Override
     public void initView() {
-        viewModel = new DetectionViewModel();
         binding = getBinding();
+        showLoading("稍等一会呢...");
+        viewModel = new DetectionViewModel();
         adapter = new HistoryAdapter();
         binding.rvStarPosts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         binding.rvStarPosts.setAdapter(adapter);
         viewModel.fetchHistory();
+        binding.bg.cvInformationBack.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
     }
 
     @Override
@@ -52,15 +65,30 @@ public class HistoryFragment extends BaseFragment<FragmentDetectionHistoryBindin
 
     private void loadHistoryData() {
         viewModel.getHistoryLiveData().observe(getViewLifecycleOwner(), result -> {
-            List<AgentChatHistory> historyList = result.getData();
+            hideLoading();
+            historyList = result.getData();
             if (historyList != null && !historyList.isEmpty()) {
                 LogUtils.INSTANCE.d("ljx",historyList.size()+"");
-                adapter.setList(HistoryAdapter.toMultiList(historyList));
+                list=  HistoryListMapper.toMultiList(historyList);
+                adapter.setList(list);
+                adapter.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                        HistoryItem historyItem = list.get(position);
+                        getChildFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fl_history, new RecognitionResultFragment(historyItem.getChatHistory()))
+                                .addToBackStack(null)
+                                .commit();
+
+                    }
+                });
 //                adapter.setNewData(HistoryAdapter.toMultiList(historyList));
 //                binding.layoutStarEmpty.setVisibility(View.GONE);
                 binding.rvStarPosts.setVisibility(View.VISIBLE);
             }
             else{
+                ToastUtils.INSTANCE.showShort(getActivity().getApplicationContext(),"暂无");
                 showEmptyState();
             }
         });
@@ -72,7 +100,7 @@ public class HistoryFragment extends BaseFragment<FragmentDetectionHistoryBindin
 
     }
     private void showEmptyState() {
-//        binding.layoutStarEmpty.setVisibility(View.VISIBLE);
+        binding.bgHistoryNone.setVisibility(View.VISIBLE);
         binding.rvStarPosts.setVisibility(View.GONE);
     }
 

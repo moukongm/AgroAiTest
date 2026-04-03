@@ -20,6 +20,7 @@ dependencyResolutionManagement {
         maven { url = uri("https://jitpack.io") }
         maven { url = uri("https://maven.aliyun.com/repository/public") }
         maven { url = uri("https://artifact.bytedance.com/repository/Volcengine/") }
+        maven { url = uri("https://maven.amap.com/repository/public/") }
         jcenter()
     }
 }

@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_height="match_parent"
     android:background="#ffffff">
     <include
@@ -105,72 +107,81 @@
                    />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id = "@+id/tv_bingname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="病害名称"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"/>
 
+                <FrameLayout
+                    android:id = "@+id/fl_bing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="10dp">
+
+                    <TextView
+                        android:id = "@+id/tv_bing"
+                        android:layout_width="100dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/bg_result_bingname"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp"
+                        android:text="炭疽病"
+                        android:textColor="#FFFFFF"/>
+
+                    <!-- 置信度 -->
+                    <TextView
+                        android:id = "@+id/bing_gailv"
+                        android:layout_width="35dp"
+                        android:layout_height="25dp"
+                        android:text="80%"
+                        android:textSize="10sp"
+                        android:textColor="#FFF"
+                        android:gravity="center"
+                        android:background="@drawable/bg_result_binggailv"
+                        android:layout_gravity="end|top"/>
+                </FrameLayout>
+
+
+                <!-- 解决方案 -->
+                <TextView
+                    android:id = "@+id/tv_jiejuefangan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="解决方案"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"/>
+
+                <TextView
+                    android:id = "@+id/tv_jiejue"
+                    android:layout_marginLeft="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineHeight="25dp"
+                    android:text="1. 清：清病株深埋，轮作豆/花生2-3年。\n2. 管：合理密植，少氮多磷钾，雨后排水。\n3. 药：发病初期喷咪鲜胺/丙环唑，7-10天一次。"
+                    android:textSize="14sp"
+                    android:textColor="#555"/>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
 
         <!-- 病害名称 -->
-        <TextView
-            android:id = "@+id/tv_bingname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="病害名称"
-            android:textSize="25sp"
-            android:textStyle="bold"
-            android:textColor="#333"/>
-
-        <FrameLayout
-            android:id = "@+id/fl_bing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="10dp">
-
-            <TextView
-                android:id = "@+id/tv_bing"
-                android:layout_width="100dp"
-                android:layout_height="70dp"
-                android:background="@drawable/bg_result_bingname"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:text="炭疽病"
-                android:textColor="#FFFFFF"/>
-
-            <!-- 置信度 -->
-            <TextView
-                android:id = "@+id/bing_gailv"
-                android:layout_width="35dp"
-                android:layout_height="25dp"
-                android:text="80%"
-                android:textSize="10sp"
-                android:textColor="#FFF"
-                android:gravity="center"
-                android:background="@drawable/bg_result_binggailv"
-                android:layout_gravity="end|top"/>
-        </FrameLayout>
-
-
-        <!-- 解决方案 -->
-        <TextView
-            android:id = "@+id/tv_jiejuefangan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="解决方案"
-            android:textSize="25sp"
-            android:textStyle="bold"
-            android:textColor="#333"/>
-
-        <TextView
-            android:id = "@+id/tv_jiejue"
-            android:layout_marginLeft="5dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:lineHeight="25dp"
-            android:text="1. 清：清病株深埋，轮作豆/花生2-3年。\n2. 管：合理密植，少氮多磷钾，雨后排水。\n3. 药：发病初期喷咪鲜胺/丙环唑，7-10天一次。"
-            android:textSize="14sp"
-            android:textColor="#555"/>
 
 
     </LinearLayout>
@@ -216,7 +227,7 @@
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintWidth_percent="0.55"
         android:textColor="#FFF"
-        android:background="@drawable/ic_result_tpa"
+        android:background="@drawable/bg_result_camera_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

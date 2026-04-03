@@ -1,5 +1,8 @@
 package com.detection.data;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.agri.pest.client.model.request.ChatRequest;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
 import com.agri.pest.client.model.response.ResultString;

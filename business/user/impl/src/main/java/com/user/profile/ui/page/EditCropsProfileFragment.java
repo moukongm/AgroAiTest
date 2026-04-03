@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.common.base.BaseFragment;
@@ -28,9 +29,13 @@ public class EditCropsProfileFragment extends BaseFragment<FragmentEditnameProfi
         binding = getBinding();
         binding.tvSettitleTitle.setText("修改作物");
         binding.tvSettitleHint.setText("请输入您关注的作物");
-
-        viewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
-
+        Fragment parent = requireParentFragment();
+        if (parent instanceof ProfileFragment) {
+            viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
+        } else {
+            // 兼容：尝试从爷爷辈获取
+            viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
+        }
         binding.tvEditnameOk.setOnClickListener(view -> {
         });
     }

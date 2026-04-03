@@ -38,7 +38,7 @@ import okio.Okio;
 public class DetectionViewModel extends BaseViewModel {
     private final SingleLiveEvent<Boolean> loadingState = new SingleLiveEvent<>();
     private final SingleLiveEvent<File> photoCaptured = new SingleLiveEvent<>();
-    private final SingleLiveEvent<String> photoUriResult = new SingleLiveEvent<>();
+    private final MutableLiveData<String> photoUriResult = new MutableLiveData<>();
     private final MutableLiveData<String> chatResult = new MutableLiveData<>();
     private final SingleLiveEvent<String> errorMessage = new SingleLiveEvent<>();
     private final SingleLiveEvent<ResultListAgentChatHistory> historyResult = new SingleLiveEvent<>();
@@ -223,7 +223,7 @@ public class DetectionViewModel extends BaseViewModel {
         return chatResult;
     }
 
-    public SingleLiveEvent<String> getPhotoUriResult() {
+    public MutableLiveData<String> getPhotoUriResult() {
         return photoUriResult;
     }
 

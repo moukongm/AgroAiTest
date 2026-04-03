@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.amap.api.location.AMapLocationClient;
 import com.common.base.BaseFragment;
 import com.common.router.RouterPath;
 import com.common.utils.ImageLoader;
@@ -39,17 +40,9 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
     @Override
     public void initView() {
+
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         binding=  getBinding();
-
-        viewModel.getLocation();
-        viewModel.getUserInfo();
-
-        viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
-            if (city != null && !city.isEmpty()) {
-                binding.mainpagePlacename.setText(city);
-            }
-        });
 
 
         viewModel.getUserNameLiveData().observe(getViewLifecycleOwner(), userName -> {
@@ -73,6 +66,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             }
         });
         binding.mainpageTime.setText(Utils.getTodayLunar());
+
 
         binding.llTakephoto.setOnClickListener(v -> {
             PermissionUtils.INSTANCE.request(this, Arrays.asList(Manifest.permission.CAMERA),
@@ -120,6 +114,25 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
     @Override
     public void initData() {
+        viewModel.getLocation();
+        viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
+            LogUtils.INSTANCE.d("lyy",city);
+            if (city != null && !city.isEmpty()) {
+                binding.mainpagePlacename.setText(city);
+            }
+        });
+        PermissionUtils.INSTANCE.request(this, Arrays.asList(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        ), () -> {
+            LogUtils.INSTANCE.d("ljx", "定位");
+            viewModel.getLocation(getActivity().getApplicationContext());
+            return null;
+        }, deniedList -> {
+            LogUtils.INSTANCE.d("ljx", "定位权限被拒绝");
+            return null;
+        });
+        viewModel.getUserInfo();
 
     }
 }

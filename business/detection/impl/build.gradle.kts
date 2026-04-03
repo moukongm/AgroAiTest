@@ -42,8 +42,23 @@ android {
 dependencies {
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
+    implementation(project(":foundation:storage"))
+    implementation(project(":foundation:webview"))
+    implementation(project(":foundation:uikit"))
+
+    implementation(project(":business:main:api"))
     implementation(project(":business:detection:api"))
-    // Can add other exports if needed
-    
+    implementation(project(":business:community:api"))
+    implementation(project(":business:user:api"))
+
+
+    // CameraX
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // BlurView
+    implementation(libs.blurview)
+
     kapt(libs.arouter.compiler)
 }

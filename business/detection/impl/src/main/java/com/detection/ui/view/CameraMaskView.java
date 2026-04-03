@@ -33,6 +33,11 @@ public class CameraMaskView extends View {
         cornerRadius = ScreenUtils.INSTANCE.dp2px(getContext(), 10);
     }
 
+    public CameraMaskView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        cornerRadius = ScreenUtils.INSTANCE.dp2px(getContext(), 10);
+    }
+
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);

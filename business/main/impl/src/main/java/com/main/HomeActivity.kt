@@ -9,7 +9,7 @@ import com.common.router.RouterPath
 import com.main.impl.databinding.ActivityHomeBinding
 import com.main.viewmodel.HomeViewModel
 
-@Route(path = RouterPath.MAIN_ACTIVITY)
+//@Route(path = RouterPath.MAIN_ACTIVITY)
 class HomeActivity : BaseActivity<ActivityHomeBinding>() {
 
     private lateinit var viewModel: HomeViewModel
@@ -20,15 +20,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
 
     override fun initView() {
         viewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-
-        binding.btnGoDebug.setOnClickListener {
-            ARouter.getInstance().build(RouterPath.DEBUG_DEMO_ACTIVITY).navigation()
-        }
-
-//        // Load HomeFragment
-//        supportFragmentManager.beginTransaction()
-//            .replace(com.main.impl.R.id.fragment_container, HomeFragment())
-//            .commit()
     }
 
     override fun initData() {

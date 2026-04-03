@@ -22,6 +22,8 @@ import java.util.TimeZone;
 
 public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMainpPostBinding> {
 
+    private final LinearSnapHelper snapHelper = new LinearSnapHelper();
+
     public MinePostAdapter() {
         super(0, null);
     }
@@ -51,15 +53,16 @@ public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMai
 
         // 帖子图片列表
         PostAvatarAdapter avatarAdapter = new PostAvatarAdapter();
-        binding.recycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext(), LinearLayoutManager.HORIZONTAL, false));
+        if (binding.recycler.getLayoutManager() == null) {
+            binding.recycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext(), LinearLayoutManager.HORIZONTAL, false));
+            snapHelper.attachToRecyclerView(binding.recycler);
+        }
         binding.recycler.setAdapter(avatarAdapter);
         List<String> imageUrls = item.getImages();
         LogUtils.INSTANCE.d("ljxandxzr",item.getId() +"");
         if (imageUrls != null && !imageUrls.isEmpty()) {
             avatarAdapter.setList(imageUrls);
         }
-        LinearSnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(binding.recycler);
 
         binding.tvPostContent.setText(item.getContent() != null ? item.getContent() : "");
 
