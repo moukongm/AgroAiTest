@@ -6,8 +6,9 @@ package com.common.router
  */
 object RouterPath {
     // 首页模块 (Main Module)
-    const val MAIN_ACTIVITY = "/main/activity" // 首页 Activity
+    const val MAIN_ACTIVITY = "/main/activity"
     const val MAIN_SERVICE = "/main/service"   // 首页对外服务接口
+    const val HOME_FRAGMENT = "/home/fragment" // 首页 Fragment
 
     // 调试模块 (Demo Module)
     const val DEBUG_DEMO_ACTIVITY = "/demo/debug_demo" // 调试工具页面
@@ -20,10 +21,14 @@ object RouterPath {
 
     // 社区模块 (Community Module)
     const val COMMUNITY_ACTIVITY = "/community/activity" // 社区主页
+    const val COMMUNITY_POST_DETAIL = "/community/post_detail" // 帖子详情
     const val COMMUNITY_SERVICE = "/community/service"   // 社区服务接口
 
     // 用户模块 (User Module)
     const val USER_LOGIN_ACTIVITY = "/user/login"     // 登录页面
     const val USER_PROFILE_ACTIVITY = "/user/profile" // 个人中心页面
     const val USER_SERVICE = "/user/service"          // 用户服务接口
+    const val TOKEN_SERVICE = "/user/token"
+
+    const val APP_MAIN_ACTIVITY = "/app/activity"
 }

@@ -68,7 +68,8 @@ object FileUtils {
     /**
      * 获取文件的 MIME 类型
      */
-    fun getMimeType(file: File): String {
+    fun getMimeType(file: File?): String {
+        if (file == null || !file.exists()) return "application/octet-stream"
         val extension = file.extension
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "application/octet-stream"
     }

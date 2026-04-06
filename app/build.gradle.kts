@@ -57,6 +57,9 @@ dependencies {
     implementation(project(":business:user:impl"))
     implementation(project(":business:demo"))
 
+    implementation(libs.blurview)
+
+
     // Base dependencies are transitively included via lib_common (api)
     // But app might need them directly sometimes. Since we use api in lib_common, app gets them.
     
@@ -65,7 +68,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
+    // AMap Location
+    implementation("com.amap.api:location:latest.integration")
     // CodeLocator
     implementation(libs.codelocator.core)
     // CodeLocator Lancet has compatibility issues with AGP 8.0+ and Jetifier

@@ -14,7 +14,6 @@ import com.common.utils.ToastUtils
 import com.common.webview.WebViewActivity
 import com.user.UserService
 import com.detection.DetectionService
-import com.community.CommunityService
 import com.demo.databinding.ActivityDebugDemoBinding
 import com.network.NetworkManager
 import com.agri.pest.client.api.ServiceCode
@@ -81,7 +80,7 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
             val userService = UserService.api()
             val isLogin = userService.isLogin()
             ToastUtils.showShort(this, "Is Login: $isLogin, User: ${userService.getUserName()}")
-            ARouter.getInstance().build(RouterPath.USER_LOGIN_ACTIVITY).navigation()
+            ARouter.getInstance().build(RouterPath.USER_PROFILE_ACTIVITY).navigation()
         }
 
         binding.btnDetection.setOnDebouncedClickListener {
@@ -91,9 +90,6 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
         }
 
         binding.btnCommunity.setOnDebouncedClickListener {
-            val communityService = CommunityService.api()
-            val posts = communityService.getLatestPosts(3)
-            ToastUtils.showShort(this, "Latest Posts: $posts")
             ARouter.getInstance().build(RouterPath.COMMUNITY_ACTIVITY).navigation()
         }
 
@@ -288,7 +284,6 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
                 }
                 return@executeByIo
             }
-
             // 2. 构造 MultipartBody.Part
             // 注意: "file" 是后端约定的字段名，必须与接口定义一致
             val requestFile = file.asRequestBody(FileUtils.getMimeType(file).toMediaTypeOrNull())

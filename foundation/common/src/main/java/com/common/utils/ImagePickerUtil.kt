@@ -101,6 +101,13 @@ class ImagePickerUtil(
         }
     }
 
+    fun getCamera(){
+        checkCameraPermissionAndLaunch()
+    }
+
+    fun getStorage(){
+        requestStoragePermissions()
+    }
     private fun checkCameraPermissionAndLaunch() {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
