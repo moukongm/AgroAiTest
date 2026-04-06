@@ -9,19 +9,23 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        jcenter()
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        // 阿里云镜像
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
+
+        // 官方仓库
         google()
         mavenCentral()
+
+        // 第三方仓库
         maven { url = uri("https://jitpack.io") }
-        maven { url = uri("https://maven.aliyun.com/repository/public") }
         maven { url = uri("https://artifact.bytedance.com/repository/Volcengine/") }
-        maven { url = uri("https://maven.amap.com/repository/public/") }
-        jcenter()
     }
 }
 
