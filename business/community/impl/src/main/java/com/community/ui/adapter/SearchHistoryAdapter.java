@@ -1,9 +1,7 @@
 package com.community.ui.adapter;
-
-import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 
+import com.community.R;
 import com.community.databinding.ItemSearchHistoryBinding;
 import com.uikit.base.BaseBindingAdapter;
 
@@ -12,6 +10,9 @@ public class SearchHistoryAdapter extends BaseBindingAdapter<String, ItemSearchH
     private OnItemClickListener onItemClickListener;
     private OnDeleteClickListener onDeleteClickListener;
 
+    public SearchHistoryAdapter() {
+        super();
+    }
     @Override
     public void convert(@NonNull ItemSearchHistoryBinding binding,
                         @NonNull String keyword,

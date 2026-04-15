@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.common.base.BaseViewModel;
 import com.community.data.CommunityRepository;
 import com.agri.pest.client.model.response.PostResponseDto;
+import com.community.viewmodel.SearchViewModel;
 
 import java.util.List;
 
@@ -131,6 +132,10 @@ public class CommunityViewModel extends BaseViewModel {
     }
 
     public void toggleLike(long postId) {
+        toggleLike(postId, null);
+    }
+
+    public void toggleLike(long postId, SearchViewModel searchViewModel) {
         if (currentPosts == null) {
             toastLiveData.setValue("数据加载中");
             return;
@@ -143,19 +148,26 @@ public class CommunityViewModel extends BaseViewModel {
             }
         }
         if (isLiked) {
-            unlikePost(postId);
+            unlikePost(postId, searchViewModel);
         } else {
-            likePost(postId);
+            likePost(postId, searchViewModel);
         }
     }
 
     public void likePost(long postId) {
+        likePost(postId, null);
+    }
+
+    public void likePost(long postId, SearchViewModel searchViewModel) {
         Disposable d = repository.likePost(postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(success -> {
                     if (success) {
                         refreshPosts();
+                        if (searchViewModel != null) {
+                            searchViewModel.refreshSearchResults();
+                        }
                     }
                 }, e -> {
                     toastLiveData.setValue("点赞失败");
@@ -164,12 +176,19 @@ public class CommunityViewModel extends BaseViewModel {
     }
 
     public void unlikePost(long postId) {
+        unlikePost(postId, null);
+    }
+
+    public void unlikePost(long postId, SearchViewModel searchViewModel) {
         Disposable d = repository.unlikePost(postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(success -> {
                     if (success) {
                         refreshPosts();
+                        if (searchViewModel != null) {
+                            searchViewModel.refreshSearchResults();
+                        }
                     }
                 }, e -> {
                     toastLiveData.setValue("取消点赞失败");

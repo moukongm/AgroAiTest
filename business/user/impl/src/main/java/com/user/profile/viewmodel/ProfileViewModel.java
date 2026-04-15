@@ -51,7 +51,6 @@ import okhttp3.RequestBody;
 
 public class ProfileViewModel extends BaseViewModel {
 
-
     private final Repository repository;
     private final SingleLiveEvent<String> mesEtLivedata = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mesEtAvatarLivedata = new SingleLiveEvent<>();
@@ -324,14 +323,25 @@ public class ProfileViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         response -> {
-                            if (response.getCode() == ServiceCode.SUCCESS) {
+                            if (response != null && response.getCode() == ServiceCode.SUCCESS) {
                                 updataProfileUtilMethod("ok", updateContent, response);
                             } else {
-                                updataProfileUtilMethod("no", updateContent, null);
+                                String errorMsg = (response != null) ? response.getMessage() : "修改失败";
+                                updataProfileUtilMethod("no", updateContent, null, errorMsg);
                             }
                         },
                         error -> {
-                            updataProfileUtilMethod("no", updateContent, null);
+                            LogUtils.INSTANCE.e("ProfileViewModel", "updataProfile error", error);
+                            String errorMsg = "网络错误";
+                            if (error instanceof retrofit2.HttpException) {
+                                int code = ((retrofit2.HttpException) error).code();
+                                if (code == 403) {
+                                    errorMsg = "权限不足，请重新登录";
+                                } else if (code == 401) {
+                                    errorMsg = "登录已过期，请重新登录";
+                                }
+                            }
+                            updataProfileUtilMethod("no", updateContent, null, errorMsg);
                         }
 
                 );
@@ -340,27 +350,40 @@ public class ProfileViewModel extends BaseViewModel {
 
     public void updataProfileUtilMethod(String res, String
             updateContent, ResultUserProfileDto response) {
+        updataProfileUtilMethod(res, updateContent, response, null);
+    }
+
+    public void updataProfileUtilMethod(String res, String
+            updateContent, ResultUserProfileDto response, String errorMsg) {
         switch (updateContent) {
             case "fullName":
                 // 处理 fullName 更新
                 if ("ok".equals(res)) {
-                    mesEtLivedata.setValue("修改成功");
-                    repository.updateLocalNickname(response.getData().getFullName());
-                    nickNameLivedata.setValue(response.getData().getFullName());
-                    profileUpdatedLivedata.setValue(true); // 标记资料已更新
-                    LogUtils.INSTANCE.d("ljx", "nameok");
+                    if (response != null && response.getData() != null) {
+                        mesEtLivedata.setValue("修改成功");
+                        repository.updateLocalNickname(response.getData().getFullName());
+                        nickNameLivedata.setValue(response.getData().getFullName());
+                        profileUpdatedLivedata.setValue(true); // 标记资料已更新
+                        LogUtils.INSTANCE.d("ljx", "nameok");
+                    } else {
+                        mesEtLivedata.setValue("修改失败：数据异常");
+                    }
                 } else {
-                    mesEtLivedata.setValue("修改失败");
+                    mesEtLivedata.setValue(errorMsg != null ? errorMsg : "修改失败");
                 }
                 break;
             case "avatarUrl":
                 // 处理 avatarUrl 更新
                 if ("ok".equals(res)) {
-                    avatarLivedata.setValue(response.getData().getAvatarUrl());
-                    mesEtAvatarLivedata.setValue("修改成功");
-                    profileUpdatedLivedata.setValue(true); // 标记资料已更新
+                    if (response != null && response.getData() != null) {
+                        avatarLivedata.setValue(response.getData().getAvatarUrl());
+                        mesEtAvatarLivedata.setValue("修改成功");
+                        profileUpdatedLivedata.setValue(true); // 标记资料已更新
+                    } else {
+                        avatarLivedata.setValue("修改失败：数据异常");
+                    }
                 } else {
-                    avatarLivedata.setValue("修改失败");
+                    avatarLivedata.setValue(errorMsg != null ? errorMsg : "修改失败");
                 }
                 break;
             case "bio":
@@ -382,12 +405,16 @@ public class ProfileViewModel extends BaseViewModel {
             case "followedCrops":
                 // 处理 followedCrops 更新
                 if ("ok".equals(res)) {
-                    cropsLivedata.setValue("修改成功");
-                    String cropsReslut = response.getData().getFollowedCrops().toString();
-                    cropsValueLivedata.setValue(cropsReslut.substring(1, cropsReslut.length() - 1));
-                    LogUtils.INSTANCE.d("ljx", "cropsok");
+                    if (response != null && response.getData() != null) {
+                        cropsLivedata.setValue("修改成功");
+                        String cropsReslut = response.getData().getFollowedCrops().toString();
+                        cropsValueLivedata.setValue(cropsReslut.substring(1, cropsReslut.length() - 1));
+                        LogUtils.INSTANCE.d("ljx", "cropsok");
+                    } else {
+                        cropsLivedata.setValue("修改失败：数据异常");
+                    }
                 } else {
-                    cropsLivedata.setValue("修改失败");
+                    cropsLivedata.setValue(errorMsg != null ? errorMsg : "修改失败");
                 }
                 break;
             default:
@@ -426,53 +453,70 @@ public class ProfileViewModel extends BaseViewModel {
 //        return MultipartBody.Part.createFormData("avatar", file.getName(), requestBody);
 //    }
 
-//    public void showDialog(Context context, String mes) {
-//        Dialog dialog = new Dialog(context);
-//        dialog.setContentView(R.layout.dialog_edit_profile);
-//        TextView tv = dialog.findViewById(R.id.dialog_setOk);
-//        tv.setText(mes);
-//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        dialog.show();
-//        ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                dialog.dismiss();
-//            }
-//        }, 1000);
-//    }
 
-    // 上传头像（ViewModel 不依赖 Context）
-    public void uploadAvatar(File file) {
-        if (file == null || !file.exists()) {
-            mesEtAvatarLivedata.postValue("文件解析失败");
+    public void showDialog(Context context, String mes) {
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            if (activity.isFinishing() || activity.isDestroyed()) {
+                return;
+            }
+        }
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_edit_profile);
+        TextView tv = dialog.findViewById(R.id.dialog_setOk);
+        tv.setText(mes);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        try {
+            dialog.show();
+        } catch (Exception e) {
             return;
         }
-        String mimeType = FileUtils.INSTANCE.getMimeType(file);
-        RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), file);
-        MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-        addDisposable(
-                repository.uploadAvatar(part, "uploads/demo/")
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                response -> {
-                                    if (response.getCode() == ServiceCode.SUCCESS) {
-                                        ProfileUpdateRequest request = new ProfileUpdateRequest(null,
-                                                response.getData(), null, null, null);
-                                        updataProfile(request, "avatarUrl");
-                                        LogUtils.INSTANCE.d("ljx", "ok");
-                                    } else {
-                                        mesEtAvatarLivedata.setValue("上传失败");
-                                    }
-                                },
-                                error -> {
-                                    LogUtils.INSTANCE.e("ljx", error);
-                                    mesEtAvatarLivedata.setValue("上传失败");
-                                }
-                        ));
+        ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Dialog already detached from window manager
+                }
+            }
+        }, 1000);
     }
 
-    //把uri转为文件给服务端
+        // 上传头像（ViewModel 不依赖 Context）
+        public void uploadAvatar (File file){
+            if (file == null || !file.exists()) {
+                mesEtAvatarLivedata.postValue("文件解析失败");
+                return;
+            }
+            String mimeType = FileUtils.INSTANCE.getMimeType(file);
+            RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), file);
+            MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+            addDisposable(
+                    repository.uploadAvatar(part, "uploads/demo/")
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .subscribe(
+                                    response -> {
+                                        if (response.getCode() == ServiceCode.SUCCESS) {
+                                            ProfileUpdateRequest request = new ProfileUpdateRequest(null,
+                                                    response.getData(), null, null, null);
+                                            updataProfile(request, "avatarUrl");
+                                            LogUtils.INSTANCE.d("ljx", "ok");
+                                        } else {
+                                            mesEtAvatarLivedata.setValue("上传失败");
+                                        }
+                                    },
+                                    error -> {
+                                        LogUtils.INSTANCE.e("ljx", error);
+                                        mesEtAvatarLivedata.setValue("上传失败");
+                                    }
+                            ));
+        }
+
+        //把uri转为文件给服务端
 //    private File getFilePath(Context context, Uri uri) {
 //        //第一个参数是放在app的缓存文件夹，系统会自动清理；第二个参数是文件名，可以避免重复而且表明是图片
 //        File file = new File(context.getCacheDir(), System.currentTimeMillis() + ".jpg");
@@ -499,107 +543,107 @@ public class ProfileViewModel extends BaseViewModel {
 //
 //    }
 
-    //验证名字合法
-    private boolean isNicknameVaild(String newName) {
-        int length = newName.length();
-        if (!newName.matches("^[\\u4e00-\\u9fa5a-zA-Z0-9_]+$")) {
-            mesNameLivedata.setValue("昵称包含@<>/等字符，请修改后重试");
-            return false;
+        //验证名字合法
+        private boolean isNicknameVaild (String newName){
+            int length = newName.length();
+            if (!newName.matches("^[\\u4e00-\\u9fa5a-zA-Z0-9_]+$")) {
+                mesNameLivedata.setValue("昵称包含@<>/等字符，请修改后重试");
+                return false;
+            }
+            if (length < 2 || length > 24) {
+                mesNameLivedata.setValue("请设置2-24个字符");
+                return false;
+            }
+            mesNameLivedata.setValue("ok");
+            return true;
         }
-        if (length < 2 || length > 24) {
-            mesNameLivedata.setValue("请设置2-24个字符");
-            return false;
+
+        //退出返回栈
+        public void popBackstackFragment (Fragment fragment){
+            if (fragment != null && fragment.getActivity() != null) {
+                fragment.getActivity().getSupportFragmentManager().popBackStack();
+            }
         }
-        mesNameLivedata.setValue("ok");
-        return true;
-    }
 
-    //退出返回栈
-    public void popBackstackFragment(Fragment fragment) {
-        if (fragment != null && fragment.getActivity() != null) {
-            fragment.getActivity().getSupportFragmentManager().popBackStack();
+
+        private final MutableLiveData<ResultUserProfileDto> userProfileMes = new MutableLiveData<>();
+
+        public SingleLiveEvent<String> getMesEtLivedata () {
+            return mesEtLivedata;
         }
-    }
+
+        public MutableLiveData<String> getCropsLivedata () {
+            return cropsLivedata;
+        }
+
+        public MutableLiveData<String> getCropsValueLivedata () {
+            return cropsValueLivedata;
+        }
+
+        public MutableLiveData<String> getPhoneValueLivedata () {
+            return phoneValueLivedata;
+        }
 
 
-    private final MutableLiveData<ResultUserProfileDto> userProfileMes = new MutableLiveData<>();
+        public MutableLiveData<List<PostResponseDto>> getMinePostsLivedata () {
+            return minePostsLivedata;
+        }
 
-    public SingleLiveEvent<String> getMesEtLivedata() {
-        return mesEtLivedata;
-    }
-
-    public MutableLiveData<String> getCropsLivedata() {
-        return cropsLivedata;
-    }
-
-    public MutableLiveData<String> getCropsValueLivedata() {
-        return cropsValueLivedata;
-    }
-
-    public MutableLiveData<String> getPhoneValueLivedata() {
-        return phoneValueLivedata;
-    }
-
-
-    public MutableLiveData<List<PostResponseDto>> getMinePostsLivedata() {
-        return minePostsLivedata;
-    }
-
-    public MutableLiveData<List<PostResponseDto>> getMineFavoritePostsLivedata() {
-        return mineFavoritePostsLivedata;
-    }
+        public MutableLiveData<List<PostResponseDto>> getMineFavoritePostsLivedata () {
+            return mineFavoritePostsLivedata;
+        }
 
     public ProfileViewModel() {
-        repository = new Repository();
-    }
+            repository = new Repository();
+        }
 
-    public SingleLiveEvent<String> getPhoneLivedata() {
-        return phoneLivedata;
-    }
+        public SingleLiveEvent<String> getPhoneLivedata () {
+            return phoneLivedata;
+        }
 
-    public SingleLiveEvent<String> getMesEtAvatarLivedata() {
-        return mesEtAvatarLivedata;
-    }
+        public SingleLiveEvent<String> getMesEtAvatarLivedata () {
+            return mesEtAvatarLivedata;
+        }
 
-    public SingleLiveEvent<String> getMesEtnameLivedata() {
-        return mesEtLivedata;
-    }
+        public SingleLiveEvent<String> getMesEtnameLivedata () {
+            return mesEtLivedata;
+        }
 
-    public SingleLiveEvent<String> getMesNameLivedata() {
-        return mesNameLivedata;
-    }
+        public SingleLiveEvent<String> getMesNameLivedata () {
+            return mesNameLivedata;
+        }
 
-    public MutableLiveData<String> getAvatarLivedata() {
-        return avatarLivedata;
-    }
+        public MutableLiveData<String> getAvatarLivedata () {
+            return avatarLivedata;
+        }
 
-    public MutableLiveData<String> getNickNameLivedata() {
-        return nickNameLivedata;
-    }
+        public MutableLiveData<String> getNickNameLivedata () {
+            return nickNameLivedata;
+        }
 
-    public MutableLiveData<Long> getFavoritesCountLivedata() {
-        return favoritesCountLivedata;
-    }
+        public MutableLiveData<Long> getFavoritesCountLivedata () {
+            return favoritesCountLivedata;
+        }
 
-    public SingleLiveEvent<String> getPasswordLivedata() {
-        return passwordLivedata;
-    }
+        public SingleLiveEvent<String> getPasswordLivedata () {
+            return passwordLivedata;
+        }
 
-    public MutableLiveData<ResultUserProfileDto> getUserProfileMes() {
-        return userProfileMes;
-    }
+        public MutableLiveData<ResultUserProfileDto> getUserProfileMes () {
+            return userProfileMes;
+        }
 
-    public SingleLiveEvent<String> getUnLogin() {
-        return unLogin;
-    }
+        public SingleLiveEvent<String> getUnLogin () {
+            return unLogin;
+        }
 
-    public MutableLiveData<Long> getHistoryCountLivedata() {
-        return historyCountLivedata;
-    }
+        public MutableLiveData<Long> getHistoryCountLivedata () {
+            return historyCountLivedata;
+        }
 
-    public MutableLiveData<Boolean> getProfileUpdatedLivedata() {
-        return profileUpdatedLivedata;
-    }
+        public MutableLiveData<Boolean> getProfileUpdatedLivedata () {
+            return profileUpdatedLivedata;
+        }
 }
 
 

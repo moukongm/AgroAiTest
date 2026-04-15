@@ -9,7 +9,12 @@ public class UserLocalDataSource {
     private final MMKVInstance mmkv = MMKVUtils.INSTANCE.custom("user_module");
 
     public void unLogin() {
-        mmkv.clear();
+        mmkv.remove("token");
+        mmkv.remove("userId");
+        mmkv.remove("username");
+        mmkv.remove("refreshToken");
+        mmkv.remove("expiresIn");
+        mmkv.remove("password");
     }
     public void updateTele(String newTele) {
 

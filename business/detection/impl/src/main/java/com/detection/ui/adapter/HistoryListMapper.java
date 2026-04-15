@@ -43,11 +43,8 @@ public final class HistoryListMapper {
                 }
                 lastTime = time;
             }
-            else{
-                LogUtils.INSTANCE.d("ljxjxl",i+"");
-                result.add(HistoryItem.item(chatHistory));
-                i++;
-            }
+            result.add(HistoryItem.item(chatHistory));
+            i++;
         }
         return result;
     }
@@ -84,8 +81,8 @@ public final class HistoryListMapper {
             }
             else{
                 LogUtils.INSTANCE.d("ljxjxl",i+"");
-                i++;
             }
+            i++;
             result.add(HistoryItem.localItem(record));
         }
         return result;

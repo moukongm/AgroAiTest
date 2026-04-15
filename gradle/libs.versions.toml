@@ -65,6 +65,8 @@ speechengine = "0.0.14.1-bugfix"
 # Blur
 blurview = "version-2.0.6"
 
+# huanghaibin CalendarView (从Maven Central获取)
+calendarViewVersion = "3.7.1"
 
 [libraries]
 # Android Core
@@ -142,6 +144,9 @@ leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-and
 speechengine-tob = { group = "com.bytedance.speechengine", name = "speechengine_tob", version.ref = "speechengine" }
 
 blurview = { group = "com.github.Dimezis", name = "BlurView", version.ref = "blurview" }
+
+# huanghaibin CalendarView (从Maven Central获取)
+calendarview = { group = "com.haibin", name = "calendarview", version.ref = "calendarViewVersion" }
 
 
 [plugins]

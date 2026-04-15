@@ -19,10 +19,18 @@ public class FabDragHelper {
     private int fabWidth;
     private int fabHeight;
     private int statusBarHeight;
+    private int leftEdgeMarginPx;
+    private int rightEdgeMarginPx;
+    private int topEdgeMarginPx;
+    private int bottomEdgeMarginPx;
     private int lastX;
     private int lastY;
     private boolean isDragging;
     private ViewGroup.MarginLayoutParams layoutParams;
+    private static final int LEFT_EDGE_MARGIN_DP = 75;  // 左侧边缘间距(dp)
+    private static final int RIGHT_EDGE_MARGIN_DP = 15; // 右侧边缘间距(dp)
+    private static final int TOP_EDGE_MARGIN_DP = 25;    // 上方边缘间距(dp)
+    private static final int BOTTOM_EDGE_MARGIN_DP = 15; // 下方边缘间距(dp)
 
     private OnSnapListener snapListener;
 
@@ -47,6 +55,12 @@ public class FabDragHelper {
             int resourceId = fab.getResources().getIdentifier("status_bar_height", "dimen", "android");
             statusBarHeight = resourceId > 0 ? fab.getResources().getDimensionPixelSize(resourceId) : 0;
 
+            float density = fab.getResources().getDisplayMetrics().density;
+            leftEdgeMarginPx = (int) (LEFT_EDGE_MARGIN_DP * density);
+            rightEdgeMarginPx = (int) (RIGHT_EDGE_MARGIN_DP * density);
+            topEdgeMarginPx = (int) (TOP_EDGE_MARGIN_DP * density);
+            bottomEdgeMarginPx = (int) (BOTTOM_EDGE_MARGIN_DP * density);
+
             restorePosition();
             fab.setOnTouchListener(this::onTouch);
         });
@@ -60,7 +74,6 @@ public class FabDragHelper {
         int savedX = mmkv.getInt(keyPrefix + "_x", -1);
         int savedY = mmkv.getInt(keyPrefix + "_y", -1);
         if (savedX >= 0 && savedY >= 0) {
-
             int maxX = screenWidth - fabWidth;
             int maxY = screenHeight - fabHeight - statusBarHeight;
             savedX = Math.max(0, Math.min(savedX, maxX));
@@ -92,8 +105,11 @@ public class FabDragHelper {
                 }
 
                 if (isDragging) {
-                    int newRight = Math.max(0, Math.min(layoutParams.rightMargin - dx, screenWidth - fabWidth));
-                    int newBottom = Math.max(statusBarHeight, Math.min(layoutParams.bottomMargin - dy, screenHeight - fabHeight - statusBarHeight));
+                    // 拖动时限制不超出屏幕边界
+                    // rightMargin 范围: 0 ~ screenWidth - fabWidth - rightEdgeMarginPx
+                    // 即按钮可以拖到贴屏幕右边，但左边不能超过 leftEdgeMarginPx
+                    int newRight = Math.max(0, Math.min(layoutParams.rightMargin - dx, screenWidth - fabWidth - rightEdgeMarginPx));
+                    int newBottom = Math.max(statusBarHeight + topEdgeMarginPx, Math.min(layoutParams.bottomMargin - dy, screenHeight - fabHeight - statusBarHeight - bottomEdgeMarginPx));
 
                     layoutParams.rightMargin = newRight;
                     layoutParams.bottomMargin = newBottom;
@@ -121,8 +137,13 @@ public class FabDragHelper {
     }
 
     private void snapToEdge(Runnable onComplete) {
+        // 判断当前是在左侧还是右侧
+        // rightMargin 小 -> 在左侧（按钮贴左）；rightMargin 大 -> 在右侧（按钮贴右）
         boolean snapLeft = layoutParams.rightMargin > (screenWidth - fabWidth) / 2;
-        int targetRight = snapLeft ? screenWidth - fabWidth : 0;
+        
+        // 左贴边：按钮左侧距屏幕左边 60dp，即 rightMargin = screenWidth - fabWidth - 60dp
+        // 右贴边：按钮右侧距屏幕右边 15dp，即 rightMargin = 15dp
+        int targetRight = snapLeft ? screenWidth - fabWidth - leftEdgeMarginPx : rightEdgeMarginPx;
 
         ValueAnimator anim = ValueAnimator.ofInt(layoutParams.rightMargin, targetRight);
         anim.setDuration(200);

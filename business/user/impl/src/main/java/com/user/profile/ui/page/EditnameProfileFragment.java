@@ -46,7 +46,7 @@ public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfil
         LiveDataExtKt.observeNonNull(viewModel.getMesEtnameLivedata(), this, mes -> {
             binding.editnameProfile.setVisibility(View.GONE);
             binding.tvEditnameOk.setEnabled(true);
-            Utils.showDialog(getContext(), mes);
+            Utils.showDialog(getActivity(), mes);
 //            ToastUtils.INSTANCE.showShort(getActivity().getBaseContext(),mes);
             if ("修改成功".equals(mes)) {
                 getParentFragmentManager().popBackStack();
@@ -64,7 +64,7 @@ public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfil
                 binding.tvEditnameOk.setEnabled(false);
             } else {
                 binding.etSettitleEdit.setText("");
-                Utils.showDialog(getContext(), mes);
+                Utils.showDialog(getActivity(), mes);
 //                viewModel.showDialog(getContext(), mes);
             }
 

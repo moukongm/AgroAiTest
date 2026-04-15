@@ -3,5 +3,6 @@
     <application>
         <activity android:name=".ui.CommunityActivity" android:exported="false"/>
         <activity android:name=".ui.PostDetailActivity" android:exported="false"/>
+        <activity android:name=".ui.PostPublishActivity" android:exported="false"/>
     </application>
 </manifest>

@@ -1,5 +1,6 @@
 package com.user.profile;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -10,8 +11,11 @@ import com.common.utils.ThreadUtils;
 import com.user.R;
 
 public class Utils {
-    public static void showDialog(Context context, String mes) {
-        Dialog dialog = new Dialog(context);
+    public static void showDialog(Activity activity, String mes) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+        Dialog dialog = new Dialog(activity);
         dialog.setContentView(R.layout.dialog_edit_profile);
         TextView tv = dialog.findViewById(R.id.dialog_setOk);
         tv.setText(mes);
@@ -20,7 +24,9 @@ public class Utils {
         ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
             @Override
             public void run() {
-                dialog.dismiss();
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
             }
         }, 1000);
     }

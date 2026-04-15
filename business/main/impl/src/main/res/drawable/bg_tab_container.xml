@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- 圆角10dp，颜色为 #000000*4%（即透明度4%的黑色） -->
+    <solid android:color="#0A000000" />
+    <corners android:radius="10dp" />
+</shape>

@@ -3,6 +3,8 @@
 
     <application>
         <activity android:name="com.main.HomeActivity" android:exported="false"/>
+        <activity android:name="com.main.ui.page.PlantAddActivity" android:exported="false"/>
+        <activity android:name="com.main.ui.page.PlantManageActivity" android:exported="false"/>
         <!-- 高德地图 API Key -->
         <meta-data
             android:name="com.amap.api.v2.apikey"

@@ -12,6 +12,12 @@ public class UserStorageConstant {
     public static final String KEY_USER_EXPIRESIN = "expiresIn";
 
     public static final String KEY_PASSWORD = "password";
+    public static final String KEY_CUSTOM_CROPS = "custom_crops";
+    public static final String KEY_CROP_SELECTION = "crop_selection";
+    public static final String KEY_ELDERLY_MODE_SELECTED = "elderly_mode_selected";
+
+    public static final String KEY_MODE_NORMAL = "normal";
+    public static final String KEY_MODE_SENIOR = "senior";
 
     public static void saveToken(String token) {
         userStorage.put(KEY_TOKEN, token);
@@ -40,5 +46,30 @@ public class UserStorageConstant {
 
     public static String getRefreshToken() {
         return userStorage.getString(KEY_USER_RETOKEN, "");
+    }
+
+    public static void saveCustomCrops(String crops) {
+        userStorage.put(KEY_CUSTOM_CROPS, crops);
+    }
+
+    public static String getCustomCrops() {
+        return userStorage.getString(KEY_CUSTOM_CROPS, "");
+    }
+
+
+    public static void saveElderlyModeSelected(boolean selected) {
+        userStorage.put(KEY_ELDERLY_MODE_SELECTED, selected);
+    }
+
+    public static boolean isElderlyModeSelected() {
+        return userStorage.getBoolean(KEY_ELDERLY_MODE_SELECTED, false);
+    }
+
+    public static void saveSelectedMode(String mode) {
+        userStorage.put("selected_mode", mode);
+    }
+
+    public static String getSelectedMode() {
+        return userStorage.getString("selected_mode", "");
     }
 }

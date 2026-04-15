@@ -121,7 +121,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginRight="45.5dp"
         android:layout_marginLeft="45.5dp"
-        android:text="注册"
+        android:text="注册并登录"
         android:textSize="17.5sp"
         android:textColor="#FFFFFF"
         app:cornerRadius="65dp"/>

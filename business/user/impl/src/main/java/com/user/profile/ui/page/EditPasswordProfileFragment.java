@@ -42,7 +42,7 @@ public class EditPasswordProfileFragment extends BaseFragment<FragmentEditnamePr
 
         LiveDataExtKt.observeNonNull(viewModel.getPasswordLivedata(), this, mes -> {
             binding.tvEditnameOk.setEnabled(true);
-            Utils.showDialog(getContext(), mes);
+            Utils.showDialog(getActivity(), mes);
             if ("修改成功".equals(mes)) {
                 getParentFragmentManager().popBackStack();
                 Log.d("xzr", mes);

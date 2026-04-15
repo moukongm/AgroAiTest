@@ -3,7 +3,6 @@ package com.community.ui;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -17,8 +16,12 @@ import android.widget.EditText;
 
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.common.base.BaseFragment;
+import com.common.router.RouterPath;
+import com.community.R;
 import com.community.databinding.FragmentSearchBinding;
 import com.community.ui.adapter.SearchHistoryAdapter;
 import com.community.ui.adapter.SearchSuggestionAdapter;
@@ -33,6 +36,7 @@ import eightbitlab.com.blurview.RenderScriptBlur;
 public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
 
     private SearchListener searchListener;
+    private VoiceSearchListener voiceSearchListener;
     private SearchViewModel viewModel;
     private SearchHistoryAdapter historyAdapter;
     private SearchSuggestionAdapter suggestionAdapter;
@@ -40,10 +44,19 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     public interface SearchListener {
         void onSearch(String keyword);
         void onClose();
+        void onShowSearchResult(String keyword);
+    }
+
+    public interface VoiceSearchListener {
+        void onOpenVoiceSearch();
     }
 
     public void setSearchListener(SearchListener listener) {
         this.searchListener = listener;
+    }
+
+    public void setVoiceSearchListener(VoiceSearchListener listener) {
+        this.voiceSearchListener = listener;
     }
 
     @Override
@@ -53,7 +66,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
 
     @Override
     public void initView() {
-        viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         viewModel.init(requireActivity().getApplication());
 
         setupRecyclerViews();
@@ -75,6 +88,12 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     }
 
     private void setupRecyclerViews() {
+        LinearLayoutManager historyLayoutManager = new LinearLayoutManager(requireContext());
+        historyLayoutManager.setAutoMeasureEnabled(false);
+        getBinding().rvHistory.setLayoutManager(historyLayoutManager);
+        LinearLayoutManager suggestionLayoutManager = new LinearLayoutManager(requireContext());
+        suggestionLayoutManager.setAutoMeasureEnabled(false);
+        getBinding().rvSuggestions.setLayoutManager(suggestionLayoutManager);
         historyAdapter = new SearchHistoryAdapter();
         historyAdapter.setOnItemClickListener((keyword, position) -> {
             getBinding().etSearch.setText(keyword);
@@ -121,6 +140,9 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
             return false;
         });
         getBinding().btnCancel.setOnClickListener(v -> close());
+
+        getBinding().btnInputMic.setOnClickListener(v -> openVoiceSearch());
+
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             EditText et = getBinding().etSearch;
             et.requestFocus();
@@ -136,8 +158,10 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         getBinding().ivWantSearch.setVisibility(View.VISIBLE);
         getBinding().rvSuggestions.setVisibility(View.GONE);
     }
+
     private void showSuggestionView() {
-        getBinding().rvHistory.setVisibility(View.GONE);
+        getBinding().rvHistory.setVisibility(View.VISIBLE);
+        getBinding().ivWantSearch.setVisibility(View.VISIBLE);
         getBinding().rvSuggestions.setVisibility(View.VISIBLE);
     }
 
@@ -158,12 +182,6 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     public String getSearchKeyword() {
         return getBinding().etSearch.getText().toString().trim();
     }
-    public void performSearch() {
-        String keyword = getSearchKeyword();
-        if (!keyword.isEmpty()) {
-            performSearch(keyword);
-        }
-    }
 
     private void performSearch(String keyword) {
         hideKeyboard();
@@ -181,5 +199,25 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
                 .setBlurRadius(radius)
                 .setOverlayColor(0x40000000);
+    }
+
+
+    public void openVoiceSearch() {
+        if (voiceSearchListener != null) {
+            voiceSearchListener.onOpenVoiceSearch();
+            hideKeyboard();
+        }
+    }
+    @Override
+    public void onDestroyView() {
+        if (getBinding().rvHistory != null) {
+            getBinding().rvHistory.setAdapter(null);
+        }
+        if (getBinding().rvSuggestions != null) {
+            getBinding().rvSuggestions.setAdapter(null);
+        }
+        historyAdapter = null;
+        suggestionAdapter = null;
+        super.onDestroyView();
     }
 }

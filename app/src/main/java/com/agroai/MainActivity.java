@@ -1,8 +1,10 @@
 package com.agroai;
 
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -51,7 +53,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
 
     @Override
     public void initData() {
-// 告知用户隐私政策是否展示（参数依次为 context, 是否显示隐私弹窗, 是否显示隐私弹窗的详情）
+        // 告知用户隐私政策是否展示（参数依次为 context, 是否显示隐私弹窗, 是否显示隐私弹窗的详情）
         AMapLocationClient.updatePrivacyShow(this, true, true);
         // 告知用户隐私政策是否同意（参数：context, 是否同意）
         AMapLocationClient.updatePrivacyAgree(this, true);
@@ -151,6 +153,5 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
         }
         super.onDestroy();
     }
-
 
 }

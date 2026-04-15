@@ -199,7 +199,6 @@ public class PostDetailViewModel extends BaseViewModel {
                 }, e -> {});
         addDisposable(d);
     }
-
     public MutableLiveData<PostResponseDto> getPostLiveData() {
         return postLiveData;
     }

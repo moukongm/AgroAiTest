@@ -1,8 +1,10 @@
 package com.main.viewmodel;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
@@ -16,7 +18,16 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationListener;
 import com.common.base.BaseViewModel;
+import com.common.storage.database.AppDatabase;
+import com.common.storage.database.CropDao;
+import com.common.storage.database.CropRecord;
+import com.common.storage.database.UserDao;
+import com.common.storage.database.UserRecord;
+import com.common.utils.AvatarUtils;
 import com.common.utils.LogUtils;
+import com.agri.pest.client.model.response.MyCropResponseDto;
+import com.agri.pest.client.model.response.ResultListMyCropResponseDto;
+import com.agri.pest.client.model.response.ResultVoid;
 import com.main.data.Repository;
 import com.network.NetworkManager;
 import com.network.model.AlertResponse;
@@ -26,18 +37,33 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import java.util.concurrent.Executors;
 
 public class HomeViewModel extends BaseViewModel {
 
     private final Repository repository = new Repository();
     private final MutableLiveData<String> locationLivedata = new MutableLiveData<>();
     private final MutableLiveData<String> cityCodeLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Long> historyCountLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> userNameLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> avatarUrlLiveData = new MutableLiveData<>();
     private final MutableLiveData<WeatherResponse.Now> weatherLiveData = new MutableLiveData<>();
+
     private final MutableLiveData<MessageResponseDto> alertLiveData = new MutableLiveData<>();
     AMapLocationClient location;
     AMapLocationListener listener;
+
+    //private final MutableLiveData<List<AlertResponse.Alert>> alertLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<MyCropResponseDto>> cropListLiveData = new MutableLiveData<>();
+    private final MutableLiveData<UserRecord> userRecordLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<CropRecord>> localCropListLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isOfflineModeLiveData = new MutableLiveData<>(false);
+
+    public MutableLiveData<Long> getHistoryCountLiveData() {
+        return historyCountLiveData;
+    }
+
+    private volatile boolean isCropLoading = false;
 
     public void getLocation(Context context) {
         LogUtils.INSTANCE.d("ljx", "定位1");
@@ -55,10 +81,7 @@ public class HomeViewModel extends BaseViewModel {
 //                    String formattedLat = String.format(Locale.US, "%.2f",x);
 //                    LogUtils.INSTANCE.d("lyy","预警参数 - 经度:" + formattedLng + " 纬度:" + formattedLat);
                     getWarning();
-                } else {
-
-                    LogUtils.INSTANCE.d("ljx", aMapLocation.getErrorCode()+aMapLocation.getErrorInfo());
-                }
+                } 
             }
         };
         location = repository.getLocation(context);
@@ -107,6 +130,15 @@ public class HomeViewModel extends BaseViewModel {
         return cityCodeLiveData;
     }
 
+    private volatile Context appContext;
+
+    public HomeViewModel() {
+    }
+
+    public void initContext(Context context) {
+        this.appContext = context.getApplicationContext();
+    }
+
     public void getUserInfo() {
         Disposable disposable = repository.getUserMes()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -116,13 +148,60 @@ public class HomeViewModel extends BaseViewModel {
                             if (response != null && response.getData() != null) {
                                 userNameLiveData.setValue(response.getData().getFullName());
                                 avatarUrlLiveData.setValue(response.getData().getAvatarUrl());
+                                historyCountLiveData.setValue(response.getData().getHistoryRecognitionCount());
+                                saveUserToDatabase(response.getData().getAvatarUrl());
                             }
                         },
                         error -> {
-                            LogUtils.INSTANCE.e("lyy", error);
+                            LogUtils.INSTANCE.e("lyy",  error);
+                            // 网络失败时尝试从数据库加载
+                            loadUserFromDatabase();
                         }
                 );
         addDisposable(disposable);
+    }
+
+    private void saveUserToDatabase(String avatarUrl) {
+        if (appContext == null) {
+            return;
+        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
+            // 删除之前存储的头像
+            AvatarUtils.deleteAvatar(appContext, 0);
+            // 下载并保存新头像
+            String localPath = AvatarUtils.downloadAndSaveAvatar(appContext, avatarUrl, 0);
+            // 创建用户记录
+            UserRecord userRecord = new UserRecord();
+            userRecord.setUserId(0L);
+            userRecord.setAvatarUrl(avatarUrl);
+            userRecord.setAvatarLocalPath(localPath);
+            userRecord.setLastUpdateTime(System.currentTimeMillis());
+            // 插入数据库
+            userDao.insert(userRecord);
+            // 通知UI
+            userRecordLiveData.postValue(userRecord);
+        });
+    }
+
+    private void loadUserFromDatabase() {
+        if (appContext == null) {
+            return;
+        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
+            UserRecord userRecord = userDao.getUserById(0);
+            if (userRecord != null) {
+                userRecordLiveData.postValue(userRecord);
+                if (userRecord.getAvatarUrl() != null) {
+                    avatarUrlLiveData.postValue(userRecord.getAvatarUrl());
+                }
+            }
+        });
+    }
+
+    public MutableLiveData<UserRecord> getUserRecordLiveData() {
+        return userRecordLiveData;
     }
 
     public MutableLiveData<String> getUserNameLiveData() {
@@ -212,5 +291,131 @@ public class HomeViewModel extends BaseViewModel {
 
     public MutableLiveData<MessageResponseDto> getAlertLiveData() {
         return alertLiveData;
+    }
+
+    public MutableLiveData<List<MyCropResponseDto>> getCropListLiveData() {
+        return cropListLiveData;
+    }
+
+    public MutableLiveData<List<CropRecord>> getLocalCropListLiveData() {
+        return localCropListLiveData;
+    }
+
+    public MutableLiveData<Boolean> getIsOfflineModeLiveData() {
+        return isOfflineModeLiveData;
+    }
+
+    public void getMyCrops() {
+        Disposable disposable = repository.getMyCrops()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            LogUtils.INSTANCE.d("HomeViewModel", "getMyCrops: 网络返回, code=" + (response != null ? response.getCode() : "null"));
+                            if (response != null && response.getCode() == 200 && response.getData() != null) {
+                                cropListLiveData.setValue(response.getData());
+                                saveCropsToDatabase(response.getData());
+                                isOfflineModeLiveData.setValue(false);
+                            } else {
+                                LogUtils.INSTANCE.d("HomeViewModel", "getMyCrops: 获取作物列表失败");
+                                cropListLiveData.setValue(null);
+                                loadCropsFromDatabase();
+                            }
+                        },
+                        error -> {
+                            LogUtils.INSTANCE.e("HomeViewModel", "getMyCrops: 网络请求失败", error);
+                            cropListLiveData.setValue(null);
+                            loadCropsFromDatabase();
+                        }
+                );
+        addDisposable(disposable);
+    }
+
+    private void saveCropsToDatabase(List<MyCropResponseDto> crops) {
+        if (appContext == null) {
+            return;
+        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            CropDao cropDao = AppDatabase.Companion.getInstance(appContext).cropDao();
+            UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
+            // 获取用户头像路径
+            UserRecord userRecord = userDao.getUserById(0);
+            String avatarLocalPath = userRecord != null ? userRecord.getAvatarLocalPath() : null;
+            // 先清除所有数据
+            cropDao.deleteAll();
+            // 等待删除完成后再插入
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // 最多存三条（仅作物数据）
+            int count = Math.min(crops.size(), 3);
+            for (int i = 0; i < count; i++) {
+                MyCropResponseDto crop = crops.get(i);
+                CropRecord record = new CropRecord();
+                record.setCropId(crop.getId());
+                record.setCropName(crop.getPlantName());
+                record.setCropImageUrl(crop.getImageUrl());
+                // 使用AvatarUtils存储作物图片到本地
+                String localPath = AvatarUtils.downloadAndSaveAvatar(appContext, crop.getImageUrl(), i + 1);
+                record.setCropImageUrl(localPath);
+                cropDao.insert(record);
+            }
+            // 更新所有作物记录的用户头像路径
+            if (avatarLocalPath != null) {
+                List<CropRecord> allCrops = cropDao.getAllCrops();
+                for (CropRecord crop : allCrops) {
+                    crop.setAvatarLocalPath(avatarLocalPath);
+                    cropDao.update(crop);
+                }
+            }
+            // 通知UI更新（使用数据库新增的方法取最新的最多3条）
+            List<CropRecord> savedCrops = cropDao.getRecentCrops();
+            localCropListLiveData.postValue(savedCrops);
+        });
+    }
+
+    private void loadCropsFromDatabase() {
+        if (appContext == null) {
+            return;
+        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            CropDao cropDao = AppDatabase.Companion.getInstance(appContext).cropDao();
+            UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
+            // 加载用户信息
+            UserRecord userRecord = userDao.getUserById(0);
+            if (userRecord != null) {
+                userRecordLiveData.postValue(userRecord);
+                if (userRecord.getAvatarUrl() != null) {
+                    avatarUrlLiveData.postValue(userRecord.getAvatarUrl());
+                }
+            }
+            // 加载作物数据（最多3条最新）
+            List<CropRecord> crops = cropDao.getRecentCrops();
+            isOfflineModeLiveData.postValue(true);
+            localCropListLiveData.postValue(crops);
+        });
+    }
+
+    public void deleteCrop(Long cropId) {
+        Disposable disposable = repository.deleteCrop(cropId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            if (response != null && response.getCode() == 200) {
+                                LogUtils.INSTANCE.d("HomeViewModel", "删除作物成功");
+                                // 清空旧数据，重新加载
+                                cropListLiveData.setValue(null);
+                                getMyCrops();
+                            } else {
+                                LogUtils.INSTANCE.e("删除作物失败: " + response.getMessage(), null);
+                            }
+                        },
+                        error -> {
+                            LogUtils.INSTANCE.e("删除作物失败: " + error.getMessage(), null);
+                        }
+                );
+        addDisposable(disposable);
     }
 }

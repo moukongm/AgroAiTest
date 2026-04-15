@@ -109,7 +109,6 @@
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:paddingBottom="12dp">
-
             <TextView
                 android:id="@+id/tv_post_save_count"
                 android:layout_width="wrap_content"

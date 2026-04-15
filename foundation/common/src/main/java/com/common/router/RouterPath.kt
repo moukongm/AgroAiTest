@@ -12,7 +12,8 @@ object RouterPath {
     const val MESSAGE_FRAGMENT = "/main/message_fragment" // 消息 Fragment
     const val NOTICE_MESSAGE_FRAGMENT = "/main/notice_message" // 通知消息页面
     const val NOTICE_CONTENT_FRAGMENT = "/main/notice_content" // 通知内容页面（ViewPager2 内容页）
-
+    const val PLANT_ADD_ACTIVITY = "/main/plant_add" // 添加植物页面
+    const val PLANT_MANAGE_ACTIVITY = "/main/plant_manage" // 植物管理页面
     // 调试模块 (Demo Module)
     const val DEBUG_DEMO_ACTIVITY = "/demo/debug_demo" // 调试工具页面
     const val RV_DEMO_ACTIVITY = "/demo/rv_demo"       // 列表工具页面
@@ -28,6 +29,8 @@ object RouterPath {
     // 社区模块 (Community Module)
     const val COMMUNITY_ACTIVITY = "/community/activity" // 社区主页
     const val COMMUNITY_POST_DETAIL = "/community/post_detail" // 帖子详情
+    const val COMMUNITY_POST_PUBLISH = "/community/post_publish" // 帖子发布
+    const val COMMUNITY_VOICE_SEARCH = "/community/voice_search" // 语音搜索页面
     const val COMMUNITY_SERVICE = "/community/service"   // 社区服务接口
 
     // 用户模块 (User Module)
@@ -39,6 +42,9 @@ object RouterPath {
     const val USER_SERVICE = "/user/service"          // 用户服务接口
     const val USER_PROFILE_SERVICE = "/user/profile_service" // 用户资料服务（跨模块通信）
     const val TOKEN_SERVICE = "/user/token"
+    const val USER_GUIDE_FRAGMENT = "/user/guide_fragment" // 农作物选择页面
+    const val USER_CROP_SELECT_ACTIVITY = "/user/crop_select" // 农作物选择Activity（用于结果返回）
+    const val USER_MODE_SELECT_ACTIVITY = "/user/mode_select" // 应用模式选择页面
 
     // 筛选
     const val COMMON_FILTER = "/common/filter"

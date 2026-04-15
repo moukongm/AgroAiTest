@@ -6,6 +6,12 @@ import com.agri.pest.client.model.request.AdminMessageCreateRequest;
 import com.agri.pest.client.model.response.ResultMessageGroupResponseDto;
 import com.agri.pest.client.model.response.ResultPageResultMessageResponseDto;
 import com.agri.pest.client.model.response.ResultPostResponseDto;
+
+import com.agri.pest.client.model.request.MyCropCreateRequest;
+import com.agri.pest.client.model.request.MyCropUpdateRequest;
+import com.agri.pest.client.model.response.ResultListMyCropResponseDto;
+import com.agri.pest.client.model.response.ResultMyCropResponseDto;
+import com.agri.pest.client.model.response.ResultString;
 import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.amap.api.location.AMapLocationClient;
@@ -23,12 +29,12 @@ import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.core.SingleEmitter;
 import io.reactivex.rxjava3.core.SingleOnSubscribe;
 
+import java.time.LocalDate;
+
 public class Repository {
-    private UserLocalDataSource localDataSource;
     private UserRemoteDataSource remoteDataSource;
 
     public Repository() {
-        localDataSource = new UserLocalDataSource();
         remoteDataSource = new UserRemoteDataSource();
     }
 
@@ -78,6 +84,30 @@ public class Repository {
                 "受强冷空气影响，预计4月13日～15日早晨最低气温将降至-2℃～0℃，地面温度可达-3℃以下。目前正值苹果花期至幼果期、冬小麦拔节孕穗期，低温霜冻可能导致花器受冻、幼果脱落、小麦结实率下降。",null,null );
         NetworkManager.INSTANCE.getApi().publishMessage(request);
         return NetworkManager.INSTANCE.getApi().publishMessage(request1);
+    }
+
+    public Single<ResultListMyCropResponseDto> getMyCrops() {
+        return remoteDataSource.getMyCrops();
+    }
+
+    public Single<ResultVoid> deleteCrop(Long id) {
+        return remoteDataSource.deleteCrop(id);
+    }
+
+    public Single<ResultMyCropResponseDto> getCropDetail(Long cropId) {
+        return remoteDataSource.getCropDetail(cropId);
+    }
+
+    public Single<ResultMyCropResponseDto> updateCrop(Long id, MyCropUpdateRequest updateRequest) {
+        return remoteDataSource.updateCrop(id, updateRequest);
+    }
+
+    public Single<ResultVoid> addTag(Long cropId, String tagType, LocalDate recordDate, String content, int status) {
+        return remoteDataSource.addTag(cropId, tagType, recordDate, content, status);
+    }
+
+    public Single<ResultVoid> cancelTag(Long cropId, String tagType, LocalDate recordDate, int status) {
+        return remoteDataSource.cancelTag(cropId, tagType, recordDate, status);
     }
 
 }

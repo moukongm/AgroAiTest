@@ -4,6 +4,7 @@ import android.app.Application
 import com.alibaba.android.arouter.launcher.ARouter
 import com.common.storage.MMKVUtils
 import com.common.speech.SpeechManager
+import com.common.speech.VoiceRecognitionManager
 
 /**
  * 基础 Application
@@ -15,6 +16,7 @@ open class BaseApplication : Application() {
         initARouter()
         initMMKV()
         initSpeechEngine()
+        initVoice()
     }
 
     /**
@@ -41,5 +43,9 @@ open class BaseApplication : Application() {
      */
     private fun initMMKV() {
         MMKVUtils.init(this)
+    }
+
+    private fun initVoice(){
+        VoiceRecognitionManager.init(this)
     }
 }

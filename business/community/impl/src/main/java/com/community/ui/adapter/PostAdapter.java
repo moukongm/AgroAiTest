@@ -1,15 +1,19 @@
 package com.community.ui.adapter;
 
-import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import com.agri.pest.client.model.response.PostResponseDto;
-import com.common.utils.ImageLoader;
 import com.community.R;
 import com.community.databinding.ItemCommunityPostBinding;
 import com.uikit.base.BaseBindingAdapter;
+
+import coil.Coil;
+import coil.ImageLoader;
+import coil.request.ImageRequest;
+import coil.size.Scale;
+import coil.transform.CircleCropTransformation;
 
 public class PostAdapter extends BaseBindingAdapter<PostResponseDto, ItemCommunityPostBinding> {
 
@@ -44,10 +48,34 @@ public class PostAdapter extends BaseBindingAdapter<PostResponseDto, ItemCommuni
         }
 
         if (item.getAuthorAvatar() != null && !item.getAuthorAvatar().isEmpty()) {
-            ImageLoader.INSTANCE.loadCircle(binding.ivAvatar, item.getAuthorAvatar());
+            ImageLoader imageLoader = Coil.imageLoader(binding.getRoot().getContext());
+            ImageRequest avatarRequest = new ImageRequest.Builder(binding.getRoot().getContext())
+                    .data(item.getAuthorAvatar())
+                    .placeholder(R.drawable.bg_community_post_avatar)
+                    .error(R.drawable.bg_community_post_avatar)
+                    .target(binding.ivAvatar)
+                    .transformations(new CircleCropTransformation())
+                    .build();
+            imageLoader.enqueue(avatarRequest);
+        } else {
+            binding.ivAvatar.setImageResource(R.drawable.bg_community_post_avatar);
         }
+
         if (item.getImages() != null && !item.getImages().isEmpty()) {
-            ImageLoader.INSTANCE.load(binding.ivCover, item.getImages().get(0));
+            binding.ivCover.setImageDrawable(null);
+
+            ImageLoader imageLoader = Coil.imageLoader(binding.getRoot().getContext());
+            ImageRequest coverRequest = new ImageRequest.Builder(binding.getRoot().getContext())
+                    .data(item.getImages().get(0))
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.placeholder_image)
+                    .target(binding.ivCover)
+                    .scale(Scale.FILL)
+                    .build();
+            imageLoader.enqueue(coverRequest);
+            binding.ivCover.setVisibility(ImageView.VISIBLE);
+        } else {
+            binding.ivCover.setVisibility(ImageView.GONE);
         }
 
         binding.getRoot().setOnClickListener(v -> {

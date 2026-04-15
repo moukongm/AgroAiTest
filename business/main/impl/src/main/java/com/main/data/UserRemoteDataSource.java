@@ -4,11 +4,17 @@ import android.content.Context;
 import android.util.Log;
 
 import com.agri.pest.client.api.ServiceCode;
+
 import com.agri.pest.client.model.request.AdminMessageCreateRequest;
 import com.agri.pest.client.model.response.AuthResponse;
 import com.agri.pest.client.model.response.ResultMessageGroupResponseDto;
 import com.agri.pest.client.model.response.ResultPageResultMessageResponseDto;
 import com.agri.pest.client.model.response.ResultPostResponseDto;
+
+import com.agri.pest.client.model.request.MyCropUpdateRequest;
+import com.agri.pest.client.model.response.AuthResponse;
+import com.agri.pest.client.model.response.ResultListMyCropResponseDto;
+import com.agri.pest.client.model.response.ResultMyCropResponseDto;
 import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.amap.api.location.AMapLocation;
@@ -33,6 +39,9 @@ import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.core.SingleEmitter;
 import io.reactivex.rxjava3.core.SingleOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class UserRemoteDataSource {
 
@@ -96,7 +105,80 @@ public class UserRemoteDataSource {
 
     }
 
+    public Single<ResultListMyCropResponseDto> getMyCrops() {
+        return NetworkManager.INSTANCE.getApi().getMyCrops()
+                .retryWhen(errors -> errors
+                        .flatMap(error -> {
+                            if (isTokenExpired(error)) {
+                                return refreshTokenAndRetry();
+                            }
+                            return Flowable.error(error);
+                        }));
+    }
 
+    public Single<ResultVoid> deleteCrop(Long id) {
+        return NetworkManager.INSTANCE.getApi().deleteCrop(id)
+                .retryWhen(errors -> errors
+                        .flatMap(error -> {
+                            if (isTokenExpired(error)) {
+                                return refreshTokenAndRetry();
+                            }
+                            return Flowable.error(error);
+                        }));
+    }
+
+
+    public Single<ResultMyCropResponseDto> getCropDetail(Long cropId) {
+        return NetworkManager.INSTANCE.getApi().getCropDetail(cropId)
+                .retryWhen(errors -> errors
+                        .flatMap(error -> {
+                            if (isTokenExpired(error)) {
+                                return refreshTokenAndRetry();
+                            }
+                            return Flowable.error(error);
+                        }));
+    }
+
+
+    public Single<ResultMyCropResponseDto> updateCrop(Long id, MyCropUpdateRequest updateRequest) {
+        return NetworkManager.INSTANCE.getApi().updateCrop(id, updateRequest)
+                .retryWhen(errors -> errors
+                        .flatMap(error -> {
+                            if (isTokenExpired(error)) {
+                                return refreshTokenAndRetry();
+                            }
+                            return Flowable.error(error);
+                        }));
+    }
+
+
+    public Single<ResultVoid> addTag(Long cropId, String tagType, LocalDate recordDate, String content, int status) {
+        com.agri.pest.client.model.request.TagOperationRequest request = 
+            new com.agri.pest.client.model.request.TagOperationRequest(recordDate, tagType, content, status);
+        
+        return NetworkManager.INSTANCE.getApi().addTag(cropId, request)
+                .retryWhen(errors -> errors
+                        .flatMap(error -> {
+                            if (isTokenExpired(error)) {
+                                return refreshTokenAndRetry();
+                            }
+                            return Flowable.error(error);
+                        }));
+    }
+
+    public Single<ResultVoid> cancelTag(Long cropId, String tagType, LocalDate recordDate, int status) {
+        com.agri.pest.client.model.request.TagOperationRequest request =
+            new com.agri.pest.client.model.request.TagOperationRequest(recordDate, tagType, null, status);
+
+        return NetworkManager.INSTANCE.getApi().removeTag(cropId, request)
+                .retryWhen(errors -> errors
+                        .flatMap(error -> {
+                            if (isTokenExpired(error)) {
+                                return refreshTokenAndRetry();
+                            }
+                            return Flowable.error(error);
+                        }));
+    }
 
     private boolean isTokenExpired(Throwable error) {
         if (error instanceof retrofit2.HttpException) {

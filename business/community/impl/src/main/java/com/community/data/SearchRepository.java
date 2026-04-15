@@ -1,10 +1,11 @@
 package com.community.data;
 
 import android.app.Application;
-import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.agri.pest.client.model.response.PostResponseDto;
+import com.agri.pest.client.model.response.ResultSearchResultResponse;
 import com.common.storage.database.AppDatabase;
 import com.common.storage.database.SearchHistoryDao;
 import com.common.storage.database.SearchHistoryRecord;
@@ -48,6 +49,21 @@ public class SearchRepository {
                             && result.getCode() == 200
                             && result.getData() != null) {
                         return result.getData();
+                    }
+                    return Collections.emptyList();
+                });
+    }
+
+    public Single<List<PostResponseDto>> searchPosts(String query, int page, int size) {
+        return NetworkManager.INSTANCE.getApi().searchPosts(query, page, size)
+                .map(result -> {
+                    if (result != null
+                            && result.getCode() != null
+                            && result.getCode() == 200
+                            && result.getData() != null
+                            && result.getData().getMatches() != null
+                            && result.getData().getMatches().getList() != null) {
+                        return result.getData().getMatches().getList();
                     }
                     return Collections.emptyList();
                 });

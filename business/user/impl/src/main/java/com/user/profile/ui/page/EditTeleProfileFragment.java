@@ -54,11 +54,11 @@ public class EditTeleProfileFragment extends BaseFragment<FragmentEditnameProfil
                 // 通知 EditProfileActivity 设置 RESULT_OK
                 viewModel.getProfileUpdatedLivedata().postValue(true);
                 Log.d("xzr", mes);
-                Utils.showDialog(getContext(), "修改成功");
+                Utils.showDialog(getActivity(), "修改成功");
             }
             else if("获取成功".equals(mes)){
             }else {
-                Utils.showDialog(getContext(), "修改失败");
+                Utils.showDialog(getActivity(), "修改失败");
             }
             binding.etSettitleEdit.setText("");
             return null;

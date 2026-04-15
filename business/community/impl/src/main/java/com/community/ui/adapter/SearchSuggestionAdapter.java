@@ -1,9 +1,8 @@
 package com.community.ui.adapter;
 
-import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 
+import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.community.databinding.ItemSearchSuggestionBinding;
 import com.uikit.base.BaseBindingAdapter;
 
@@ -23,7 +22,6 @@ public class SearchSuggestionAdapter extends BaseBindingAdapter<String, ItemSear
     public void convert(@NonNull ItemSearchSuggestionBinding binding,
                         @NonNull String item,
                         int position) {
-        android.util.Log.d("SuggestionAdapter", "convert called! item=" + item + " position=" + position);
         binding.tvKeyword.setText(item);
 
         binding.getRoot().setOnClickListener(v -> {

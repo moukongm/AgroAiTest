@@ -96,14 +96,15 @@ public class EditProfileActivity extends BaseActivity<FragmentEditProfileBinding
         });
 
         LiveDataExtKt.observeNonNull(viewModel.getAvatarLivedata(), this, observer -> {
-            Log.d("pppppp", observer);
+            Log.d("ljx", observer);
             ImageLoader.INSTANCE.load(binding.ivSettingTitle, observer);
+            // 通知其他页面刷新
             return null;
         });
 
         LiveDataExtKt.observeNonNull(viewModel.getMesEtAvatarLivedata(), this, observer -> {
             hideLoading();
-            Utils.showDialog(getApplicationContext(), observer);
+            Utils.showDialog(this, observer);
             return null;
         });
 

@@ -208,9 +208,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
         // 错误提示
         LiveDataExtKt.observeNonNull(viewModel.getErrorMessage(), this, msg -> {
             ToastUtils.INSTANCE.showLong(getApplicationContext(), msg);
-            if(msg.equals("AI 识别失败，请重试") || (msg.equals("AI连接错误"))){
-                showPreview("");
-            }
+            showPreview("");
             return null;
         });
     }
@@ -253,6 +251,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
             imagePickerUtil.release();
             imagePickerUtil = null;
         }
+        LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY).setValue(false);
         binding.ivSelectedImage.setImageBitmap(null);
     }
 

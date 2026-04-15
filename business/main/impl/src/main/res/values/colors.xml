@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 日历日期颜色 -->
+    <color name="calendar_date_color">#333333</color>
+    <color name="calendar_weekday_color">#999999</color>
+
+    <!-- 种植管理标签颜色 - 深色 -->
+    <color name="mark_water">#2196F3</color>
+    <color name="mark_fertilize">#4CAF50</color>
+    <color name="mark_medicine">#E53935</color>
+    <color name="mark_note">#FF9800</color>
+
+    <!-- 种植管理标签颜色 - 浅色（待处理状态） -->
+    <color name="mark_water_light">#90CAF9</color>
+    <color name="mark_fertilize_light">#A5D6A7</color>
+    <color name="mark_medicine_light">#EF9A9A</color>
+    <color name="mark_note_light">#FFE0B2</color>
+
+    <!-- Tab文字颜色状态 -->
+    <color name="tab_text_normal">#999999</color>
+    <color name="tab_text_selected">#00CFAC</color>
+
+    <!-- 按钮颜色 -->
+    <color name="btn_gray">#E6E6E6</color>
+    <color name="btn_text_dark">#333333</color>
+    <color name="btn_icon_gray">#666666</color>
+    <color name="orange_selected">#FFB05D</color>
+
+    <!-- 主题颜色 -->
+    <color name="primary">#4CAF50</color>
+    <color name="primary_dark">#388E3C</color>
+    <color name="accent">#FF9800</color>
+</resources>

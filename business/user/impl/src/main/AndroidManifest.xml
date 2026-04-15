@@ -6,5 +6,7 @@
         <activity android:name=".profile.ui.page.EditProfileActivity" android:exported="false"/>
         <activity android:name=".profile.ui.page.SettingProfileActivity" android:exported="false"/>
         <activity android:name=".profile.ui.page.FavoritePostActivity" android:exported="false"/>
+        <activity android:name=".profile.ui.CropSelectActivity" android:exported="false"/>
+        <activity android:name=".login.ui.ModeSelectActivity" android:exported="false"/>
     </application>
 </manifest>

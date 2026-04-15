@@ -23,6 +23,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="51dp"/>
 
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ic_back"
+        android:contentDescription="返回"
+        android:layout_marginStart="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/tvTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"/>
+
     <TextView
         android:id="@+id/tvSubtitle"
         android:layout_width="wrap_content"

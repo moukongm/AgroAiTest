@@ -15,8 +15,16 @@ import com.user.databinding.ItemGuideRegisterBinding;
 import com.user.profile.model.GuideMultiItem;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class GuideMuiltiAdapter extends BaseBindingMultiAdapter<GuideMultiItem> {
+
+    private final Set<String> selectedItems = new HashSet<>();
+
     public GuideMuiltiAdapter() {
         addItemBinding(GuideMultiItem.TYPE_NEW, (parent, viewType, boo) ->
                 ItemGuideRegisterBinding.inflate(LayoutInflater.from(parent.getContext()), viewType, false));
@@ -26,12 +34,21 @@ public class GuideMuiltiAdapter extends BaseBindingMultiAdapter<GuideMultiItem> 
                 ItemGuideAddBinding.inflate(LayoutInflater.from(parent.getContext()), viewType, false));
     }
 
+    public void setSelectedItems(@Nullable List<String> items) {
+        if (items != null) {
+            selectedItems.clear();
+            selectedItems.addAll(items);
+            notifyDataSetChanged();
+        }
+    }
+
     @Override
     public void convert(@NotNull ViewBinding binding, @NonNull GuideMultiItem item, int itemType, int position) {
         switch (itemType) {
             case GuideMultiItem.TYPE_NEW:
                 ItemGuideRegisterBinding binding1 = (ItemGuideRegisterBinding) binding;
                 binding1.chipMelon.setText(item.getNewCrop());
+                binding1.chipMelon.setSelected(selectedItems.contains(item.getNewCrop()));
                 break;
             case GuideMultiItem.TYPE_EDIT:
                 ItemGuideEditBinding editBinding = (ItemGuideEditBinding) binding;
