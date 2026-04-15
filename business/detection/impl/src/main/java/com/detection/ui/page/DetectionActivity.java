@@ -147,6 +147,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
         binding.ivHistory.setOnClickListener(v -> {
             ARouter.getInstance().build(RouterPath.DETECTION_HISTORY).navigation();
         });
+
         // 相册
         binding.llGallery.setOnClickListener(v -> {
             PermissionUtils.INSTANCE.request(this, Arrays.asList(Manifest.permission.CAMERA),
@@ -244,6 +245,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
             cameraProvider.unbindAll();
             cameraProvider = null;
         }
+        LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY).setValue(false);
         camera = null;
         imageCapture = null;
         // 释放图片选择器

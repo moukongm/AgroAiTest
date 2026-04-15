@@ -2,6 +2,7 @@ package com.detection.ui.page;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,8 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.common.base.BaseActivity;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.storage.database.DetectionRecord;
 import com.common.utils.LogUtils;
@@ -32,6 +35,9 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import eightbitlab.com.blurview.BlurView;
+import eightbitlab.com.blurview.RenderScriptBlur;
 
 
 @Route(path = RouterPath.DETECTION_HISTORY)
@@ -58,9 +64,50 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
         adapter = new HistoryAdapter();
         binding.rvStarPosts.setLayoutManager(new GridLayoutManager(this, 2));
         binding.rvStarPosts.setAdapter(adapter);
+        binding.xz.setOnClickListener(v->{
+            showBlurMask();
+            CalendarFragment calendarFragment = new CalendarFragment();
+
+            LiveDataBus.getInstance().with(BusKey.FILTER).observe(this,observe->{
+                String res = (String) observe;
+                if(!res.isEmpty()){
+                  if("close".equals(res))  {
+                      hideBlurMask();
+                  }else{
+                      scrollToMonth(res);
+                      hideBlurMask();
+                  }
+                }
+            });
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fl_fragment_container, calendarFragment)
+                    .commit();
+
+        });
+
         binding.bg.cvInformationBack.setOnClickListener(v -> {
             finish();
         });
+
+        // 高斯模糊
+        binding.blurMask.setVisibility(View.GONE);
+        setupBlurView();
+    }
+
+    private void setupBlurView() {
+        ViewGroup rootView = findViewById(android.R.id.content);
+        binding.blurMask.setupWith(rootView, new RenderScriptBlur(this))
+                .setBlurRadius(2f)
+                .setOverlayColor(0x40000000);
+    }
+
+    private void showBlurMask() {
+        binding.blurMask.setVisibility(View.VISIBLE);
+    }
+
+    private void hideBlurMask() {
+        binding.blurMask.setVisibility(View.GONE);
     }
 
     @Override
@@ -75,6 +122,7 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
         // 1. 先观察本地数据，显示本地数据
         viewModel.getLocalRecordsLiveData().observe(this, records -> {
             if (records != null && !records.isEmpty()) {
+                hideLoading();
                 LogUtils.INSTANCE.d("opopop","local");
                 list = HistoryListMapper.toMultiListFromLocal(records);
                 LogUtils.INSTANCE.d("opopop",list.size()+"");
@@ -128,5 +176,22 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    private void scrollToMonth(String yearMonth) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            HistoryItem item = list.get(i);
+            if (item.getItemType() == HistoryItem.TYPE_DATE) {
+                String dateLabel = item.getDateLabel();
+                if (dateLabel != null && dateLabel.startsWith(yearMonth)) {
+                    binding.rvStarPosts.smoothScrollToPosition(i);
+                    return;
+                }
+            }
+        }
+        Toast.makeText(this, "没有该月份的记录", Toast.LENGTH_SHORT).show();
     }
 }

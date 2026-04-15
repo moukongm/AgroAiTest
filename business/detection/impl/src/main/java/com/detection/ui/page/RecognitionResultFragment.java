@@ -207,6 +207,5 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY).setValue(false);
     }
 }

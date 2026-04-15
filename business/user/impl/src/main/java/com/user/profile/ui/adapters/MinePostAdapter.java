@@ -85,19 +85,6 @@ public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMai
 
         int favCount = item.getFavoriteCount();
         binding.tvPostSaveCount.setText(favCount > 0 ? "+" + favCount + "收藏" : "0收藏");
-        if(favCount == 0){
-            binding.ivSaveAvatar1.setVisibility(View.GONE);
-            binding.ivSaveAvatar2.setVisibility(View.GONE);
-        } else if (favCount == 1) {
-            //后端没给返回的字段；
-//            ImageLoader.INSTANCE.loadCircle(binding.ivSaveAvatar1,);
-            binding.ivSaveAvatar2.setVisibility(View.GONE);
-        }
-        else{
-            binding.ivSaveAvatar1.setVisibility(View.VISIBLE);
-            binding.ivSaveAvatar2.setVisibility(View.VISIBLE);
-        }
-
         binding.tvPostTime.setText(formatTimeAgo(item.getCreatedAt().toString()));
     }
 

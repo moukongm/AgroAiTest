@@ -51,5 +51,6 @@ dependencies {
     api(project(":business:user:api"))
     api(project(":business:detection:api"))
     implementation(project(":foundation:uikit"))
+    implementation(libs.blurview)
     kapt(libs.arouter.compiler)
 }

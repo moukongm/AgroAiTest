@@ -40,5 +40,8 @@ object RouterPath {
     const val USER_PROFILE_SERVICE = "/user/profile_service" // 用户资料服务（跨模块通信）
     const val TOKEN_SERVICE = "/user/token"
 
+    // 筛选
+    const val COMMON_FILTER = "/common/filter"
+
     const val APP_MAIN_ACTIVITY = "/app/activity"
 }

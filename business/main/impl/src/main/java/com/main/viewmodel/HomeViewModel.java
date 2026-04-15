@@ -56,7 +56,8 @@ public class HomeViewModel extends BaseViewModel {
 //                    LogUtils.INSTANCE.d("lyy","预警参数 - 经度:" + formattedLng + " 纬度:" + formattedLat);
                     getWarning();
                 } else {
-                    LogUtils.INSTANCE.d("ljx", "no");
+
+                    LogUtils.INSTANCE.d("ljx", aMapLocation.getErrorCode()+aMapLocation.getErrorInfo());
                 }
             }
         };

@@ -2,8 +2,11 @@ package com.user.profile.ui.page;
 
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,8 +17,11 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.common.base.BaseActivity;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.utils.LogUtils;
+import com.detection.model.HistoryItem;
 import com.user.R;
 import com.user.databinding.FragmentStarProfileBinding;
 import com.user.profile.model.StarFavoriteMutiItem;
@@ -25,6 +31,8 @@ import com.user.profile.viewmodel.ProfileViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import eightbitlab.com.blurview.RenderScriptBlur;
 
 @Route(path = RouterPath.USER_FAVORITE_POST_ACTIVITY)
 public class FavoritePostActivity extends BaseActivity<FragmentStarProfileBinding> {
@@ -66,6 +74,8 @@ public class FavoritePostActivity extends BaseActivity<FragmentStarProfileBindin
             hideLoading();
             finish();
         });
+
+
         binding.rvStarPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -95,8 +105,61 @@ public class FavoritePostActivity extends BaseActivity<FragmentStarProfileBindin
 
             }
         });
+        binding.tvShaixuanTitle.setOnClickListener(v->{
+            showBlurMask();
+            Fragment calendarFragment =(Fragment) ARouter.getInstance().build(RouterPath.COMMON_FILTER).navigation();
+            LiveDataBus.getInstance().with(BusKey.FILTER).observe(this, observe->{
+                String res = (String) observe;
+                if(!res.isEmpty()){
+                    if("close".equals(res))  {
+                        hideBlurMask();
+                    }else{
+                        scrollToMonth(res);
+                        hideBlurMask();
+                    }
+                }
+            });
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fl_fragment_container, calendarFragment)
+                    .commit();
+
+        });
+
+        // 高斯模糊
+        binding.blurMask.setVisibility(View.GONE);
+        setupBlurView();
+    }
+    private void scrollToMonth(String yearMonth) {
+        if (multiList == null || multiList.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < multiList.size(); i++) {
+            StarFavoriteMutiItem item = multiList.get(i);
+            if (item.getItemType() == StarFavoriteMutiItem.TYPE_DATE) {
+                String dateLabel = item.getDateLabel();
+                if (dateLabel != null && dateLabel.startsWith(yearMonth)) {
+                    binding.rvStarPosts.smoothScrollToPosition(i);
+                    return;
+                }
+            }
+        }
+        Toast.makeText(this, "没有该月份的记录", Toast.LENGTH_SHORT).show();
+    }
+    private void setupBlurView() {
+        ViewGroup rootView = findViewById(android.R.id.content);
+        binding.blurMask.setupWith(rootView, new RenderScriptBlur(this))
+                .setBlurRadius(2f)
+                .setOverlayColor(0x40000000);
     }
 
+    private void showBlurMask() {
+        binding.blurMask.setVisibility(View.VISIBLE);
+    }
+
+    private void hideBlurMask() {
+        binding.blurMask.setVisibility(View.GONE);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

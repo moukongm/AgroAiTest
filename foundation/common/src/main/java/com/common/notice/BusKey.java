@@ -8,4 +8,5 @@ public class BusKey {
     public static final String DETECTIONHISTORY = "detectionhistory";
 
     public static final String SENTPOST = "sentpost";
+    public static final String FILTER = "filter";
 }
