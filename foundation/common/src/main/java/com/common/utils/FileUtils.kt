@@ -21,7 +21,9 @@ object FileUtils {
 
     /**
      * 将 Uri 转换为 File
-     * Android 10+ 推荐将 Uri 内容拷贝到私有目录再进行操作，以规避分区存储限制。
+     * - FileProvider 的 content:// URI：直接用原始文件路径
+     * - 其他 content:// URI：通过 contentResolver 拷贝
+     * - file:// URI：直接返回
      *
      * @param context 上下文
      * @param uri 目标 Uri
@@ -29,12 +31,27 @@ object FileUtils {
      * @return 转换后的 File 对象，失败返回 null
      */
     fun uriToFile(context: Context, uri: Uri, destDir: File = context.externalCacheDir ?: context.cacheDir): File? {
-        val fileName = getFileName(context, uri) ?: "temp_file_${System.currentTimeMillis()}"
-        val destFile = File(destDir, fileName)
-        
+        LogUtils.d("ljx_file", "uriToFile start - uri: $uri")
         return try {
-            val inputStream = context.contentResolver.openInputStream(uri) ?: return null
-            if (copyStream(inputStream, FileOutputStream(destFile))) {
+            // FileProvider 的 content:// URI，直接用原始文件
+            if (uri.scheme == "content" && uri.authority?.contains("fileprovider") == true) {
+                val path = uri.path
+                LogUtils.d("ljx_file", "FileProvider URI, path: $path")
+                val originalFile = File(path)
+                LogUtils.d("ljx_file", "file exists: ${originalFile.exists()}, size: ${originalFile.length()}")
+                if (originalFile.exists()) {
+                    return originalFile
+                }
+            }
+
+            // 其他 content:// URI，通过 contentResolver 拷贝
+            val fileName = getFileName(context, uri) ?: "temp_file_${System.currentTimeMillis()}"
+            LogUtils.d("ljx_file", "content URI, fileName: $fileName")
+            val destFile = File(destDir, fileName)
+            val inputStream = context.contentResolver.openInputStream(uri)
+            LogUtils.d("ljx_file", "inputStream: ${inputStream != null}")
+            if (inputStream != null && copyStream(inputStream, FileOutputStream(destFile))) {
+                LogUtils.d("ljx_file", "copied file size: ${destFile.length()}")
                 destFile
             } else {
                 null

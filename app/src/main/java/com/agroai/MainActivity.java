@@ -8,11 +8,16 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.agroai.databinding.ActivityMainBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.amap.api.location.AMapLocationClient;
+import com.common.NavigationController;
 import com.common.base.BaseActivity;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
+import com.common.utils.LogUtils;
 import com.community.ui.CommunityFragment;
-import com.main.MessageFragment;
+import com.main.ui.page.MessageFragment;
 import com.main.ui.page.HomeFragment;
 import com.user.profile.ui.page.ProfileFragment;
 
@@ -21,7 +26,7 @@ import eightbitlab.com.blurview.RenderScriptBlur;
 
 @Route(path = RouterPath.APP_MAIN_ACTIVITY)
 public class MainActivity extends BaseActivity<ActivityMainBinding>
-        implements CommunityFragment.OnNavigationControlListener {
+        implements NavigationController {
 
     private CommunityFragment communityFragment;
 
@@ -50,6 +55,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
         AMapLocationClient.updatePrivacyShow(this, true, true);
         // 告知用户隐私政策是否同意（参数：context, 是否同意）
         AMapLocationClient.updatePrivacyAgree(this, true);
+
+        LiveDataBus.getInstance().with(BusKey.UNLOGIN)
+                .observe(this,observer ->{
+                    LogUtils.INSTANCE.d("unlogin","wai");
+                    if(observer instanceof Boolean){
+                        Boolean b = (Boolean) observer;
+                        if(b){
+                            LogUtils.INSTANCE.d("unlogin","li");
+                            finish();
+                            ARouter.getInstance().build(RouterPath.USER_LOGIN_ACTIVITY).navigation();
+                        }
+                    }
+                });
     }
 
     private void setupFragments() {
@@ -124,4 +142,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
     public void showBottomNavigation() {
         binding.navContainer.setVisibility(View.VISIBLE);
     }
+
+    @Override
+    protected void onDestroy() {
+        // 停止定位，防止 HomeViewModel 中的 AMapLocationClient 泄漏
+        if (homeFragment != null) {
+            homeFragment.stopLocationIfNeeded();
+        }
+        super.onDestroy();
+    }
+
+
 }

@@ -12,6 +12,7 @@ import com.agri.pest.client.model.request.ChangePhoneRequest;
 import com.common.base.BaseFragment;
 import com.common.utils.LiveDataExtKt;
 import com.user.databinding.FragmentEditnameProfileBinding;
+import com.user.profile.Utils;
 import com.user.profile.viewmodel.ProfileViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,33 +33,34 @@ public class EditTeleProfileFragment extends BaseFragment<FragmentEditnameProfil
         binding = getBinding();
         binding.tvSettitleTitle.setText("修改电话");
         binding.tvSettitleHint.setText("请输入您的电话");
-        Fragment parent = requireParentFragment();
-        if (parent instanceof ProfileFragment) {
-            viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
-        } else {
-            // 兼容：尝试从爷爷辈获取
-            viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
-        }
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
-        binding.cvSettitleBack.setOnClickListener(v -> {
+        binding.bg.cvInformationBack.setOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
         });
 
         binding.tvEditnameOk.setOnClickListener(view -> {
             ChangePhoneRequest request = new ChangePhoneRequest(String.valueOf(binding.etSettitleEdit.getText()));
-            binding.tvEditnameOk.setEnabled(false);
             viewModel.updatePhone(request);
+            binding.tvEditnameOk.setEnabled(false);
         });
 
         LiveDataExtKt.observeNonNull(viewModel.getPhoneLivedata(), this, mes -> {
             binding.tvEditnameOk.setEnabled(true);
-            viewModel.showDialog(getContext(), mes);
+
             if ("修改成功".equals(mes)) {
+                // 修改电话成功，通知 Activity 返回结果
                 getParentFragmentManager().popBackStack();
+                // 通知 EditProfileActivity 设置 RESULT_OK
+                viewModel.getProfileUpdatedLivedata().postValue(true);
                 Log.d("xzr", mes);
-            } else {
-                binding.etSettitleEdit.setText("");
+                Utils.showDialog(getContext(), "修改成功");
             }
+            else if("获取成功".equals(mes)){
+            }else {
+                Utils.showDialog(getContext(), "修改失败");
+            }
+            binding.etSettitleEdit.setText("");
             return null;
         });
 

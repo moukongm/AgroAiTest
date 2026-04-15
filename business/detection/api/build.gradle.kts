@@ -25,4 +25,5 @@ dependencies {
     api(project(":foundation:common"))
     implementation(project(":foundation:network"))
     implementation(project(":foundation:uikit"))
+
 }

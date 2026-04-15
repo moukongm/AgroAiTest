@@ -14,6 +14,7 @@ import com.common.base.BaseFragment;
 import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
 import com.user.databinding.FragmentGuideRegisterBinding;
+import com.user.profile.Utils;
 import com.user.profile.model.GuideMultiItem;
 import com.user.profile.ui.adapters.GuideFirAdapter;
 import com.user.profile.ui.adapters.GuideMuiltiAdapter;
@@ -39,13 +40,7 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
     @Override
     public void initView() {
         binding = getBinding();
-        Fragment parent = requireParentFragment();
-        if (parent instanceof ProfileFragment) {
-            viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
-        } else {
-            // 兼容：尝试从爷爷辈获取
-            viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
-        }
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
         List<String> list1 = new ArrayList<>();
         list1.add("小麦");
@@ -132,7 +127,7 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
 
         LiveDataExtKt.observeNonNull(viewModel.getCropsLivedata(), this, mes -> {
             binding.btnGuideOk.setEnabled(true);
-            viewModel.showDialog(getContext(), mes);
+            Utils.showDialog(getContext(), mes);
             if ("修改成功".equals(mes)) {
                 getParentFragmentManager().popBackStack();
                 Log.d("xzr", mes);

@@ -4,11 +4,15 @@ import android.content.Context;
 import android.util.Log;
 
 import com.agri.pest.client.model.request.ChatRequest;
+import com.agri.pest.client.model.response.AgentChatHistory;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
+import com.agri.pest.client.model.response.ResultListDiagnosisItem;
 import com.agri.pest.client.model.response.ResultString;
 import com.common.utils.LogUtils;
 import com.network.NetworkManager;
 import com.user.TokenService;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
@@ -25,17 +29,19 @@ public class UserRemoteDataSource {
                             return Flowable.error(error);
                         }));
     }
-    public Single<ResultString> getchat(ChatRequest chatRequest) {
+    public  Single<ResultListDiagnosisItem> getchat(ChatRequest chatRequest) {
+
         return NetworkManager.INSTANCE.getApi().chat(chatRequest)
                 .retryWhen(errors -> errors
-                        .flatMap(error -> {
-                            if (isTokenExpired(error)) {
-                                return refreshTokenAndRetry();
-                            }
-                            return Flowable.error(error);
-                        }));
+                .flatMap(error -> {
+                    if (isTokenExpired(error)) {
+                        return refreshTokenAndRetry();
+                    }
+                    return Flowable.error(error);
+                }));
     }
     public Single<ResultListAgentChatHistory> getchatHistory() {
+
         return NetworkManager.INSTANCE.getApi().getHistory()
                 .retryWhen(errors -> errors
                         .flatMap(error -> {

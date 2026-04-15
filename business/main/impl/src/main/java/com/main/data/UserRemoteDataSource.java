@@ -4,8 +4,13 @@ import android.content.Context;
 import android.util.Log;
 
 import com.agri.pest.client.api.ServiceCode;
+import com.agri.pest.client.model.request.AdminMessageCreateRequest;
 import com.agri.pest.client.model.response.AuthResponse;
+import com.agri.pest.client.model.response.ResultMessageGroupResponseDto;
+import com.agri.pest.client.model.response.ResultPageResultMessageResponseDto;
+import com.agri.pest.client.model.response.ResultPostResponseDto;
 import com.agri.pest.client.model.response.ResultUserProfileDto;
+import com.agri.pest.client.model.response.ResultVoid;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -49,6 +54,7 @@ public class UserRemoteDataSource {
             AMapLocationClient aMapLocationClient = new AMapLocationClient(context);
             AMapLocationClientOption aMapLocationClientOption = new AMapLocationClientOption();
             aMapLocationClientOption.setOnceLocation(true);
+            aMapLocationClientOption.setNeedAddress(true);
             aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
             aMapLocationClient.setLocationOption(aMapLocationClientOption);
             aMapLocationClient.startLocation();
@@ -64,6 +70,9 @@ public class UserRemoteDataSource {
     public Single<GeocodeResponse> getGeoCode(String name) {
         return LocationRetrofitClient.getLocationApi().getCityCode(name);
     }
+    public Single<ResultPageResultMessageResponseDto> getWarnningApi() {
+       return NetworkManager.INSTANCE.getApi().getAlertMessages(0, 1);
+    }
 
     public Single<WeatherResponse> getWeather(String jwd) {
         return LocationRetrofitClient.getWeatherApiService().getWeather(authorization,jwd);
@@ -72,6 +81,22 @@ public class UserRemoteDataSource {
     public Single<AlertResponse> getWarnning(String jd, String wd) {
         return LocationRetrofitClient.getWeatherApiService().getWarnning(authorization,jd, wd);
     }
+
+    public  Single<ResultMessageGroupResponseDto> getMessageUser(int i) {
+        return NetworkManager.INSTANCE.getApi().getMyMessages(i, 10);
+    }
+    public  Single<ResultVoid> isRead(Long i) {
+        return NetworkManager.INSTANCE.getApi().markAsRead(i);
+    }
+    public  Single<ResultVoid> isReadAll() {
+        return NetworkManager.INSTANCE.getApi().markAllAsRead();
+    }
+    public  Single<ResultPostResponseDto> getPost(Long id) {
+        return NetworkManager.INSTANCE.getApi().getPostDetail(id);
+
+    }
+
+
 
     private boolean isTokenExpired(Throwable error) {
         if (error instanceof retrofit2.HttpException) {

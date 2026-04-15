@@ -1,6 +1,5 @@
 package com.network
 
-import com.common.storage.MMKVUtils
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.openapitools.client.infrastructure.ApiClient
@@ -14,14 +13,6 @@ import java.util.concurrent.TimeUnit
 object NetworkManager {
     // 基础 URL
     private const val BASE_URL = "http://115.191.67.35:8080/"
-
-    /**
-     * 从 MMKV 读取保存的 Token
-     */
-    private fun getSavedToken(): String? {
-        val token = MMKVUtils.custom("user_module").getString("token", "")
-        return if (token.isNullOrEmpty()) null else token
-    }
 
     /**
      * 全局共享的 OkHttpClient
@@ -41,19 +32,13 @@ object NetworkManager {
     /**
      * SDK ApiClient 实例
      * 使用自定义的 okHttpClientBuilder 以便复用
-     * 初始化时自动从 MMKV 读取 Token
      */
     private val apiClient by lazy {
-        val client = ApiClient(
+        ApiClient(
             baseUrl = BASE_URL,
             okHttpClientBuilder = okHttpClient.newBuilder(),
             authNames = arrayOf("BearerAuth")
         )
-        // 尝试从 MMKV 恢复 Token
-        getSavedToken()?.let {
-            client.setBearerToken(it)
-        }
-        client
     }
 
     /**

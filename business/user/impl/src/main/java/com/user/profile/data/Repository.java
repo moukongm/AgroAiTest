@@ -8,6 +8,7 @@ import com.agri.pest.client.model.response.ResultString;
 import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.network.NetworkManager;
+import com.user.login.data.UserStorageConstant;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
@@ -54,5 +55,16 @@ public class Repository {
 
     public Single<ResultPageResultPostResponseDto> getMinePosts(int page){
         return remoteDataSource.getMinePosts(page);
+    }
+
+    public void updateLocalTele(String newTele) {
+        localDataSource.updateTele(newTele);
+    }
+    public void updateLocalNickname(String newNickname) {
+        localDataSource.updateNickname(newNickname);
+
+    }
+    public void updateLocalPassword(String newPassword) {
+        localDataSource.updatePassword(newPassword);
     }
 }

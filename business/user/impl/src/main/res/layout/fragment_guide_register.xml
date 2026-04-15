@@ -3,11 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
+    android:background="@drawable/bg_main_newheader"
     android:clickable="true"
     android:focusable="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_mainp_header">
+   >
 
     <TextView
         android:id="@+id/tvTitle"

@@ -40,15 +40,19 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     }
 
     private void checkLogin() {
-        if (TokenService.api().isTokenValid()) {
-            ARouter.getInstance()
-                    .build(RouterPath.APP_MAIN_ACTIVITY)
-                    .navigation();
-        } else {
-            ARouter.getInstance()
-                    .build(RouterPath.USER_LOGIN_ACTIVITY)
-                    .navigation();
-        }
-        finish();
+        // 使用 post 延迟到视图完全显示后再跳转，避免 ARouter 持有 SplashActivity 引用
+        binding.getRoot().post(() -> {
+            if (TokenService.api().isTokenValid()) {
+                NetworkManager.INSTANCE.setToken(MMKVUtils.INSTANCE.custom("user_module").getString("token", ""));
+                ARouter.getInstance()
+                        .build(RouterPath.APP_MAIN_ACTIVITY)
+                        .navigation();
+            } else {
+                ARouter.getInstance()
+                        .build(RouterPath.USER_LOGIN_ACTIVITY)
+                        .navigation();
+            }
+            finish();
+        });
     }
 }

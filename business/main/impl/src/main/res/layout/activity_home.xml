@@ -1,704 +1,712 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/bg_main_header">
-
-    <androidx.core.widget.NestedScrollView
+    android:id = "@+id/fullscreen_header"
+    android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:fillViewport="true">
+        >
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/shape_main_main"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="24dp">
+            android:fillViewport="true">
 
-            <!-- 左右留白约 4% 屏宽，中间分列约 48% / 52% -->
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_content_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.06" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_content_end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.94" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_col_split"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.50" />
-
-            <LinearLayout
-                android:layout_marginLeft="5dp"
-                android:id="@+id/mainpage_hello"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
-                android:orientation="horizontal"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/tv_nihao"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="你好，"
-                    android:textColor="@android:color/white"
-                    android:textSize="24sp" />
-
-                <TextView
-                    android:id="@+id/mainpage_username"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="王建军"
-                    android:textColor="@android:color/white"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/mainpage_header_decoration"
-                android:layout_width="40dp"
-                android:layout_height="9dp"
-                android:layout_marginLeft="100dp"
-                android:layout_marginTop="2dp"
-                android:contentDescription="@null"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_main_smell"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mainpage_hello" />
-
-            <ImageView
-                android:id="@+id/mainpage_local"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginLeft="5dp"
-                android:alpha="0.92"
-                android:src="@drawable/ic_main_dingwei"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/mainpage_header_decoration" />
-
-            <TextView
-                android:id="@+id/mainpage_placename"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="杭州"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@+id/mainpage_local"
-                app:layout_constraintStart_toEndOf="@+id/mainpage_local"
-                app:layout_constraintTop_toTopOf="@+id/mainpage_local" />
-
-            <ImageView
-                android:id="@+id/mainpage_place_arrow"
-                android:layout_width="13dp"
-                android:layout_height="10dp"
-                android:layout_marginStart="4dp"
-                android:src="@drawable/ic_main_dingweixuan"
-                app:layout_constraintBottom_toBottomOf="@+id/mainpage_placename"
-                app:layout_constraintStart_toEndOf="@+id/mainpage_placename"
-                app:layout_constraintTop_toTopOf="@+id/mainpage_placename" />
-
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/barrier_header_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="mainpage_hello,mainpage_local,mainpage_placename,mainpage_place_arrow,mainpage_header_decoration" />
-
-            <!-- 竹叶：向上延伸到预警卡片顶边（紧贴预警边框），宽度屏宽45%，无高度上限 -->
-            <ImageView
-                android:id="@+id/mainpage_icon_leaf"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginBottom="-5dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_main_xiecao"
-                app:layout_constraintBottom_toTopOf="@+id/mainpage_warning"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.85"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/mainpage_temp"
-                app:layout_constraintWidth_percent="0.45" />
-
-            <TextView
-                android:id="@+id/mainpage_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="3"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:textColor="@android:color/white"
-                android:textSize="60sp"
-                android:textStyle="bold"
-                app:autoSizeStepGranularity="2sp"
-                app:autoSizeTextType="uniform"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/barrier_header_bottom" />
-
-            <TextView
-                android:id="@+id/mainpage_du"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="℃/"
-
-                android:textColor="@android:color/white"
-                android:textSize="25sp"
-                app:layout_constraintBottom_toBottomOf="@+id/mainpage_temp"
-                app:layout_constraintStart_toEndOf="@+id/mainpage_temp" />
-
-            <TextView
-                android:id="@+id/mainpage_weather"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="晴"
-                android:textColor="@android:color/white"
-                android:textSize="25sp"
-                app:layout_constraintBottom_toBottomOf="@id/mainpage_du"
-                app:layout_constraintStart_toEndOf="@+id/mainpage_du" />
-
-            <!-- 天气图标：紧挨「晴」字右侧偏上，不要约束到屏幕右缘（否则会落到竹叶上） -->
-            <ImageView
-                android:id="@+id/mainpage_weather_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="-30dp"
-                android:layout_marginBottom="-10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_weather_cloudy"
-                app:layout_constraintBottom_toTopOf="@+id/mainpage_weather"
-                app:layout_constraintStart_toEndOf="@+id/mainpage_weather" />
-
-            <TextView
-                android:id="@+id/mainpage_time"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-10dp"
-                android:text="农历冬月十五"
-                android:layout_marginLeft="5dp"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/mainpage_temp" />
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/mainpage_warning"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:minHeight="140dp"
-                android:background="@android:color/transparent"
-                android:backgroundTint="@android:color/transparent"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:cardMaxElevation="0dp"
-                app:cardPreventCornerOverlap="false"
-                app:cardUseCompatPadding="false"
-                app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/mainpage_time">
-
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/cons_nothaveWarn"
-                    android:layout_width="match_parent"
-                    android:background="#90ffffff"
-                    android:minHeight="140dp"
-                    android:layout_height="match_parent">
-                    <TextView
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        android:id="@+id/tv_nothaveWarn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="暂无预警信息"
-                        android:textColor="#202020"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/cons_haveWarn"
-                    android:layout_width="match_parent"
-                    android:background="#90ffffff"
-                    android:layout_height="match_parent"
-                    android:visibility="visible">
-
-                    <ImageView
-                        android:id="@+id/mainpage_icon_warning"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/ic_main_warning"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/mainpage_warning_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="22dp"
-                        android:text="【橙色霜冻预警警报】"
-                        android:textColor="#202020"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintLeft_toRightOf="@+id/mainpage_icon_warning"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id = "@+id/tv_warnning"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginRight="20dp"
-                        android:maxLines="2"
-                        android:text="预计24小时内，我区地面最低温将降至-5℃以下，农作物面临严重冻害风险。请农户立即采取防寒防冻措施，对农作物、蔬菜、花卉、瓜果等进行覆盖、烟熏、灌水等防护处理，减轻冻害影响，确保农业生产安全。"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/mainpage_warning_title" />
-
-                    <ImageView
-                        android:id="@+id/mainpage_warning_right"
-                        android:layout_width="70dp"
-                        android:layout_height="20dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/ic_main_warndetails"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_warnning"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintRight_toRightOf="parent" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginRight="10dp"
-                        android:scaleType="centerInside"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/mainpage_warning_goneright"
-                        android:layout_width="70dp"
-                        android:layout_height="20dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/ic_main_shouqixiangxi"
-                        android:visibility="gone"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_warnning"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintRight_toRightOf="parent" />
-
-                    <TextView
-                        android:id="@+id/mainpage_warning_history"
-                        android:layout_width="50dp"
-                        android:layout_height="13dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginBottom="10dp"
-
-                        android:background="@drawable/ic_warn_history"
-                        android:textColor="@android:color/black"
-                        android:textSize="13sp"
-
-                        app:layout_constraintTop_toBottomOf="@+id/tv_warnning"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/mainpage_head"
-                android:layout_width="54dp"
-                android:layout_height="54dp"
-                android:backgroundTint="@android:color/transparent"
-                app:cardCornerRadius="27dp"
-                app:cardElevation="0dp"
-                app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
-                app:layout_constraintTop_toTopOf="@+id/mainpage_hello">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/iv_settingTitle"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_main_title"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
-
-            <LinearLayout
-                android:id="@+id/mainpage_laonianban"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@+id/mainpage_head"
-                app:layout_constraintEnd_toStartOf="@+id/mainpage_head"
-                app:layout_constraintTop_toTopOf="@+id/mainpage_head">
-
-                <ImageView
-                    android:id="@+id/mainpage_icon_old"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_main_laonianban" />
-
-            </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/mainpage_history"
-                android:layout_width="0dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:layout_marginEnd="8dp"
-                android:minHeight="82dp"
-                app:cardCornerRadius="20dp"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_col_split"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/mainpage_warning">
+                android:background="@drawable/shape_main_main"
+                android:clipToPadding="false"
+                android:paddingBottom="24dp">
 
-                <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                <!-- 左右留白约 4% 屏宽，中间分列约 48% / 52% -->
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_content_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.06" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_content_end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.94" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_col_split"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.50" />
+
+                <LinearLayout
                     android:layout_marginLeft="5dp"
-                    android:layout_marginTop="12dp"
-                    android:src="@drawable/ic_main_shibie" />
-
-                <TextView
+                    android:id="@+id/mainpage_hello"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="75dp"
-                    android:layout_marginTop="15dp"
-                    android:text="识别记录"
-                    android:textColor="#373737"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/mianpage_cnt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="75dp"
-                    android:layout_marginTop="40dp"
-                    android:alpha="0.35"
-                    android:text="共5次识别记录"
-                    android:textColor="#000000"
-                    android:textSize="12sp" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/mainpage_ai"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="8dp"
-                android:minHeight="82dp"
-                app:cardCornerRadius="20dp"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_col_split"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/mainpage_history">
-
-                <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="12dp"
-                    android:src="@drawable/ic_main_ai" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="75dp"
-                    android:layout_marginTop="15dp"
-                    android:text="AI助手"
-                    android:textColor="#373737"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="75dp"
-                    android:layout_marginTop="40dp"
-                    android:alpha="0.35"
-                    android:text="询问病虫害难题"
-                    android:textColor="#000000"
-                    android:textSize="12sp" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/mainpage_takephoto"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="8dp"
-
-                app:cardCornerRadius="20dp"
-                app:layout_constraintBottom_toBottomOf="@+id/mainpage_ai"
-                app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
-                app:layout_constraintStart_toEndOf="@+id/guideline_col_split"
-                app:layout_constraintTop_toTopOf="@+id/mainpage_history">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/iv_takephoto_bg"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/bg_main_takephoto" />
-
-                    <LinearLayout
-                        android:id="@+id/ll_takephoto"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/iv_takephoto_icon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:adjustViewBounds="true"
-                            android:maxWidth="96dp"
-                            android:maxHeight="96dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_main_takephoto" />
-
-                        <TextView
-                            android:id="@+id/tv_takephoto_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="拍照识别"
-                            android:textColor="@android:color/white"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:id="@+id/tv_takephoto_sub"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:alpha="0.6"
-                            android:text="识别病虫害"
-                            android:textColor="@android:color/white"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </FrameLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/mainpage_ai" />
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/mainpage_plant_card"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="48dp"
-                app:cardCornerRadius="20dp"
-                app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
-                app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                app:layout_constraintTop_toBottomOf="@+id/recycler">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_marginTop="48dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/tv_plant_manage_title"
+                        android:id="@+id/tv_nihao"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginTop="10dp"
-                        android:text="种植物管理"
-                        android:textColor="#505050"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        app:layout_constraintLeft_toRightOf="@+id/mainpage_plant_head"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/mainpage_plant_icon"
-                        android:layout_width="20dp"
-                        android:layout_height="15dp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginBottom="2dp"
-                        android:src="@drawable/ic_main_dingwei"
-                        app:layout_constraintBottom_toBottomOf="@id/mainpage_plant_local"
-                        app:layout_constraintLeft_toRightOf="@+id/mainpage_plant_head" />
+                        android:text="你好，"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp" />
 
                     <TextView
-                        android:id="@+id/mainpage_plant_local"
+                        android:id="@+id/mainpage_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:alpha="0.35"
-                        android:gravity="bottom"
-                        android:text="杭州"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        app:layout_constraintBottom_toBottomOf="@id/mainpage_plant_head"
-                        app:layout_constraintLeft_toRightOf="@+id/mainpage_plant_icon" />
+                        android:text="王建军"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/mainpage_header_decoration"
+                    android:layout_width="40dp"
+                    android:layout_height="9dp"
+                    android:layout_marginLeft="100dp"
+                    android:layout_marginTop="2dp"
+                    android:contentDescription="@null"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_main_smell"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_hello" />
+
+                <ImageView
+                    android:id="@+id/mainpage_local"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginLeft="5dp"
+                    android:alpha="0.92"
+                    android:src="@drawable/ic_main_dingwei"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_header_decoration" />
+
+                <TextView
+                    android:id="@+id/mainpage_placename"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="杭州"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/mainpage_local"
+                    app:layout_constraintStart_toEndOf="@+id/mainpage_local"
+                    app:layout_constraintTop_toTopOf="@+id/mainpage_local" />
+
+                <ImageView
+                    android:id="@+id/mainpage_place_arrow"
+                    android:layout_width="13dp"
+                    android:layout_height="10dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_main_dingweixuan"
+                    app:layout_constraintBottom_toBottomOf="@+id/mainpage_placename"
+                    app:layout_constraintStart_toEndOf="@+id/mainpage_placename"
+                    app:layout_constraintTop_toTopOf="@+id/mainpage_placename" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier_header_bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="mainpage_hello,mainpage_local,mainpage_placename,mainpage_place_arrow,mainpage_header_decoration" />
+
+                <!-- 竹叶：向上延伸到预警卡片顶边（紧贴预警边框），宽度屏宽45%，无高度上限 -->
+                <ImageView
+                    android:id="@+id/mainpage_icon_leaf"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="-5dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_main_xiecao"
+                    app:layout_constraintBottom_toTopOf="@+id/mainpage_warning"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.85"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/mainpage_temp"
+                    app:layout_constraintWidth_percent="0.45" />
+
+                <TextView
+                    android:id="@+id/mainpage_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="3"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="60sp"
+                    android:textStyle="bold"
+                    app:autoSizeStepGranularity="2sp"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/barrier_header_bottom" />
+
+                <TextView
+                    android:id="@+id/mainpage_du"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="℃/"
+
+                    android:textColor="@android:color/white"
+                    android:textSize="25sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/mainpage_temp"
+                    app:layout_constraintStart_toEndOf="@+id/mainpage_temp" />
+
+                <TextView
+                    android:id="@+id/mainpage_weather"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="晴"
+                    android:textColor="@android:color/white"
+                    android:textSize="25sp"
+                    app:layout_constraintBottom_toBottomOf="@id/mainpage_du"
+                    app:layout_constraintStart_toEndOf="@+id/mainpage_du" />
+
+                <!-- 天气图标：紧挨「晴」字右侧偏上，不要约束到屏幕右缘（否则会落到竹叶上） -->
+                <ImageView
+                    android:id="@+id/mainpage_weather_icon"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="-30dp"
+                    android:layout_marginBottom="-10dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_weather_cloudy"
+                    app:layout_constraintBottom_toTopOf="@+id/mainpage_weather"
+                    app:layout_constraintStart_toEndOf="@+id/mainpage_weather" />
+
+                <TextView
+                    android:id="@+id/mainpage_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-10dp"
+                    android:text="农历冬月十五"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_temp" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/mainpage_warning"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:minHeight="140dp"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="@android:color/transparent"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:cardMaxElevation="0dp"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardUseCompatPadding="false"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_time">
+
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/plant_crop_tag_bar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@drawable/bg_main_takephoto"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginRight="5dp"
-                            android:gravity="center"
-                            android:src="@drawable/ic_plant_name"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@+id/tv_cropname"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                        </ImageView>
-
+                        android:id="@+id/cons_nothaveWarn"
+                        android:layout_width="match_parent"
+                        android:background="#90ffffff"
+                        android:minHeight="140dp"
+                        android:layout_height="match_parent">
                         <TextView
-                            android:id="@+id/tv_cropname"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            android:id="@+id/tv_nothaveWarn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="15dp"
-                            android:gravity="center"
-                            android:text="新建"
-                            android:textAllCaps="false"
-                            android:textColor="@android:color/white"
-                            android:textSize="14sp"
+                            android:layout_gravity="center"
+                            android:text="暂无预警信息"
+                            android:textColor="#202020"
+                            android:textSize="18sp"
                             android:textStyle="bold"
+                            android:visibility="gone" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cons_haveWarn"
+                        android:layout_width="match_parent"
+                        android:background="#90ffffff"
+                        android:layout_height="match_parent"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/mainpage_icon_warning"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="10dp"
+                            android:src="@drawable/ic_main_warning"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/mainpage_warning_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="22dp"
+                            android:text="【橙色霜冻预警警报】"
+                            android:textColor="#202020"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:layout_constraintLeft_toRightOf="@+id/mainpage_icon_warning"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id = "@+id/tv_warnning"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="20dp"
+                            android:maxLines="2"
+                            android:text="预计24小时内，我区地面最低温将降至-5℃以下，农作物面临严重冻害风险。请农户立即采取防寒防冻措施，对农作物、蔬菜、花卉、瓜果等进行覆盖、烟熏、灌水等防护处理，减轻冻害影响，确保农业生产安全。"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/mainpage_warning_title" />
+
+                        <ImageView
+                            android:id="@+id/mainpage_warning_right"
+                            android:layout_width="70dp"
+                            android:layout_height="20dp"
+                            android:layout_marginRight="20dp"
+                            android:layout_marginBottom="15dp"
+                            android:layout_marginTop="10dp"
+                            android:src="@drawable/ic_main_warndetails"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_warnning"
                             app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="10dp"
+                            android:scaleType="centerInside"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/mainpage_warning_goneright"
+                            android:layout_width="70dp"
+                            android:layout_height="20dp"
+                            android:layout_marginRight="20dp"
+                            android:layout_marginBottom="15dp"
+                            android:layout_marginTop="10dp"
+                            android:src="@drawable/ic_main_shouqixiangxi"
+                            android:visibility="gone"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_warnning"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent" />
+
+                        <TextView
+                            android:id="@+id/mainpage_warning_history"
+                            android:layout_width="50dp"
+                            android:layout_height="13dp"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginBottom="10dp"
+
+                            android:background="@drawable/ic_warn_history"
+                            android:textColor="@android:color/black"
+                            android:textSize="13sp"
+
+                            app:layout_constraintTop_toBottomOf="@+id/tv_warnning"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/mainpage_head"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:backgroundTint="@android:color/transparent"
+                    app:cardCornerRadius="27dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
+                    app:layout_constraintTop_toTopOf="@+id/mainpage_hello">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/iv_settingTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_main_title"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <LinearLayout
+                    android:id="@+id/mainpage_laonianban"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@+id/mainpage_head"
+                    app:layout_constraintEnd_toStartOf="@+id/mainpage_head"
+                    app:layout_constraintTop_toTopOf="@+id/mainpage_head">
+
+                    <ImageView
+                        android:id="@+id/mainpage_icon_old"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_main_laonianban" />
+
+                </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/mainpage_history"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:minHeight="82dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="20dp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_col_split"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_warning">
+
+                    <ImageView
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="12dp"
+                        android:src="@drawable/ic_main_shibie" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="75dp"
+                        android:layout_marginTop="15dp"
+                        android:text="识别记录"
+                        android:textColor="#373737"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/mianpage_cnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="75dp"
+                        android:layout_marginTop="40dp"
+                        android:alpha="0.35"
+                        android:text="共5次识别记录"
+                        android:textColor="#000000"
+                        android:textSize="12sp" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/mainpage_ai"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="8dp"
+                    android:minHeight="82dp"
+                    app:cardCornerRadius="20dp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_col_split"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_history">
+
+                    <ImageView
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="12dp"
+                        android:src="@drawable/ic_main_ai" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="75dp"
+                        android:layout_marginTop="15dp"
+                        android:text="AI助手"
+                        android:textColor="#373737"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="75dp"
+                        android:layout_marginTop="40dp"
+                        android:alpha="0.35"
+                        android:text="询问病虫害难题"
+                        android:textColor="#000000"
+                        android:textSize="12sp" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/mainpage_takephoto"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="8dp"
+
+                    app:cardCornerRadius="20dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/mainpage_ai"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_col_split"
+                    app:layout_constraintTop_toTopOf="@+id/mainpage_history">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/iv_takephoto_bg"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/bg_main_takephoto" />
+
+                        <LinearLayout
+                            android:id="@+id/ll_takephoto"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/iv_takephoto_icon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:adjustViewBounds="true"
+                                android:maxWidth="96dp"
+                                android:maxHeight="96dp"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_main_takephoto" />
+
+                            <TextView
+                                android:id="@+id/tv_takephoto_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="拍照识别"
+                                android:textColor="@android:color/white"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/tv_takephoto_sub"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:alpha="0.6"
+                                android:text="识别病虫害"
+                                android:textColor="@android:color/white"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_ai" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/mainpage_plant_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="48dp"
+                    app:cardCornerRadius="20dp"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/recycler">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tv_plant_manage_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="10dp"
+                            android:text="种植物管理"
+                            android:textColor="#505050"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:layout_constraintLeft_toRightOf="@+id/mainpage_plant_head"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/mainpage_plant_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="15dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginBottom="2dp"
+                            android:src="@drawable/ic_main_dingwei"
+                            app:layout_constraintBottom_toBottomOf="@id/mainpage_plant_local"
+                            app:layout_constraintLeft_toRightOf="@+id/mainpage_plant_head" />
+
+                        <TextView
+                            android:id="@+id/mainpage_plant_local"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.35"
+                            android:gravity="bottom"
+                            android:text="杭州"
+                            android:textColor="#000000"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toBottomOf="@id/mainpage_plant_head"
+                            app:layout_constraintLeft_toRightOf="@+id/mainpage_plant_icon" />
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/plant_crop_tag_bar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="10dp"
+                            android:background="@drawable/bg_main_takephoto"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
 
-                        </TextView>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/mainpage_plant_head"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="10dp"
-                        android:backgroundTint="@android:color/transparent"
-                        app:cardCornerRadius="25dp"
-                        app:cardElevation="0dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
                             <ImageView
-                                android:id="@+id/iv_item_settingTitle"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_main_title"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="15dp"
+                                android:layout_marginRight="5dp"
+                                android:gravity="center"
+                                android:src="@drawable/ic_plant_name"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintRight_toLeftOf="@+id/tv_cropname"
                                 app:layout_constraintTop_toTopOf="parent">
 
                             </ImageView>
+
+                            <TextView
+                                android:id="@+id/tv_cropname"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="15dp"
+                                android:gravity="center"
+                                android:text="新建"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                            </TextView>
                         </androidx.constraintlayout.widget.ConstraintLayout>
-                    </androidx.cardview.widget.CardView>
 
-                    <androidx.constraintlayout.widget.Barrier
-                        android:id="@+id/barrier_plant_header"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:barrierDirection="bottom"
-                        app:constraint_referenced_ids="mainpage_plant_head,tv_plant_manage_title,plant_crop_tag_bar" />
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/mainpage_plant_photo"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginBottom="20dp"
-                        app:cardCornerRadius="20dp"
-                        app:layout_constraintDimensionRatio="16:9"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/barrier_plant_header">
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/mainpage_plant_head"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginLeft="15dp"
+                            android:layout_marginTop="10dp"
+                            android:backgroundTint="@android:color/transparent"
+                            app:cardCornerRadius="25dp"
+                            app:cardElevation="0dp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
 
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_plant_none">
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
 
-                        </ImageView>
+                                <ImageView
+                                    android:id="@+id/iv_item_settingTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/ic_main_title"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
 
-                        <ImageView
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_plant_noneadd">
+                                </ImageView>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+                        </androidx.cardview.widget.CardView>
 
-                        </ImageView>
-                    </androidx.cardview.widget.CardView>
+                        <androidx.constraintlayout.widget.Barrier
+                            android:id="@+id/barrier_plant_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:barrierDirection="bottom"
+                            app:constraint_referenced_ids="mainpage_plant_head,tv_plant_manage_title,plant_crop_tag_bar" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/mainpage_plant_photo"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginBottom="20dp"
+                            app:cardCornerRadius="20dp"
+                            app:layout_constraintDimensionRatio="16:9"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/barrier_plant_header">
 
-            </androidx.cardview.widget.CardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_plant_none">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                            </ImageView>
+
+                            <ImageView
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_plant_noneadd">
+
+                            </ImageView>
+                        </androidx.cardview.widget.CardView>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.cardview.widget.CardView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

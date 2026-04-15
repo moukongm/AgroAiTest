@@ -1,10 +1,15 @@
 package com.detection.ui.page;
 
 import android.Manifest;
+import android.graphics.Bitmap;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.net.Uri;
+import android.os.Build;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.Preview;
@@ -13,7 +18,10 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.common.base.BaseActivity;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.utils.FileUtils;
 import com.common.utils.ImageLoader;
@@ -21,6 +29,7 @@ import com.common.utils.ImagePickerUtil;
 import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
 import com.common.utils.PermissionUtils;
+import com.common.utils.ThreadUtils;
 import com.common.utils.ToastUtils;
 import com.detection.R;
 import com.detection.databinding.ActivityDetectionBinding;
@@ -29,17 +38,20 @@ import com.detection.viewmodel.DetectionViewModel;
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import eightbitlab.com.blurview.BlurView;
+import eightbitlab.com.blurview.RenderScriptBlur;
+
 
 @Route(path = RouterPath.DETECTION_ACTIVITY)
 public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
     private DetectionViewModel viewModel;
     private ProcessCameraProvider cameraProvider;
+    private Camera camera;
     private ImagePickerUtil imagePickerUtil;
     private ImageCapture imageCapture;
     private boolean flashOn = false;
-    // 相册选中的文件，null 表示未选
     private File selectedFile = null;
 
     @NonNull
@@ -57,11 +69,6 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
         setupClickListeners();
         observeViewModel();
 
-        BlurView blurView = binding.blurView;
-        blurView.setupWith(binding.getRoot())
-                .setBlurRadius(50f)
-                .setOverlayColor(0x30FFFFFF);
-
         if (imagePickerUtil == null) {
             imagePickerUtil = new ImagePickerUtil(this, uri -> {
                 LogUtils.INSTANCE.d("ljx",uri.toString());
@@ -72,13 +79,13 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
                 LogUtils.INSTANCE.d("ljx",selectedFile+"");
                 if (selectedFile == null || !selectedFile.exists()) {
                     viewModel.getLoadingState().postValue(false);
-                    ToastUtils.INSTANCE.showLong(getBaseContext(), "图片文件无效，请重新选择");
+                    ToastUtils.INSTANCE.showLong(getApplicationContext(), "图片文件无效，请重新选择");
                     return null;
                 }
                 binding.previewView.setVisibility(View.GONE);
                 showPreview(uri.toString());
                 showLoading("稍等一下呢...");
-                viewModel.uploadAndRecognizeFromGallery(getApplicationContext(), selectedFile);
+                viewModel.uploadAndRecognizeFromGallery(getApplicationContext(), "这个得了什么病",selectedFile);
                 return null;
             });
         }
@@ -103,11 +110,12 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
 
         imageCapture = new ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setFlashMode(flashOn ? ImageCapture.FLASH_MODE_ON : ImageCapture.FLASH_MODE_OFF)
                 .build();
 
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
-            cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+            camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
             binding.btnRecognize.setEnabled(true);
         }
     }
@@ -118,15 +126,17 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
 
         // 识别按钮（拍照路径：拍完会显示预览并自动识别，无需再点）
         binding.btnRecognize.setOnClickListener(v -> {
-            if (selectedFile == null) {
-                // 未选相册图 → 拍照，拍完自动识别
-                binding.previewView.setVisibility(View.GONE);
-                viewModel.takePhoto(this, imageCapture);
-            } else {
-                // 已选相册图 → 直接上传并识别
-//                viewModel.uploadAndRecognizeFromGallery(getApplicationContext(), selectedFile);
-//                selectedFile = null;
+
+            Bitmap frozenBitmap = binding.previewView.getBitmap();
+            if (frozenBitmap != null) {
+                binding.ivFrozenFrame.setImageBitmap(frozenBitmap);
+                binding.ivFrozenFrame.setVisibility(View.VISIBLE);
             }
+            if(flashOn){
+                flashOn = !flashOn;
+                updateFlashState();
+            }
+            viewModel.takePhoto(this, imageCapture);
         });
 
         // 闪光灯
@@ -135,10 +145,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
             updateFlashState();
         });
         binding.ivHistory.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fl_dete_activity, new HistoryFragment())
-                    .addToBackStack(null)
-                    .commit();
+            ARouter.getInstance().build(RouterPath.DETECTION_HISTORY).navigation();
         });
         // 相册
         binding.llGallery.setOnClickListener(v -> {
@@ -148,7 +155,7 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
                         return null;
                     },
                     deniedList -> {
-                        ToastUtils.INSTANCE.showShort(getBaseContext(), "您拒绝了权限，功能无法使用");
+                        ToastUtils.INSTANCE.showShort(getApplicationContext(), "您拒绝了权限，功能无法使用");
                         return null;
                     });
         });
@@ -156,7 +163,12 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
 
     private void updateFlashState() {
         binding.ivFlash.setAlpha(flashOn ? 1.0f : 0.5f);
+        // 使用 Camera 对象控制闪光灯（手电筒）
+        if (camera != null) {
+            camera.getCameraControl().enableTorch(flashOn);
+        }
     }
+
 
     private void observeViewModel() {
         viewModel.getLoadingState().observe(this, isLoading -> {
@@ -182,17 +194,20 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
         // AI 识别结果，跳转结果页
         LiveDataExtKt.observeNonNull(viewModel.getChatResult(), this, res -> {
 //            ToastUtils.INSTANCE.showLong(getApplicationContext(), res);
+            showPreview("");
+            LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY).setValue(true);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fl_dete_activity, new RecognitionResultFragment())
                     .addToBackStack(null)
                     .commit();
+
             return null;
         });
 
         // 错误提示
         LiveDataExtKt.observeNonNull(viewModel.getErrorMessage(), this, msg -> {
-            ToastUtils.INSTANCE.showLong(getBaseContext(), msg);
-            if(msg.equals("AI 识别失败，请重试")){
+            ToastUtils.INSTANCE.showLong(getApplicationContext(), msg);
+            if(msg.equals("AI 识别失败，请重试") || (msg.equals("AI连接错误"))){
                 showPreview("");
             }
             return null;
@@ -200,22 +215,61 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
     }
 
     private void showPreview(String imageUrl) {
+        binding.ivFrozenFrame.setVisibility(View.GONE);
         if(imageUrl != null && !imageUrl.isEmpty()){
+            binding.previewView.setVisibility(View.GONE);
+//            binding.maskView.setVisibility(View.GONE);
             binding.ivSelectedImage.setVisibility(View.VISIBLE);
-//            binding.previewView.setVisibility(View.GONE);
             ImageLoader.INSTANCE.load(binding.ivSelectedImage, imageUrl);
         }
         else{
             binding.ivSelectedImage.setVisibility(View.GONE);
             binding.previewView.setVisibility(View.VISIBLE);
+//            binding.maskView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // 页面不可见时隐藏预览，节省资源
+        binding.previewView.setVisibility(View.GONE);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        binding.ivSelectedImage.setVisibility(View.GONE);
-        binding.previewView.setVisibility(View.VISIBLE);
+        // 释放相机资源
+        if (cameraProvider != null) {
+            cameraProvider.unbindAll();
+            cameraProvider = null;
+        }
+        camera = null;
+        imageCapture = null;
+        // 释放图片选择器
+        if (imagePickerUtil != null) {
+            imagePickerUtil.release();
+            imagePickerUtil = null;
+        }
+        binding.ivSelectedImage.setImageBitmap(null);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // 如果相机还未初始化（首次进入或销毁后返回），重新初始化
+        if (cameraProvider == null) {
+            initCamera();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 恢复预览可见性
+        if (cameraProvider != null) {
+            binding.previewView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

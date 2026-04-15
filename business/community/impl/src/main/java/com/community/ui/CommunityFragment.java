@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.common.base.BaseFragment;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.storage.MMKVInstance;
 import com.common.storage.MMKVUtils;
@@ -144,6 +146,16 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
             }
         });
 
+        LiveDataBus.getInstance().with(BusKey.PROFILE_CHANGED)
+                .observe(getViewLifecycleOwner(),object->{
+                    if(object instanceof Boolean){
+                        Boolean b = (Boolean) object;
+                        if(b){
+                            viewModel.loadPosts();
+                        }
+                    }
+
+                });
     }
 
     private void setupSearch() {

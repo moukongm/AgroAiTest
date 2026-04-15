@@ -1,5 +1,6 @@
 package com.detection.ui.page;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,33 +9,40 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.agri.pest.client.model.response.AgentChatHistory;
+
+import com.agri.pest.client.model.response.DiagnosisItem;
 import com.common.base.BaseFragment;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
+import com.common.utils.AvatarUtils;
 import com.common.utils.ImageLoader;
 import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
 import com.common.utils.ToastUtils;
 import com.detection.R;
-import com.detection.Utils;
 import com.detection.databinding.FragmentRecocgnitionResultBinding;
 import com.detection.viewmodel.DetectionViewModel;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
+import io.noties.markwon.Markwon;
+
 public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnitionResultBinding> {
     private DetectionViewModel viewModel;
 
-    // 存储最多3个结果
-    private String[] diseases = new String[3];
-    private String[] confidences = new String[3];
-    private String[] solutions = new String[3];
-    String[] sections;
-    Boolean ishistory = false;
-    FragmentRecocgnitionResultBinding binding;
-    private AgentChatHistory history = null;
-    private String pendingResult = null;
-    private String pendingImageUrl = null;
+    private List<DiagnosisItem> diagnosisItems;
     private int currentIndex = 0;
+    private Boolean ishistory = false;
+    FragmentRecocgnitionResultBinding binding;
+    Gson gson;
+    private AgentChatHistory history = null;
+    private String pendingImageUrl = null;
+    Markwon markwon;
 
     @NonNull
     @Override
@@ -44,9 +52,7 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
 
     public RecognitionResultFragment(AgentChatHistory history) {
         this.history = history;
-        // 保存数据，在 initView 中处理
         if (history != null && history.getAgentResponse() != null) {
-            this.pendingResult = history.getAgentResponse().toString();
             this.pendingImageUrl = history.getImageUrl();
         }
     }
@@ -54,37 +60,74 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
     public RecognitionResultFragment() {
     }
 
+
     @Override
     public void initView() {
         viewModel = new ViewModelProvider(requireActivity()).get(DetectionViewModel.class);
         binding = getBinding();
 
+        markwon = Markwon.builder(requireActivity().getApplicationContext())
+                .build();
+        if(history != null){
+            binding.btnCamera.setVisibility(View.INVISIBLE);
+        }
         // 设置标签点击事件
         binding.tvRes1.setOnClickListener(v -> selectTab(0));
         binding.tvRes2.setOnClickListener(v -> selectTab(1));
         binding.tvRes3.setOnClickListener(v -> selectTab(2));
 
+        Boolean cd= history != null ? Boolean.FALSE : Boolean.TRUE;
+        binding.llAi.setOnClickListener(v ->{
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fl_result, new AIMainFragment(cd))
+                    .addToBackStack(null)
+                    .commit();
+        });
+        binding.btnCamera.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+        binding.bg.cvInformationBack.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
         if (history != null) {
-            // 从历史记录加载
-            if (pendingResult != null) {
-                parseResult(pendingResult);
+            LogUtils.INSTANCE.d("ljxxjl", "history: " + history.getAgentResponse());
+            if (history.getAgentResponse() != null) {
+                try {
+                     gson = new Gson();
+                     TypeToken<List<DiagnosisItem>> listType = new TypeToken<List<DiagnosisItem>>(){};
+                     diagnosisItems = gson.fromJson(history.getAgentResponse().toString(), listType.getType());
+                } catch (Exception e) {
+                    LogUtils.INSTANCE.e("ljxxjl", e);
+                    notHaveResult(history.getAgentResponse());
+                }
             }
             if (pendingImageUrl != null) {
                 ImageLoader.INSTANCE.load(binding.imgResult, pendingImageUrl);
             }
         } else {
-            // 从 ViewModel 观察
             LiveDataExtKt.observeNonNull(viewModel.getChatResult(), this, result -> {
-                parseResult(result);
+                if(result.isEmpty()){
+                    ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(),"服务端返回错误，请到ai处询问");
+                }
+                diagnosisItems = result;
                 LogUtils.INSTANCE.d("ljx", "原始结果: " + result);
+                selectTab(0);
                 return null;
             });
-
-            LiveDataExtKt.observeNonNull(viewModel.getPhotoUriResult(), this, uri -> {
-                ImageLoader.INSTANCE.load(binding.imgResult, uri);
+            LiveDataExtKt.observeNonNull(viewModel.getPhotoUriResult(), this, result -> {
+                ImageLoader.INSTANCE.load(binding.imgResult, result);
+                return null;
+            });
+            // 监听识别成功后的数据，用于保存到本地数据库
+            LiveDataExtKt.observeNonNull(viewModel.getSaveRecordResult(), this, data -> {
+                if (data != null && data.diagnosisItems != null && !data.diagnosisItems.isEmpty()) {
+                    viewModel.insertLocalDetectionHistory(requireActivity().getApplicationContext(), data);
+                }
                 return null;
             });
         }
+        selectTab(0);
     }
 
     // 切换标签
@@ -94,119 +137,76 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
     }
 
     private void updateUI(int index) {
-        if (binding == null || index < 0 || index >= 3) return;
+        if (binding == null) return;
 
         binding.tvRes1.setSelected(index == 0);
         binding.tvRes2.setSelected(index == 1);
         binding.tvRes3.setSelected(index == 2);
 
-        // 检查数据是否加载
-        if (sections == null || diseases == null) {
+        if (diagnosisItems == null || diagnosisItems.isEmpty()) {
+            notHaveResult("暂无解析结果");
             return;
         }
 
-        if (diseases[index] != null) {
-            binding.tvBing.setText(diseases[index]);
+        int totalCount = diagnosisItems.size();
+        if (index >= totalCount) {
+            notHaveResult("暂无更多解析结果");
+            return;
         }
-        if (confidences[index] != null && !confidences[index].isEmpty()) {
+
+        DiagnosisItem item = diagnosisItems.get(index);
+        if (item == null) {
+            notHaveResult("暂无更多解析结果");
+            return;
+        }
+
+        markwon.setMarkdown(binding.tvBing, item.getDiseaseName() != null ? item.getDiseaseName() : "无法识别");
+
+        if (item.getConfidence() > 0) {
             binding.bingGailv.setVisibility(View.VISIBLE);
-            binding.bingGailv.setText(confidences[index]);
+            int percent = item.getConfidence();
+            markwon.setMarkdown(binding.bingGailv, percent + "%");
         } else {
             binding.bingGailv.setVisibility(View.GONE);
         }
-        if (solutions[index] != null) {
-            binding.tvJiejue.setText(solutions[index]);
-        }
 
-        // 检查是否有多个结果
-        if (sections.length == 1 && index != 0) {
-            notHaveResult("暂无更多解析结果");
-        } else if (sections.length == 2 && index == 2) {
-            notHaveResult("暂无更多解析结果");
-        } else {
-            binding.flBing.setVisibility(View.VISIBLE);
-            binding.tvBingname.setVisibility(View.VISIBLE);
-            binding.tvJiejuefangan.setVisibility(View.VISIBLE);
+        String solutionText = buildSolutionText(item);
+        LogUtils.INSTANCE.d("ljx", "防治方案原始内容: " + solutionText);
+        binding.tvJiejue.setText(solutionText);
+//        markwon.setMarkdown(binding.tvJiejue, solutionText);
+
+        binding.flBing.setVisibility(View.VISIBLE);
+        binding.tvBingname.setVisibility(View.VISIBLE);
+        binding.tvJiejuefangan.setVisibility(View.VISIBLE);
+    }
+
+    private String buildSolutionText(DiagnosisItem item) {
+        if (item.getControlPlan() != null && !item.getControlPlan().isEmpty()) {
+            return item.getControlPlan();
         }
+        return "暂无防治方案";
     }
 
     private void notHaveResult(String res){
         binding.flBing.setVisibility(View.GONE);
         binding.tvBingname.setVisibility(View.GONE);
         binding.tvJiejuefangan.setVisibility(View.GONE);
-        binding.tvJiejue.setText(res);
+        markwon.setMarkdown(binding.tvJiejue,res);
+        binding.tvJiejue.setVisibility(View.VISIBLE);
     }
-    private void parseResult(String result) {
-        LogUtils.INSTANCE.d("ljx", "原始结果: " + result);
-
-        if (result == null || result.isEmpty()) {
-            ToastUtils.INSTANCE.showShort(getActivity().getApplicationContext(), "未获取到识别结果");
-            return;
-        }
-        //为什么要重置
-        diseases = new String[3];
-        confidences = new String[3];
-        solutions = new String[3];
-        if(result.contains("无法开展病虫害诊断")){
-            sections = new String[3];
-            diseases[0] = "无法确认";
-            solutions[0] = result;
-        }
-        else{
-            sections = result.split("(?=结果[一二三])");
-            for (int i = 0; i < sections.length && i < 3; i++) {
-                String section = sections[i].trim();
-                if (section.isEmpty()) continue;
-                // 提取病害名称
-                diseases[i] = Utils.extractDiseaseName(section);
-                // 提取置信度
-                confidences[i] = extractPercent(section);
-                // 提取防治建议
-                solutions[i] = extractSolution(section);
-            }
-        }
-        // 显示第一个结果
-        updateUI(0);
-    }
-
-    // 提取病害名称
-
-
-    // 提取百分比
-    private String extractPercent(String text) {
-        int percentIdx = text.indexOf("%");
-        if (percentIdx != -1) {
-            int i = percentIdx - 1;
-            StringBuilder sb = new StringBuilder();
-            while (i >= 0 && (Character.isDigit(text.charAt(i)) || text.charAt(i) == '.')) {
-                sb.insert(0, text.charAt(i));
-                i--;
-            }
-            if (sb.length() > 0) {
-                try {
-                    double value = Double.parseDouble(sb.toString());
-                    return (int) value + "%";
-                } catch (Exception e) {
-                    return sb.toString() + "%";
-                }
-            }
-        }
-        return "";
-    }
-
-    // 提取防治建议
-    private String extractSolution(String text) {
-        int idx = text.indexOf("防治建议");
-        if (idx != -1) {
-            String solution = text.substring(idx);
-            solution = solution.replaceAll("\\n{3,}", "\n\n");
-            return solution;
-        }
-        return text;
-    }
-
 
     @Override
     public void initData() {
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY).setValue(false);
     }
 }

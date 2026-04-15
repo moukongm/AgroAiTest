@@ -55,7 +55,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> {
     public void initData() {
         viewModel.getLoginResultLiveData().observe(this,response -> {
             if (response != null && response.getCode() == ServiceCode.SUCCESS) {
-                ToastUtils.INSTANCE.showShort(requireContext(), "登录成功:" + response.getMessage());
+                ToastUtils.INSTANCE.showShort(requireContext().getApplicationContext(), "登录成功:" + response.getMessage());
                 ARouter.getInstance()
                         .build(RouterPath.APP_MAIN_ACTIVITY)
                         .navigation();
@@ -66,17 +66,17 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> {
 
         viewModel.getRegisterResultLiveData().observe(this,response -> {
             if(response!=null&&response.getCode()==ServiceCode.SUCCESS){
-                ToastUtils.INSTANCE.showShort(requireContext(), "注册成功:" + response.getMessage());
+                ToastUtils.INSTANCE.showShort(requireContext().getApplicationContext(), "注册成功:" + response.getMessage());
             }
         });
 
         viewModel.getErrorLiveData().observe(this,error -> {
-            ToastUtils.INSTANCE.showShort(requireContext(),error);
+            ToastUtils.INSTANCE.showShort(requireContext().getApplicationContext(),error);
         });
 
         viewModel.getToastMsg().observe(this, msg -> {
             if(msg != null && !msg.isEmpty()){
-                ToastUtils.INSTANCE.showShort(requireContext(),msg);
+                ToastUtils.INSTANCE.showShort(requireContext().getApplicationContext(),msg);
             }
         });
     }

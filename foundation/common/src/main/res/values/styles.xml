@@ -14,4 +14,14 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:layout_gravity">bottom</item>
     </style>
+
+    <style name="RoundedCorner" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="CircleImageStyle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

@@ -45,8 +45,7 @@ dependencies {
     implementation(project(":foundation:storage"))
     implementation(project(":foundation:webview"))
     implementation(project(":foundation:uikit"))
-    // AMap Location
-    implementation("com.amap.api:location:latest.integration")
+    implementation(libs.location)
     implementation(project(":business:main:api"))
     implementation(project(":business:detection:api"))
     implementation(project(":business:community:api"))

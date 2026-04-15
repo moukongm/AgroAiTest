@@ -8,15 +8,24 @@
    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@android:color/black">
 
         <androidx.camera.view.PreviewView
             android:id="@+id/preview_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:implementationMode="compatible" />
 
 
+        <eightbitlab.com.blurview.BlurView
+            android:id = "@+id/bv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </eightbitlab.com.blurview.BlurView>
         <ImageView
             android:id="@+id/iv_selected_image"
             android:layout_width="match_parent"
@@ -24,14 +33,15 @@
             android:scaleType="centerCrop"
             android:visibility="gone" />
 
-
-        <!-- 模糊层 -->
-        <eightbitlab.com.blurview.BlurView
-            android:id="@+id/blur_view"
+        <!-- 定格画面 -->
+        <ImageView
+            android:id="@+id/iv_frozen_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
 
-        <!-- 挖空层 -->
+        <!-- 挖空遮罩层（四周半透明黑色，中间透明显示相机） -->
         <com.detection.ui.view.CameraMaskView
             android:id="@+id/mask_view"
             android:layout_width="match_parent"

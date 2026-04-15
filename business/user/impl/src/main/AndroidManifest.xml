@@ -3,5 +3,8 @@
     <application>
         <activity android:name=".login.ui.LoginActivity" android:exported="false"/>
         <activity android:name=".profile.ui.page.ProfileActivity" android:exported="false"/>
+        <activity android:name=".profile.ui.page.EditProfileActivity" android:exported="false"/>
+        <activity android:name=".profile.ui.page.SettingProfileActivity" android:exported="false"/>
+        <activity android:name=".profile.ui.page.FavoritePostActivity" android:exported="false"/>
     </application>
 </manifest>

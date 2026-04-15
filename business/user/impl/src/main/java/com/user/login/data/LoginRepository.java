@@ -11,18 +11,17 @@ import com.agri.pest.client.model.response.ResultAuthResponse;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.network.NetworkManager;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class LoginRepository {
 
     private static final String PHONE_PATTERN = "^1[3-9]\\d{9}$";
-
-    public boolean ans = true;
 
     public Single<ResultAuthResponse> register(String phone, String password, String username) {
         RegisterRequest request = new RegisterRequest(phone, password, username);
@@ -49,21 +48,39 @@ public class LoginRepository {
         return NetworkManager.INSTANCE.getApi().refresh(request);
     }
 
+    /**
+     * 同步刷新 Token
+     * 用于 retryWhen 操作符中同步等待刷新结果
+     * 返回 true 表示刷新成功，false 表示失败
+     */
     public boolean refreshToken() {
-        Disposable disposable = refresh()
+        final boolean[] result = {false};
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        refresh()
+                // 使用 Schedulers.io() 确保回调在 IO 线程执行，避免与 latch.await() 死锁
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribe(response -> {
                     if (response.getCode() == 200) {
                         saveUserInfo(response.getData());
-                        ans = true;
+                        result[0] = true;
                     } else {
-                        ans = false;
+                        result[0] = false;
                     }
+                    latch.countDown();
                 }, error -> {
-                    ans = false;
+                    result[0] = false;
+                    latch.countDown();
                 });
-        return ans;
+
+        try {
+            // 最多等待 30 秒
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            result[0] = false;
+        }
+        return result[0];
     }
 
     public String validatePhone(String phone) {

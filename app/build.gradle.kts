@@ -68,8 +68,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    // AMap Location
-    implementation("com.amap.api:location:latest.integration")
+    implementation(libs.location)
     // CodeLocator
     implementation(libs.codelocator.core)
     // CodeLocator Lancet has compatibility issues with AGP 8.0+ and Jetifier

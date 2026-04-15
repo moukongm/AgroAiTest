@@ -9,17 +9,23 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.agri.pest.client.model.response.MessageResponseDto;
+import com.agri.pest.client.model.response.PageResultMessageResponseDto;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.amap.api.location.AMapLocationClient;
 import com.common.base.BaseFragment;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.utils.ImageLoader;
 import com.common.utils.LogUtils;
 import com.common.utils.PermissionUtils;
 import com.main.Utils;
+import com.main.impl.R;
 import com.main.impl.databinding.ActivityHomeBinding;
 import com.main.viewmodel.HomeViewModel;
 import com.network.model.AlertResponse;
@@ -47,6 +53,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
         viewModel.getUserNameLiveData().observe(getViewLifecycleOwner(), userName -> {
             if (userName != null && !userName.isEmpty()) {
+                LogUtils.INSTANCE.d("init",userName);
                 binding.mainpageUsername.setText(userName);
             }
         });
@@ -56,6 +63,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                 ImageLoader.INSTANCE.loadCircle(binding.ivSettingTitle, avatarUrl);
             }
         });
+
 
         viewModel.getWeatherLiveData().observe(getViewLifecycleOwner(), now -> {
             if (now != null) {
@@ -91,15 +99,19 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             binding.mainpageWarningHistory.setVisibility(View.GONE);
             binding.tvWarnning.setMaxLines(2);
         });
+        binding.mainpageHistory.setOnClickListener(v -> {
+            LogUtils.INSTANCE.d("ljx","history");
+           ARouter.getInstance().build(RouterPath.DETECTION_HISTORY).navigation();
+
+        });
+
         viewModel.getAlertLiveData().observe(getViewLifecycleOwner(), alerts -> {
-            if (alerts != null && !alerts.isEmpty()) {
-                AlertResponse.Alert first = alerts.get(0);
-                String title = "【" + (first.getColor() != null ? Utils.colorEnToZh( first.getColor().getCode()): "") +
-                        (first.getEventType() != null ? first.getEventType().getName() : "") +
-                        "预警警报】";
-                LogUtils.INSTANCE.d("lyy", title);
+            LogUtils.INSTANCE.d("lyy", alerts+"");
+            if (alerts != null) {
+                String title = "【" +  alerts.getType() +
+                        "】";
                 binding.mainpageWarningTitle.setText(title);
-                binding.tvWarnning.setText(first.getDescription());
+                binding.tvWarnning.setText(alerts.getContent());
                 binding.consHaveWarn.setVisibility(View.VISIBLE);
                 binding.tvNothaveWarn.setVisibility(View.GONE);
                 binding.consNothaveWarn.setVisibility(View.GONE);
@@ -114,7 +126,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
     @Override
     public void initData() {
-        viewModel.getLocation();
         viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
             LogUtils.INSTANCE.d("lyy",city);
             if (city != null && !city.isEmpty()) {
@@ -133,6 +144,24 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             return null;
         });
         viewModel.getUserInfo();
+        LiveDataBus.getInstance().with(BusKey.PROFILE_CHANGED).observe(getViewLifecycleOwner(),object->{
+            LogUtils.INSTANCE.d("init","home");
+            if(object instanceof Boolean){
+                Boolean b = (Boolean) object;
+                if(b){
+                    viewModel.getUserInfo();
+                }
+            }
+        });
 
+    }
+
+    /**
+     * 供 MainActivity 调用，在 Activity 销毁时停止定位
+     */
+    public void stopLocationIfNeeded() {
+        if (viewModel != null) {
+            viewModel.stopLocation();
+        }
     }
 }

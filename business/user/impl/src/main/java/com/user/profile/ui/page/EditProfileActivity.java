@@ -1,108 +1,116 @@
 package com.user.profile.ui.page;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.common.base.BaseFragment;
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.common.base.BaseActivity;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
+import com.common.router.RouterPath;
+import com.common.utils.FileUtils;
 import com.common.utils.ImageLoader;
 import com.common.utils.ImagePickerUtil;
 import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
+import com.common.utils.ToastUtils;
 import com.user.R;
 import com.user.databinding.FragmentEditProfileBinding;
+import com.user.profile.Utils;
 import com.user.profile.viewmodel.ProfileViewModel;
 
+import java.io.File;
 
-public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding> {
+@Route(path = RouterPath.USER_EDIT_PROFILE_ACTIVITY)
+public class EditProfileActivity extends BaseActivity<FragmentEditProfileBinding> {
     FragmentEditProfileBinding binding;
-
     ProfileViewModel viewModel;
     private ImagePickerUtil imagePicker;
 
-
-    EditnameProfileFragment editnameProfileFragment;
-
     @NonNull
     @Override
-    public FragmentEditProfileBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentEditProfileBinding.inflate(inflater, container, false);
+    public FragmentEditProfileBinding getViewBinding() {
+        return FragmentEditProfileBinding.inflate(getLayoutInflater());
     }
 
     @Override
     public void initView() {
-
         binding = getBinding();
-        viewModel = new ViewModelProvider(requireParentFragment()).get(ProfileViewModel.class);
+        // 使用 Activity scope 的 ViewModel，与 ProfileFragment 共享同一个实例
+        // 确保 LiveData 数据在两个页面间同步
+        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
         ProfileViewModel vm = viewModel;
-        final Context appContext = requireActivity().getApplicationContext();
-        imagePicker = new ImagePickerUtil(requireActivity(), uri -> {
-            vm.getUnloadAvatar(appContext, uri);
+        imagePicker = new ImagePickerUtil(this, uri -> {
+            File file = FileUtils.INSTANCE.uriToFile(this, uri, getCacheDir());
+            if (file != null && file.exists()) {
+                vm.uploadAvatar(file);
+                showLoading("稍等");
+            } else {
+                ToastUtils.INSTANCE.showShort(getApplicationContext(), "文件解析失败");
+            }
             return null;
         });
 
         binding.cvInformationBack.setOnClickListener(v -> {
-             getParentFragmentManager().popBackStack();
+            finish();
         });
-        //修改昵称界面
+
         binding.nicknameContainer.setOnClickListener(v -> {
-            getChildFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fl_editprofile, new EditnameProfileFragment())
                     .addToBackStack(null)
                     .commit();
-            LogUtils.INSTANCE.d("ljx", "到底能不能点");
-
         });
+
         binding.passwordContainer.setOnClickListener(v -> {
-            getChildFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fl_editprofile, new EditPasswordProfileFragment())
                     .addToBackStack(null)
                     .commit();
         });
+
         binding.cropContainer.setOnClickListener(v -> {
-            getChildFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fl_editprofile, new GuideFragment())
                     .addToBackStack(null)
                     .commit();
         });
+
         binding.phoneContainer.setOnClickListener(v -> {
-            getChildFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fl_editprofile, new EditTeleProfileFragment())
                     .addToBackStack(null)
                     .commit();
         });
-        //选择
+
         binding.ivArrow1.setOnClickListener(v -> {
             imagePicker.showImageSourceDialog();
-//            binding.editProfile.show();
         });
 
-        //修改照片成功
         LiveDataExtKt.observeNonNull(viewModel.getAvatarLivedata(), this, observer -> {
-            //记得通知其他有用到头像的地方
-            //本地数据库也没改
-            Log.d("ljx", observer);
-
+            Log.d("pppppp", observer);
             ImageLoader.INSTANCE.load(binding.ivSettingTitle, observer);
-//            binding.editProfile.hide();
             return null;
         });
 
-        //修改结果
         LiveDataExtKt.observeNonNull(viewModel.getMesEtAvatarLivedata(), this, observer -> {
-            viewModel.showDialog(getContext(), observer);
+            hideLoading();
+            Utils.showDialog(getApplicationContext(), observer);
             return null;
         });
 
         LiveDataExtKt.observeNonNull(viewModel.getNickNameLivedata(), this, mes -> {
             binding.tvNicknameValue.setText(mes);
-            Log.d("ljx", mes);
+            hideLoading();
+            Log.d("pppppp", mes);
             return null;
         });
 
@@ -111,15 +119,39 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
             return null;
         });
 
-
         LiveDataExtKt.observeNonNull(viewModel.getCropsValueLivedata(), this, mes -> {
             binding.tvCropValue.setText(mes);
             return null;
         });
+        viewModel.getProfileUpdatedLivedata().observe(this, mes -> {
+            // 只响应 true 的情况，忽略 onDestroy 时的 false 重置
+            if (Boolean.TRUE.equals(mes)) {
+                LiveDataBus.getInstance().with(BusKey.PROFILE_CHANGED)
+                        .setValue(true);
+            }
+        });
+        LiveDataBus.getInstance().with(BusKey.GETUSERPROFILE).observe(this,ob->{
+            viewModel.getUserMes();
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (imagePicker != null) {
+            imagePicker.release();
+            imagePicker = null;
+        }
+        // 重置更新标记，避免下次进入时误触发
+        viewModel.getProfileUpdatedLivedata().setValue(false);
     }
 
     @Override
     public void initData() {
-        
+        Log.d("pppppp", "data");
+        showLoading("加载中...");
+        // 获取用户信息（头像、昵称、手机号、关注的作物）
+        viewModel.getUserMes();
     }
+
 }

@@ -4,18 +4,26 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
+
 import java.util.List;
 import java.util.Locale;
 
+import com.agri.pest.client.api.ServiceCode;
+import com.agri.pest.client.model.response.MessageResponseDto;
+import com.agri.pest.client.model.response.PageResultMessageResponseDto;
+import com.agri.pest.client.model.response.ResultPageResultMessageResponseDto;
 import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationListener;
 import com.common.base.BaseViewModel;
 import com.common.utils.LogUtils;
 import com.main.data.Repository;
+import com.network.NetworkManager;
 import com.network.model.AlertResponse;
 import com.network.model.WeatherResponse;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -27,56 +35,36 @@ public class HomeViewModel extends BaseViewModel {
     private final MutableLiveData<String> userNameLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> avatarUrlLiveData = new MutableLiveData<>();
     private final MutableLiveData<WeatherResponse.Now> weatherLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<AlertResponse.Alert>> alertLiveData = new MutableLiveData<>();
+    private final MutableLiveData<MessageResponseDto> alertLiveData = new MutableLiveData<>();
+    AMapLocationClient location;
+    AMapLocationListener listener;
 
-    public void getLocation(Context context){
+    public void getLocation(Context context) {
         LogUtils.INSTANCE.d("ljx", "定位1");
-        repository.getLocation(context).setLocationListener(new AMapLocationListener() {
+        listener = new AMapLocationListener() {
             @Override
             public void onLocationChanged(AMapLocation aMapLocation) {
-                if(aMapLocation!=null && aMapLocation.getErrorCode()==0){
+                if (aMapLocation != null && aMapLocation.getErrorCode() == 0) {
                     double x = aMapLocation.getLatitude();
                     double y = aMapLocation.getLongitude();
                     String city = aMapLocation.getCity();
-                    Log.d("asdf",city);
+                    Log.d("asdf", city);
+                    locationLivedata.setValue(city);
                     getWeather(String.valueOf(y) + "," + String.valueOf(x));
-                    String formattedLng = String.format(Locale.US, "%.2f", y);
-                    String formattedLat = String.format(Locale.US, "%.2f",x);
-                    LogUtils.INSTANCE.d("lyy","预警参数 - 经度:" + formattedLng + " 纬度:" + formattedLat);
-                    getWarning(formattedLat, formattedLng);
-                    }
-                else{
+//                    String formattedLng = String.format(Locale.US, "%.2f", y);
+//                    String formattedLat = String.format(Locale.US, "%.2f",x);
+//                    LogUtils.INSTANCE.d("lyy","预警参数 - 经度:" + formattedLng + " 纬度:" + formattedLat);
+                    getWarning();
+                } else {
                     LogUtils.INSTANCE.d("ljx", "no");
                 }
             }
-        });
+        };
+        location = repository.getLocation(context);
+        location.setLocationListener(listener);
+
     }
 
-
-
-    public void getLocation() {
-        LogUtils.INSTANCE.d("ljxtyswy", "load");
-        Disposable disposable = repository.getLocation().observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        response -> {
-                            if (response.getStatus().equals("1")) {
-                                LogUtils.INSTANCE.d("lyy","locationnotok");
-                                 locationLivedata.setValue(response.getCity());
-
-                            } else {
-                                LogUtils.INSTANCE.d("lyy","locationnotok");
-                            }
-
-                        },
-                        error -> {
-//                            LogUtils.INSTANCE.e("lyy", "getLocation error: " + error.getClass().getName() + " - " + error.getMessage());
-                            error.printStackTrace();
-                        }
-
-                );
-        addDisposable(disposable);
-    }
 
     public MutableLiveData<String> getLocationLivedata() {
         return locationLivedata;
@@ -130,7 +118,7 @@ public class HomeViewModel extends BaseViewModel {
                             }
                         },
                         error -> {
-                            LogUtils.INSTANCE.e("lyy",  error);
+                            LogUtils.INSTANCE.e("lyy", error);
                         }
                 );
         addDisposable(disposable);
@@ -152,14 +140,13 @@ public class HomeViewModel extends BaseViewModel {
                         response -> {
                             if (response != null && response.getNow() != null) {
                                 weatherLiveData.setValue(response.getNow());
-                                LogUtils.INSTANCE.d("lyy",response.getNow().toString());
-                            }
-                            else{
-                                LogUtils.INSTANCE.d("lyy","weathernotok");
+                                LogUtils.INSTANCE.d("lyy", response.getNow().toString());
+                            } else {
+                                LogUtils.INSTANCE.d("lyy", "weathernotok");
                             }
                         },
                         error -> {
-                            LogUtils.INSTANCE.e("weather",  error);
+                            LogUtils.INSTANCE.e("weather", error);
                         }
                 );
         addDisposable(disposable);
@@ -169,19 +156,19 @@ public class HomeViewModel extends BaseViewModel {
         return weatherLiveData;
     }
 
-    public void getWarning(String jd, String wd) {
-        LogUtils.INSTANCE.d("ljx",jd+wd);
-        Disposable disposable = repository.getWarning(jd, wd)
+    public void getWarning() {
+        Disposable disposable = repository.getWarnningApi()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         response -> {
-                            if (response != null && response.getAlerts() != null && !response.getAlerts().isEmpty()) {
-//                                LogUtils.INSTANCE.d("lyy",response.getAlerts().get(0).getDescription());
-                                alertLiveData.setValue(response.getAlerts());
-                            }
-                            else{
-                                LogUtils.INSTANCE.d("lyy","wrningnotok");
+                            if (response.getCode() == ServiceCode.SUCCESS) {
+                                PageResultMessageResponseDto data = response.getData();
+                                MessageResponseDto messageResponseDto = null;
+                                if (data != null && data.getList() != null && !data.getList().isEmpty()) {
+                                    messageResponseDto = data.getList().get(0);
+                                }
+                                alertLiveData.setValue(messageResponseDto);
                             }
                         },
                         error -> {
@@ -200,7 +187,29 @@ public class HomeViewModel extends BaseViewModel {
         addDisposable(disposable);
     }
 
-    public MutableLiveData<List<AlertResponse.Alert>> getAlertLiveData() {
+    //碎片或者活动或者调用ViewModelStore.clear()时触发;
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        stopLocation();
+    }
+
+    /**
+     * 手动停止定位（供外部调用）
+     */
+    public void stopLocation() {
+        if (location != null) {
+            if (listener != null) {
+                location.unRegisterLocationListener(listener);
+            }
+            location.stopLocation();
+            location.onDestroy();
+            location = null;
+            listener = null;
+        }
+    }
+
+    public MutableLiveData<MessageResponseDto> getAlertLiveData() {
         return alertLiveData;
     }
 }

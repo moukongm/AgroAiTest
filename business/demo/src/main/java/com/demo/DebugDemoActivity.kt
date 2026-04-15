@@ -313,6 +313,7 @@ class DebugDemoActivity : BaseActivity<ActivityDebugDemoBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
+        imagePickerUtil.release()
         // 可选：清理上传时产生的临时文件
     }
 }

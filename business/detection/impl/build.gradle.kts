@@ -37,7 +37,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    configurations.all {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
 }
+
 
 dependencies {
     implementation(project(":foundation:common"))
@@ -52,6 +56,12 @@ dependencies {
     implementation(project(":business:user:api"))
 
 
+    //markdon
+    implementation(libs.markwon.core)
+    implementation(libs.markwon.highlight)
+    implementation(libs.markwon.html)
+
+
     // CameraX
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
@@ -60,5 +70,8 @@ dependencies {
     // BlurView
     implementation(libs.blurview)
 
+
+
     kapt(libs.arouter.compiler)
 }
+

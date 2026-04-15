@@ -5,13 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [RecognitionRecord::class, ChatMessage::class, SearchHistoryRecord::class], version = 2, exportSchema = false)
+//实现database和实体类的统一绑定
+@Database(entities = [RecognitionRecord::class, ChatMessage::class, SearchHistoryRecord::class, DetectionRecord::class, PostEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun recognitionDao(): RecognitionDao
     abstract fun chatDao(): ChatDao
 
     abstract fun searchHistoryDao(): SearchHistoryDao
+    abstract fun detectionDao(): DetectionDao
 
     companion object {
         @Volatile

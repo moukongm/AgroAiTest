@@ -13,6 +13,7 @@ import com.agri.pest.client.model.response.PostResponseDto;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.common.base.BaseViewModel;
 import com.common.router.RouterPath;
+import com.common.utils.FileUtils;
 import com.common.utils.SingleLiveEvent;
 
 import android.app.Dialog;
@@ -28,9 +29,11 @@ import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.common.utils.LogUtils;
 import com.common.utils.ThreadUtils;
 import com.common.utils.ToastUtils;
+import com.detection.HistoryCountService;
 import com.network.NetworkManager;
 import com.user.R;
 import com.user.profile.data.Repository;
+import com.user.profile.ui.page.SettingProfileActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,6 +58,7 @@ public class ProfileViewModel extends BaseViewModel {
     private final SingleLiveEvent<String> mesNameLivedata = new SingleLiveEvent<>();
     private final MutableLiveData<String> avatarLivedata = new MutableLiveData<>();
     private final MutableLiveData<String> nickNameLivedata = new MutableLiveData<>();
+    private final MutableLiveData<Long> historyCountLivedata = new MutableLiveData<>();
     private final SingleLiveEvent<String> phoneLivedata = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> passwordLivedata = new SingleLiveEvent<>();
 
@@ -64,6 +68,10 @@ public class ProfileViewModel extends BaseViewModel {
     private final MutableLiveData<List<PostResponseDto>> mineFavoritePostsLivedata = new MutableLiveData<>();
     private final MutableLiveData<Long> favoritesCountLivedata = new MutableLiveData<>();
     private final SingleLiveEvent<String> cropsLivedata = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> unLogin = new SingleLiveEvent<>();
+    // 标记资料是否已更新（用于通知调用方刷新）
+    private final MutableLiveData<Boolean> profileUpdatedLivedata = new MutableLiveData<>(false);
+
 
     private int currentPagePost = 0;
     private boolean isLoaddingPost = false;
@@ -199,14 +207,13 @@ public class ProfileViewModel extends BaseViewModel {
         addDisposable(disposable);
     }
 
-    public void unLogin(Fragment fragment) {
+    public void unLogin() {
         repository.unLogin();
         ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
             @Override
             public void run() {
+                unLogin.setValue("yes");
 //                fragment.requireActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                ARouter.getInstance().build(RouterPath.USER_LOGIN_ACTIVITY).navigation();
-                fragment.getActivity().finish();
             }
         }, 1000);
 
@@ -219,18 +226,19 @@ public class ProfileViewModel extends BaseViewModel {
                 .subscribe(
                         response -> {
                             if (response.getCode() == ServiceCode.SUCCESS) {
-                                LogUtils.INSTANCE.d("ljx", "nameok");
+                                LogUtils.INSTANCE.d("asdfghjkl", "nameok");
                                 nickNameLivedata.setValue(response.getData().getFullName());
                                 avatarLivedata.setValue(response.getData().getAvatarUrl());
                                 phoneValueLivedata.setValue(response.getData().getPhone());
                                 String cropsReslut = response.getData().getFollowedCrops().toString();
                                 cropsValueLivedata.setValue(cropsReslut.substring(1, cropsReslut.length() - 1));
-                                phoneLivedata.setValue("修改成功");
+                                phoneLivedata.setValue("获取成功");
+                                // 新增：设置收藏数
+                                favoritesCountLivedata.setValue(response.getData().getFavoriteCount());
+                                // 新增：设置历史识别数
+                                historyCountLivedata.setValue(response.getData().getHistoryRecognitionCount());
                             } else {
-
-                                phoneLivedata.setValue("修改失败");
                             }
-
                         },
                         error -> {
                             LogUtils.INSTANCE.d(error.getMessage());
@@ -270,7 +278,6 @@ public class ProfileViewModel extends BaseViewModel {
                                 favoriteList.addAll(response.getData().getList());
                                 isLoaddingFavoritePost = false;
                                 currentPageFavoritePost++;
-                                favoritesCountLivedata.setValue(response.getData().getTotal());
                                 isHasFavoriteNext = response.getData().getHasNext();
                                 mineFavoritePostsLivedata.setValue(favoriteList);
                             } else {
@@ -294,16 +301,17 @@ public class ProfileViewModel extends BaseViewModel {
                         response -> {
                             if (response.getCode() == ServiceCode.SUCCESS) {
                                 phoneValueLivedata.setValue(request.getNewPhone());
+                                repository.updateLocalTele(request.getNewPhone());
                                 LogUtils.INSTANCE.d("ljxphone", "phoneok");
                                 phoneLivedata.setValue("修改成功");
                             } else {
-                                LogUtils.INSTANCE.d("ljxphone", "phonenotok");
-                                phoneLivedata.setValue("修改失败");
+                                LogUtils.INSTANCE.d("ljxphone", response.getCode() +response.getMessage());
+                                phoneLivedata.setValue("修改失败"+response.getMessage());
                             }
                         },
                         error -> {
                             LogUtils.INSTANCE.e("ljxphone", error);
-                            phoneLivedata.setValue("修改失败");
+                            phoneLivedata.setValue("修改失败"+error.getMessage());
                         }
 
                 );
@@ -337,7 +345,9 @@ public class ProfileViewModel extends BaseViewModel {
                 // 处理 fullName 更新
                 if ("ok".equals(res)) {
                     mesEtLivedata.setValue("修改成功");
+                    repository.updateLocalNickname(response.getData().getFullName());
                     nickNameLivedata.setValue(response.getData().getFullName());
+                    profileUpdatedLivedata.setValue(true); // 标记资料已更新
                     LogUtils.INSTANCE.d("ljx", "nameok");
                 } else {
                     mesEtLivedata.setValue("修改失败");
@@ -348,6 +358,7 @@ public class ProfileViewModel extends BaseViewModel {
                 if ("ok".equals(res)) {
                     avatarLivedata.setValue(response.getData().getAvatarUrl());
                     mesEtAvatarLivedata.setValue("修改成功");
+                    profileUpdatedLivedata.setValue(true); // 标记资料已更新
                 } else {
                     avatarLivedata.setValue("修改失败");
                 }
@@ -392,8 +403,9 @@ public class ProfileViewModel extends BaseViewModel {
                 .subscribe(
                         response -> {
                             if (response.getCode() == ServiceCode.SUCCESS) {
+                                repository.updateLocalPassword(password);
                                 passwordLivedata.setValue("修改成功，请重新登录");
-                                unLogin(fragment);
+                                unLogin();
                             } else {
                                 passwordLivedata.setValue("修改失败");
                             }
@@ -407,96 +419,85 @@ public class ProfileViewModel extends BaseViewModel {
     }
 
     //请求体的构建
-    private MultipartBody.Part prepareFilePart(Context context, Uri uri) {
-        File file = getFilePath(context, uri);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
-        //第一给服务端识别参数，第二文件名，第三文件；
-        return MultipartBody.Part.createFormData("avatar", file.getName(), requestBody);
-    }
+//    private MultipartBody.Part prepareFilePart(Context context, Uri uri) {
+//        File file = getFilePath(context, uri);
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
+//        //第一给服务端识别参数，第二文件名，第三文件；
+//        return MultipartBody.Part.createFormData("avatar", file.getName(), requestBody);
+//    }
 
-    public void showDialog(Context context, String mes) {
-        Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_edit_profile);
-        TextView tv = dialog.findViewById(R.id.dialog_setOk);
-        tv.setText(mes);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
-        ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dialog.dismiss();
-            }
-        }, 1000);
+//    public void showDialog(Context context, String mes) {
+//        Dialog dialog = new Dialog(context);
+//        dialog.setContentView(R.layout.dialog_edit_profile);
+//        TextView tv = dialog.findViewById(R.id.dialog_setOk);
+//        tv.setText(mes);
+//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        dialog.show();
+//        ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                dialog.dismiss();
+//            }
+//        }, 1000);
+//    }
 
-    }
-
-    public void getUnloadAvatar(Context context, Uri uri) {
-        ThreadUtils.INSTANCE.executeByIo(() -> {
-            File file = getFilePath(context, uri);
-            if (file == null || !file.exists()) {
-                ThreadUtils.INSTANCE.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ToastUtils.INSTANCE.showShort(context, "文件解析失败");
-                    }
-                });
-                return;
-            }
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
-            //第一给服务端识别参数，第二文件名，第三文件；
-            MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-            addDisposable(
-                    repository.uploadAvatar(part, "uploads/demo/")
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(
-                                    response -> {
-                                        if (response.getCode() == ServiceCode.SUCCESS) {
-                                            ProfileUpdateRequest request = new ProfileUpdateRequest(null,
-                                                    response.getData(), null, null, null);
-                                            updataProfile(request, "avatarUrl");
-                                            LogUtils.INSTANCE.d("ljx", "ok");
-//                                    mesEtAvatarLivedata.setValue("上传成功");
-                                        } else {
-                                            mesEtAvatarLivedata.setValue("上传失败");
-                                        }
-                                    },
-                                    error -> {
-                                        LogUtils.INSTANCE.e("ljx", error);
+    // 上传头像（ViewModel 不依赖 Context）
+    public void uploadAvatar(File file) {
+        if (file == null || !file.exists()) {
+            mesEtAvatarLivedata.postValue("文件解析失败");
+            return;
+        }
+        String mimeType = FileUtils.INSTANCE.getMimeType(file);
+        RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), file);
+        MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+        addDisposable(
+                repository.uploadAvatar(part, "uploads/demo/")
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                response -> {
+                                    if (response.getCode() == ServiceCode.SUCCESS) {
+                                        ProfileUpdateRequest request = new ProfileUpdateRequest(null,
+                                                response.getData(), null, null, null);
+                                        updataProfile(request, "avatarUrl");
+                                        LogUtils.INSTANCE.d("ljx", "ok");
+                                    } else {
                                         mesEtAvatarLivedata.setValue("上传失败");
                                     }
-
-
-                            ));
-        });
+                                },
+                                error -> {
+                                    LogUtils.INSTANCE.e("ljx", error);
+                                    mesEtAvatarLivedata.setValue("上传失败");
+                                }
+                        ));
     }
 
     //把uri转为文件给服务端
-    private File getFilePath(Context context, Uri uri) {
-        //第一个参数是放在app的缓存文件夹，系统会自动清理；第二个参数是文件名，可以避免重复而且表明是图片
-        File file = new File(context.getCacheDir(), System.currentTimeMillis() + ".jpg");
-
-        try {
-            //通过内容提供器，把uri的数据读出来
-            InputStream inputStream = context.getContentResolver().openInputStream(uri);
-            //写到文件里
-            FileOutputStream outputStream = new FileOutputStream(file);
-            //照片资源可能过大，避免内存爆炸
-            byte[] buffer = new byte[1024];
-            int len;
-            if (inputStream != null) {
-                while ((len = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, len);
-                }
-                inputStream.close();
-            }
-            outputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return file;
-
-    }
+//    private File getFilePath(Context context, Uri uri) {
+//        //第一个参数是放在app的缓存文件夹，系统会自动清理；第二个参数是文件名，可以避免重复而且表明是图片
+//        File file = new File(context.getCacheDir(), System.currentTimeMillis() + ".jpg");
+//
+//        try {
+//            //通过内容提供器，把uri的数据读出来
+//            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+//            //写到文件里
+//            FileOutputStream outputStream = new FileOutputStream(file);
+//            //照片资源可能过大，避免内存爆炸
+//            byte[] buffer = new byte[1024];
+//            int len;
+//            if (inputStream != null) {
+//                while ((len = inputStream.read(buffer)) != -1) {
+//                    outputStream.write(buffer, 0, len);
+//                }
+//                inputStream.close();
+//            }
+//            outputStream.close();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return file;
+//
+//    }
 
     //验证名字合法
     private boolean isNicknameVaild(String newName) {
@@ -588,6 +589,17 @@ public class ProfileViewModel extends BaseViewModel {
         return userProfileMes;
     }
 
+    public SingleLiveEvent<String> getUnLogin() {
+        return unLogin;
+    }
+
+    public MutableLiveData<Long> getHistoryCountLivedata() {
+        return historyCountLivedata;
+    }
+
+    public MutableLiveData<Boolean> getProfileUpdatedLivedata() {
+        return profileUpdatedLivedata;
+    }
 }
 
 
