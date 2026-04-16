@@ -67,8 +67,8 @@ public class PostAdapter extends BaseBindingAdapter<PostResponseDto, ItemCommuni
             ImageLoader imageLoader = Coil.imageLoader(binding.getRoot().getContext());
             ImageRequest coverRequest = new ImageRequest.Builder(binding.getRoot().getContext())
                     .data(item.getImages().get(0))
-                    .placeholder(R.drawable.placeholder_image)
-                    .error(R.drawable.placeholder_image)
+                    .placeholder(R.drawable.zhanweitu)
+                    .error(R.drawable.zhanweitu)
                     .target(binding.ivCover)
                     .scale(Scale.FILL)
                     .build();
