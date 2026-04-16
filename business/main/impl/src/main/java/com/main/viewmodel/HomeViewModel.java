@@ -178,37 +178,21 @@ public class HomeViewModel extends BaseViewModel {
             return;
         }
         Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
-                // 先检查数据库中是否已有用户信息
-                UserRecord existingUser = userDao.getUserById(0);
-                if (existingUser != null) {
-                    // 如果数据库里有信息，就更新数据
-                    existingUser.setAvatarUrl(avatarUrl);
-                    // 删除旧头像，下载新头像
-                    AvatarUtils.deleteAvatar(appContext, 0);
-                    String localPath = AvatarUtils.downloadAndSaveAvatar(appContext, avatarUrl, 0);
-                    existingUser.setAvatarLocalPath(localPath);
-                    existingUser.setLastUpdateTime(System.currentTimeMillis());
-                    userDao.update(existingUser);
-                    LogUtils.INSTANCE.d("HomeViewModel", "user info updated in database");
-                    userRecordLiveData.postValue(existingUser);
-                } else {
-                    // 如果没有信息，创建新用户并插入
-                    AvatarUtils.deleteAvatar(appContext, 0);
-                    String localPath = AvatarUtils.downloadAndSaveAvatar(appContext, avatarUrl, 0);
-                    UserRecord newUser = new UserRecord();
-                    newUser.setUserId(0L);
-                    newUser.setAvatarUrl(avatarUrl);
-                    newUser.setAvatarLocalPath(localPath);
-                    newUser.setLastUpdateTime(System.currentTimeMillis());
-                    userDao.insert(newUser);
-                    LogUtils.INSTANCE.d("HomeViewModel", "new user created in database");
-                    userRecordLiveData.postValue(newUser);
-                }
-            } catch (Exception e) {
-                LogUtils.INSTANCE.e("HomeViewModel", "save user to database failed", e);
-            }
+            UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
+            // 删除之前存储的头像
+            AvatarUtils.deleteAvatar(appContext, 0);
+            // 下载并保存新头像
+            String localPath = AvatarUtils.downloadAndSaveAvatar(appContext, avatarUrl, 0);
+            // 创建用户记录
+            UserRecord userRecord = new UserRecord();
+            userRecord.setUserId(0L);
+            userRecord.setAvatarUrl(avatarUrl);
+            userRecord.setAvatarLocalPath(localPath);
+            userRecord.setLastUpdateTime(System.currentTimeMillis());
+            // 插入数据库
+            userDao.insert(userRecord);
+            // 通知UI
+            userRecordLiveData.postValue(userRecord);
         });
     }
 
@@ -341,6 +325,7 @@ public class HomeViewModel extends BaseViewModel {
                 if (user != null) {
                     user.setLocation(city);
                     userDao.update(user);
+                    LogUtils.INSTANCE.d("HomeViewModel", "location saved to database: " + city);
                 } else {
                     // 创建新用户记录
                     UserRecord newUser = new UserRecord();
@@ -370,10 +355,10 @@ public class HomeViewModel extends BaseViewModel {
                     String location = user.getLocation();
                     ThreadUtils.INSTANCE.runOnUiThread(() -> {
                         locationLivedata.setValue(location);
+                        LogUtils.INSTANCE.d("HomeViewModel", "location loaded from database: " + location);
                     });
                 }
                 ThreadUtils.INSTANCE.runOnUiThread(() -> {
-                    LogUtils.INSTANCE.d("zxcvbnm","shazi");
                     historyCountLiveData.setValue(Long.valueOf(detection));
                 });
             } catch (Exception e) {

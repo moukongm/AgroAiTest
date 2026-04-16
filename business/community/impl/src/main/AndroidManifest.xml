@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
-        <activity android:name=".ui.CommunityActivity" android:exported="false"/>
-        <activity android:name=".ui.PostDetailActivity" android:exported="false"/>
-        <activity android:name=".ui.PostPublishActivity" android:exported="false"/>
+        <activity android:name=".ui.PostDetailActivity" android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".ui.PostPublishActivity" android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"/>
     </application>
 </manifest>
