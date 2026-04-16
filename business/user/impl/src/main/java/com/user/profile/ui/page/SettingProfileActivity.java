@@ -30,6 +30,8 @@ public class SettingProfileActivity extends BaseActivity<FragmentSettingProfileB
         binding = getBinding();
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
+        viewModel.initContext(this);
+
         binding.cvSettingprofileBack.setOnClickListener(v -> {
             finish();
         });
@@ -54,6 +56,8 @@ public class SettingProfileActivity extends BaseActivity<FragmentSettingProfileB
 
     @Override
     public void initData() {
+        // 加载用户信息
+        viewModel.getUserMes();
     }
 
 }

@@ -61,15 +61,10 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
 
         if (isStandaloneMode) {
             viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        } else if (getParentFragment() != null) {
-            Fragment parent = getParentFragment();
-            if (parent instanceof ProfileFragment) {
-                viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
-            } else {
-                viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
-            }
-        } else {
+        } else if(requireActivity() instanceof EditProfileActivity){
             viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        } else {
+            viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         }
 
         // 只有从发帖页(post)进入时才显示返回按钮
@@ -188,6 +183,7 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
             // 只有从发帖页(post)进入时才保存自定义作物到本地
             if ("post".equals(returnTo)) {
                 saveCustomCrops();
+                return;
             }
             viewModel.updataProfile(request, "followedCrops");
         });
@@ -202,14 +198,7 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
                     // 独立模式/从引导页进入/从登录页进入 -> 弹提示后关闭 Activity
                     Utils.showDialog(getActivity(), mes);
                     requireActivity().finish();
-                } else if ("post".equals(returnTo)) {
-                    // 从发帖页进入 -> 直接返回结果关闭 Activity，不弹 Dialog
-                    // 避免 Dialog 持有 Activity Window 引用，在 finish() 后延迟 dismiss 时崩溃
-                    Bundle result = new Bundle();
-                    result.putString("selected_crop", TextUtils.join(",", cropSet));
-                    requireActivity().getSupportFragmentManager().setFragmentResult("crop_select_result", result);
-                    requireActivity().finish();
-                } else {
+                }else {
                     // 从主页进入（如 ProfileFragment）-> 弹提示后 popBackStack
                     Utils.showDialog(requireActivity(), mes);
                     getParentFragmentManager().popBackStack();
@@ -261,6 +250,12 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
         }
         String cropsToSave = TextUtils.join(",", newCrops);
         UserStorageConstant.saveCustomCrops(cropsToSave);
+        // 从发帖页进入 -> 直接返回结果关闭 Activity，不弹 Dialog
+        // 避免 Dialog 持有 Activity Window 引用，在 finish() 后延迟 dismiss 时崩溃
+        Bundle result = new Bundle();
+        result.putString("selected_crop", TextUtils.join(",", cropSet));
+        requireActivity().getSupportFragmentManager().setFragmentResult("crop_select_result", result);
+        requireActivity().finish();
     }
 
     @Override

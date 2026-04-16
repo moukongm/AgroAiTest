@@ -12,4 +12,6 @@ public class BusKey {
     public static final String FILTER = "filter";
 
     public static final String CROP_ADDED = "crop_added";
+
+    public static final String COLLECT = "collect";
 }

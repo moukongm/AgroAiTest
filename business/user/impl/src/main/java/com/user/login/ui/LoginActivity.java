@@ -57,7 +57,7 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
                         }
                         ARouter.getInstance()
                                 .build(RouterPath.APP_MAIN_ACTIVITY)
-                                .navigation(LoginActivity.this);
+                                .navigation(this.getApplicationContext());
                         finish();
                     });
                 } else {

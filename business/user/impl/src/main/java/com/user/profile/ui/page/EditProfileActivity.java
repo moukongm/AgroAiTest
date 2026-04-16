@@ -46,6 +46,8 @@ public class EditProfileActivity extends BaseActivity<FragmentEditProfileBinding
         // 使用 Activity scope 的 ViewModel，与 ProfileFragment 共享同一个实例
         // 确保 LiveData 数据在两个页面间同步
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        // 初始化 Context，确保网络检测正常
+        viewModel.initContext(this);
 
         ProfileViewModel vm = viewModel;
         imagePicker = new ImagePickerUtil(this, uri -> {
@@ -110,7 +112,6 @@ public class EditProfileActivity extends BaseActivity<FragmentEditProfileBinding
 
         LiveDataExtKt.observeNonNull(viewModel.getNickNameLivedata(), this, mes -> {
             binding.tvNicknameValue.setText(mes);
-            hideLoading();
             Log.d("pppppp", mes);
             return null;
         });
@@ -124,6 +125,8 @@ public class EditProfileActivity extends BaseActivity<FragmentEditProfileBinding
             binding.tvCropValue.setText(mes);
             return null;
         });
+
+
         viewModel.getProfileUpdatedLivedata().observe(this, mes -> {
             // 只响应 true 的情况，忽略 onDestroy 时的 false 重置
             if (Boolean.TRUE.equals(mes)) {
@@ -133,6 +136,11 @@ public class EditProfileActivity extends BaseActivity<FragmentEditProfileBinding
         });
         LiveDataBus.getInstance().with(BusKey.GETUSERPROFILE).observe(this,ob->{
             viewModel.getUserMes();
+        });
+
+        // 观察用户数据加载状态，加载完成后关闭加载对话框
+        viewModel.getUserProfileMes().observe(this, profile -> {
+            hideLoading();
         });
     }
 

@@ -1,6 +1,8 @@
 package com.user.profile.data;
 
 
+import android.content.Context;
+
 import com.agri.pest.client.model.request.ChangePhoneRequest;
 import com.agri.pest.client.model.request.ProfileUpdateRequest;
 import com.agri.pest.client.model.response.ResultPageResultPostResponseDto;
@@ -9,6 +11,7 @@ import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.network.NetworkManager;
 import com.user.login.data.UserStorageConstant;
+import com.common.storage.database.UserRecord;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
@@ -18,6 +21,11 @@ import okhttp3.MultipartBody;
 public class Repository {
     private UserLocalDataSource localDataSource;
     private UserRemoteDataSource remoteDataSource;
+
+    public Repository(Context context) {
+        localDataSource = new UserLocalDataSource(context);
+        remoteDataSource = new UserRemoteDataSource();
+    }
 
     //做统一管理
     public Repository() {
@@ -67,4 +75,20 @@ public class Repository {
     public void updateLocalPassword(String newPassword) {
         localDataSource.updatePassword(newPassword);
     }
+    public void updateLocalAvatar(String avatarLocalPath) {
+        localDataSource.updateAvatarLocalPath(avatarLocalPath);
+    }
+
+    public UserRecord getLocalUser() {
+        return localDataSource.getLocalUser();
+    }
+
+    public int getLocalDetectionCount() {
+        return localDataSource.getLocalDetectionCount();
+    }
+
+    public String getLocalNickname() {
+        return localDataSource.getLocalNickname();
+    }
+
 }

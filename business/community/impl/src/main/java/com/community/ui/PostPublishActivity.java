@@ -15,8 +15,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.common.base.BaseActivity;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.utils.FileUtils;
+import com.common.utils.LiveDataExtKt;
 import com.community.databinding.ActivityPostPublishBinding;
 import com.community.ui.adapter.PublishImageAdapter;
 import com.community.viewmodel.PublishPostViewModel;
@@ -193,6 +196,7 @@ public class PostPublishActivity extends BaseActivity<ActivityPostPublishBinding
         viewModel.getPublishSuccess().observe(this, post -> {
             if (post != null) {
                 showPublishSuccessDialog();
+                LiveDataBus.getInstance().with(BusKey.SENTPOST).setValue(true);
             }
         });
     }

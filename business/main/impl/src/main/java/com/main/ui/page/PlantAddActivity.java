@@ -67,6 +67,12 @@ public class PlantAddActivity extends BaseActivity<ActivityPlantAddBinding> {
                     ImageLoader.INSTANCE.loadCircle(binding.ivItemSettingTitle, userRecord.getAvatarLocalPath());
                 });
             }
+            // 同时加载定位信息
+            if (userRecord != null && userRecord.getLocation() != null) {
+                runOnUiThread(() -> {
+                    binding.mainpagePlantLocal.setText(userRecord.getLocation());
+                });
+            }
         });
     }
 

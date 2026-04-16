@@ -21,6 +21,7 @@ import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.utils.FileUtils;
 import com.common.utils.ImageLoader;
+import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
 import com.user.databinding.ActivityProfileBinding;
 import com.user.profile.ui.adapters.MinePostAdapter;
@@ -54,6 +55,8 @@ public class ProfileFragment extends BaseFragment<ActivityProfileBinding> {
         // 使用 requireActivity() 获取 Activity scope，确保与 EditProfileActivity 共享同一个 ViewModel 实例
         // 避免每次进入页面创建新实例导致 LiveData 数据丢失
         viewModel = getSharedViewModel();
+        // 初始化 ViewModel 的 Context，确保本地数据访问正常
+        viewModel.initContext(requireActivity());
         binding = getBinding();
         postAdapter = new MinePostAdapter();
         binding.userPostRec.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -151,6 +154,7 @@ public class ProfileFragment extends BaseFragment<ActivityProfileBinding> {
                 }
             }
         });
+
         // 滑动监听：滑到底部加载更多
         binding.userPostRec.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -188,6 +192,25 @@ public class ProfileFragment extends BaseFragment<ActivityProfileBinding> {
                         .navigation();
             }
         });
+
+        LiveDataBus.getInstance().with(BusKey.SENTPOST)
+                .observe(getViewLifecycleOwner(), object -> {
+                    if ((Boolean) object) {
+                        viewModel.getMinePostsLivedata().observe(getViewLifecycleOwner(), list -> {
+                            if (list != null && !list.isEmpty()) {
+                                this.list = list;
+                                postAdapter.setList(list);
+                            }
+                        });
+                    }
+                });
+
+        LiveDataBus.getInstance().with(BusKey.COLLECT)
+                .observe(getViewLifecycleOwner(), object -> {
+                    if((Boolean) object){
+                        viewModel.getUserMes();
+                    }
+                });
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.common.base.BaseFragment;
 import com.common.notice.BusKey;
 import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
+import com.common.storage.MMKVUtils;
 import com.common.storage.database.AppDatabase;
 import com.common.storage.database.UserDao;
 import com.common.storage.database.UserRecord;
@@ -107,6 +108,12 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                 if (avatarPath != null && !avatarPath.isEmpty()) {
                     ImageLoader.INSTANCE.loadCircle(binding.ivSettingTitle, avatarPath);
                 }
+                String username = null;
+                username = MMKVUtils.INSTANCE.custom("user_module").getString("username","");
+                if(username != null){
+                    getBinding().mainpageUsername.setText(username);
+                    LogUtils.INSTANCE.d("usermodel",username);
+                }
                 // 禁用添加作物功能
                 binding.mainpagePlantPhoto.setEnabled(false);
                 binding.mainpagePlantPhoto.setAlpha(0.5f);
@@ -119,12 +126,26 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
         // 监听用户头像本地路径，设置到作物列表
         viewModel.getUserRecordLiveData().observe(getViewLifecycleOwner(), userRecord -> {
-            if (userRecord != null && userRecord.getAvatarLocalPath() != null) {
-                cropAdapter.setUserAvatarPath(userRecord.getAvatarLocalPath());
-                ImageLoader.INSTANCE.loadCircle(binding.ivItemSettingTitle,userRecord.getAvatarLocalPath());
+            if (userRecord != null) {
+                if (userRecord.getAvatarLocalPath() != null) {
+                    cropAdapter.setUserAvatarPath(userRecord.getAvatarLocalPath());
+                    ImageLoader.INSTANCE.loadCircle(binding.ivItemSettingTitle, userRecord.getAvatarLocalPath());
+                }
+                // 同时更新定位信息
+                if (userRecord.getLocation() != null) {
+                    cropAdapter.setUserLocation(userRecord.getLocation());
+                }
             }
         });
 
+        viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
+            LogUtils.INSTANCE.d("lyy", city);
+            if (city != null && !city.isEmpty()) {
+                binding.mainpagePlacename.setText(city);
+            }
+        });
+
+        // 监听天气信息
         viewModel.getWeatherLiveData().observe(getViewLifecycleOwner(), now -> {
             if (now != null) {
                 LogUtils.INSTANCE.d("ljx","whynot");
@@ -133,6 +154,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                 binding.mainpageWeatherIcon.setImageResource(Utils.handleicon(now.getIcon()));
             }
         });
+
         binding.mainpageTime.setText(Utils.getTodayLunar());
 
 
@@ -198,21 +220,19 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
     @Override
     public void initData() {
-        viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
-            LogUtils.INSTANCE.d("lyy",city);
-            if (city != null && !city.isEmpty()) {
-                binding.mainpagePlacename.setText(city);
-            }
-        });
         PermissionUtils.INSTANCE.request(this, Arrays.asList(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
         ), () -> {
             LogUtils.INSTANCE.d("ljx", "定位");
             viewModel.getLocation(getActivity().getApplicationContext());
+            // 同时从数据库加载上次的定位（作为后备）
+            viewModel.loadLocationFromDb();
             return null;
         }, deniedList -> {
             LogUtils.INSTANCE.d("ljx", "定位权限被拒绝");
+            // 权限被拒绝，仍然从数据库加载上次的定位
+            viewModel.loadLocationFromDb();
             return null;
         });
         viewModel.getUserInfo();
@@ -248,8 +268,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             }
         });
 
-        // 监听本地数据库作物数据（离线模式）
-        // 注意：仅在离线时才使用本地数据，在线时网络数据优先，清空本地数据避免冲突
         viewModel.getLocalCropListLiveData().observe(getViewLifecycleOwner(), crops -> {
             if (cropAdapter.getItemCount() > 0) {
                 return;
@@ -270,7 +288,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                 // 在线模式：恢复功能
                 cropAdapter.setDeleteEnabled(true);
                 cropAdapter.setCropClickEnabled(true);
-                // 切换到在线模式时，清空本地数据避免与网络数据冲突
             }
         });
         cropAdapter.setOnDeleteClickListener((crop, position) -> {
@@ -285,7 +302,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                         .setNegativeButton("取消", null)
                         .show();
             }
-            // 如果不是预期的类型，什么都不做
         });
 
         // RecyclerView 子项点击跳转到 PlantManageActivity
@@ -301,7 +317,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                             .navigation();
                 }
             }
-            // 离线模式下不响应点击，无需处理 CropRecord
         });
 
     }
@@ -314,9 +329,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             viewModel.getMyCrops();
         }
     }
-    /**
-     * 供 MainActivity 调用，在 Activity 销毁时停止定位
-     */
+
     public void stopLocationIfNeeded() {
         if (viewModel != null) {
             viewModel.stopLocation();

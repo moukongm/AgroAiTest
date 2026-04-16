@@ -21,6 +21,8 @@ import com.common.base.BaseViewModel;
 import com.common.storage.database.AppDatabase;
 import com.common.storage.database.CropDao;
 import com.common.storage.database.CropRecord;
+import com.common.storage.database.DetectionDao;
+import com.common.storage.database.DetectionRecord;
 import com.common.storage.database.UserDao;
 import com.common.storage.database.UserRecord;
 import com.common.utils.AvatarUtils;
@@ -28,6 +30,7 @@ import com.common.utils.LogUtils;
 import com.agri.pest.client.model.response.MyCropResponseDto;
 import com.agri.pest.client.model.response.ResultListMyCropResponseDto;
 import com.agri.pest.client.model.response.ResultVoid;
+import com.common.utils.ThreadUtils;
 import com.main.data.Repository;
 import com.network.NetworkManager;
 import com.network.model.AlertResponse;
@@ -76,23 +79,25 @@ public class HomeViewModel extends BaseViewModel {
                     String city = aMapLocation.getCity();
                     Log.d("asdf", city);
                     locationLivedata.setValue(city);
+                    // 定位成功，保存到数据库
+                    saveLocationToDatabase(city);
                     getWeather(String.valueOf(y) + "," + String.valueOf(x));
 //                    String formattedLng = String.format(Locale.US, "%.2f", y);
 //                    String formattedLat = String.format(Locale.US, "%.2f",x);
 //                    LogUtils.INSTANCE.d("lyy","预警参数 - 经度:" + formattedLng + " 纬度:" + formattedLat);
                     getWarning();
-                } 
+                }
             }
         };
         location = repository.getLocation(context);
         location.setLocationListener(listener);
-
     }
 
 
     public MutableLiveData<String> getLocationLivedata() {
         return locationLivedata;
     }
+
 
 //    public void getGeoCode(String name) {
 //        Disposable disposable = repository.getGeoCode(name)
@@ -159,6 +164,11 @@ public class HomeViewModel extends BaseViewModel {
                         }
                 );
         addDisposable(disposable);
+    }
+
+
+    public void loadLocationFromDb() {
+        loadLocationFromDatabase();
     }
 
     private void saveUserToDatabase(String avatarUrl) {
@@ -274,9 +284,6 @@ public class HomeViewModel extends BaseViewModel {
         stopLocation();
     }
 
-    /**
-     * 手动停止定位（供外部调用）
-     */
     public void stopLocation() {
         if (location != null) {
             if (listener != null) {
@@ -303,6 +310,59 @@ public class HomeViewModel extends BaseViewModel {
 
     public MutableLiveData<Boolean> getIsOfflineModeLiveData() {
         return isOfflineModeLiveData;
+    }
+    private void saveLocationToDatabase(String city) {
+        if (appContext == null) {
+            LogUtils.INSTANCE.d("HomeViewModel", "appContext is null, skip saving location");
+            return;
+        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
+                UserRecord user = userDao.getUserById(0);
+                if (user != null) {
+                    user.setLocation(city);
+                    userDao.update(user);
+                    LogUtils.INSTANCE.d("HomeViewModel", "location saved to database: " + city);
+                } else {
+                    // 创建新用户记录
+                    UserRecord newUser = new UserRecord();
+                    newUser.setUserId(0L);
+                    newUser.setLocation(city);
+                    userDao.insert(newUser);
+                    LogUtils.INSTANCE.d("HomeViewModel", "user created with location: " + city);
+                }
+            } catch (Exception e) {
+                LogUtils.INSTANCE.e("HomeViewModel", "save location to database failed", e);
+            }
+        });
+    }
+    
+    private void loadLocationFromDatabase() {
+        if (appContext == null) {
+            LogUtils.INSTANCE.d("HomeViewModel", "appContext is null, cannot load location");
+            return;
+        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
+                UserRecord user = userDao.getUserById(0);
+                DetectionDao detectionDao = AppDatabase.Companion.getInstance(appContext).detectionDao();
+                int detection = detectionDao.getCount();
+                if (user != null && user.getLocation() != null) {
+                    String location = user.getLocation();
+                    ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                        locationLivedata.setValue(location);
+                        LogUtils.INSTANCE.d("HomeViewModel", "location loaded from database: " + location);
+                    });
+                }
+                ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                    historyCountLiveData.setValue(Long.valueOf(detection));
+                });
+            } catch (Exception e) {
+                LogUtils.INSTANCE.e("HomeViewModel", "load location from database failed", e);
+            }
+        });
     }
 
     public void getMyCrops() {

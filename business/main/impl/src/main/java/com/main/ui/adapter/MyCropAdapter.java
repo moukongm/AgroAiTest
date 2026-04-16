@@ -25,6 +25,7 @@ public class MyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlantBindi
     private List<MyCropResponseDto> networkData = new ArrayList<>();
     private List<CropRecord> localData = new ArrayList<>();
     private String userAvatarPath;
+    private String userLocation; // 用户定位信息
 
     public interface OnCropClickListener {
         void onCropClick(Object crop);
@@ -54,6 +55,11 @@ public class MyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlantBindi
 
     public void setUserAvatarPath(String path) {
         this.userAvatarPath = path;
+        notifyDataSetChanged();
+    }
+
+    public void setUserLocation(String location) {
+        this.userLocation = location;
         notifyDataSetChanged();
     }
 
@@ -91,6 +97,11 @@ public class MyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlantBindi
         if (userAvatarPath != null && !userAvatarPath.isEmpty()) {
             ImageLoader.INSTANCE.load(binding.ivSettingTitle, userAvatarPath);
         }
+        // 显示定位信息
+        if (userLocation != null && !userLocation.isEmpty()) {
+            binding.mainpagePlantLocal.setText(userLocation);
+        }
+
         LogUtils.INSTANCE.d("HomeViewModel",item.getClass().getName());
 
         if (item instanceof MyCropResponseDto) {

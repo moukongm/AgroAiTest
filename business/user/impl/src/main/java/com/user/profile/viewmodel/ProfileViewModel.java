@@ -13,6 +13,8 @@ import com.agri.pest.client.model.response.PostResponseDto;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.common.base.BaseViewModel;
 import com.common.router.RouterPath;
+import com.common.storage.MMKVUtils;
+import com.common.storage.database.UserRecord;
 import com.common.utils.FileUtils;
 import com.common.utils.SingleLiveEvent;
 
@@ -51,7 +53,8 @@ import okhttp3.RequestBody;
 
 public class ProfileViewModel extends BaseViewModel {
 
-    private final Repository repository;
+    private  Repository repository;
+    private volatile Context appContext;
     private final SingleLiveEvent<String> mesEtLivedata = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mesEtAvatarLivedata = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mesNameLivedata = new SingleLiveEvent<>();
@@ -180,6 +183,12 @@ public class ProfileViewModel extends BaseViewModel {
         loadMinePosts();
     }
 
+    public void initContext(Context context) {
+        this.appContext = context.getApplicationContext();
+        // 重新创建 repository，确保 UserLocalDataSource 能获取到 Context
+        this.repository = new Repository(appContext);
+    }
+
     public void loadMinePosts() {
         LogUtils.INSTANCE.d("ljxtyswy", "load");
         Disposable disposable = repository.getMinePosts(currentPagePost).observeOn(AndroidSchedulers.mainThread())
@@ -220,6 +229,12 @@ public class ProfileViewModel extends BaseViewModel {
 
     //获取用户消息
     public void getUserMes() {
+        if (!isNetworkConnected()) {
+            LogUtils.INSTANCE.d("ProfileViewModel", "无网络连接，从本地加载数据");
+            loadUserDataFromLocal();
+            return;
+        }
+
         Disposable disposable = repository.getUserMes().observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -232,20 +247,78 @@ public class ProfileViewModel extends BaseViewModel {
                                 String cropsReslut = response.getData().getFollowedCrops().toString();
                                 cropsValueLivedata.setValue(cropsReslut.substring(1, cropsReslut.length() - 1));
                                 phoneLivedata.setValue("获取成功");
-                                // 新增：设置收藏数
                                 favoritesCountLivedata.setValue(response.getData().getFavoriteCount());
-                                // 新增：设置历史识别数
                                 historyCountLivedata.setValue(response.getData().getHistoryRecognitionCount());
+                                // 通知数据加载完成
+                                userProfileMes.setValue(response);
                             } else {
+                                // 即使返回错误也尝试从本地加载
+                                loadUserDataFromLocal();
                             }
+
                         },
                         error -> {
                             LogUtils.INSTANCE.d(error.getMessage());
-
+                            loadUserDataFromLocal();
                         }
 
                 );
         addDisposable(disposable);
+    }
+
+
+    private boolean isNetworkConnected() {
+        if (appContext == null) {
+            return false;
+        }
+        android.net.ConnectivityManager cm = (android.net.ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) {
+            return false;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            android.net.NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            return capabilities != null &&
+                   (capabilities.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
+                    capabilities.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                    capabilities.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET));
+        } else {
+            android.net.NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnected();
+        }
+    }
+
+
+    private void loadUserDataFromLocal() {
+        if (appContext == null) {
+            LogUtils.INSTANCE.d("ProfileViewModel", "appContext is null, cannot load local data");
+            userProfileMes.postValue(null); // 通知加载完成
+            return;
+        }
+
+        ThreadUtils.INSTANCE.executeByIo(() -> {
+            try {
+                UserRecord user = repository.getLocalUser();
+                if (user != null) {
+                    ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                        nickNameLivedata.setValue(repository.getLocalNickname());
+                        if (user.getAvatarLocalPath() != null && !user.getAvatarLocalPath().isEmpty()) {
+                            avatarLivedata.setValue("file://" + user.getAvatarLocalPath());
+                        } else if (user.getAvatarUrl() != null) {
+                            avatarLivedata.setValue(user.getAvatarUrl());
+                        }
+                    });
+                }
+                int detectionCount = repository.getLocalDetectionCount();
+                ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                    historyCountLivedata.setValue((long) detectionCount);
+                    userProfileMes.postValue(null);
+                });
+                LogUtils.INSTANCE.d("ProfileViewModel", "本地数据加载完成");
+            } catch (Exception e) {
+                LogUtils.INSTANCE.e("ProfileViewModel", "load local data failed", e);
+                userProfileMes.postValue(null);
+            }
+        });
     }
 
     //第一次我的收藏帖子
@@ -364,6 +437,7 @@ public class ProfileViewModel extends BaseViewModel {
                         repository.updateLocalNickname(response.getData().getFullName());
                         nickNameLivedata.setValue(response.getData().getFullName());
                         profileUpdatedLivedata.setValue(true); // 标记资料已更新
+                        MMKVUtils.INSTANCE.custom("user_module").put("username",response.getData().getFullName());
                         LogUtils.INSTANCE.d("ljx", "nameok");
                     } else {
                         mesEtLivedata.setValue("修改失败：数据异常");
@@ -376,9 +450,33 @@ public class ProfileViewModel extends BaseViewModel {
                 // 处理 avatarUrl 更新
                 if ("ok".equals(res)) {
                     if (response != null && response.getData() != null) {
-                        avatarLivedata.setValue(response.getData().getAvatarUrl());
+                        String newAvatarUrl = response.getData().getAvatarUrl();
+                        avatarLivedata.setValue(newAvatarUrl);
                         mesEtAvatarLivedata.setValue("修改成功");
-                        profileUpdatedLivedata.setValue(true); // 标记资料已更新
+                        profileUpdatedLivedata.setValue(true);
+
+
+                        if (appContext != null) {
+                            long userId = 0;
+
+                            try {
+                                com.common.utils.AvatarUtils.deleteAvatar(appContext, userId);
+                                LogUtils.INSTANCE.d("ProfileViewModel", "old avatar deleted for userId: " + userId);
+                            } catch (Exception e) {
+                                LogUtils.INSTANCE.e("ProfileViewModel", "delete old avatar failed", e);
+                            }
+
+
+                            ThreadUtils.INSTANCE.executeByIo(() -> {
+                                String localPath = com.common.utils.AvatarUtils.downloadAndSaveAvatar(appContext, newAvatarUrl, userId);
+                                if (localPath != null) {
+                                    repository.updateLocalAvatar(localPath);
+                                    LogUtils.INSTANCE.d("ProfileViewModel", "new avatar downloaded and saved: " + localPath);
+                                } else {
+                                    LogUtils.INSTANCE.d("ProfileViewModel", "download new avatar failed");
+                                }
+                            });
+                        }
                     } else {
                         avatarLivedata.setValue("修改失败：数据异常");
                     }
@@ -593,8 +691,8 @@ public class ProfileViewModel extends BaseViewModel {
             return mineFavoritePostsLivedata;
         }
 
-    public ProfileViewModel() {
-            repository = new Repository();
+        public ProfileViewModel() {
+            repository = new Repository();  // 先初始化为无参构造，等 initContext 时再重新初始化
         }
 
         public SingleLiveEvent<String> getPhoneLivedata () {

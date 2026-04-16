@@ -99,7 +99,7 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
             return;
         }
 
-        PermissionUtils.INSTANCE.requestRecordAudio((AppCompatActivity)getActivity(), new RequestCallback() {
+        PermissionUtils.INSTANCE.requestRecordAudio((AppCompatActivity) getActivity(), new RequestCallback() {
             @Override
             public void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList) {
                 requireActivity().runOnUiThread(() -> {
@@ -211,6 +211,7 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
             stopVoiceRecording();
         }
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

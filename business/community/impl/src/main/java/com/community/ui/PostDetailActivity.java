@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.speech.VoiceRecognitionCallback;
 import com.common.speech.VoiceRecognitionManager;
 import com.common.utils.PermissionUtils;
@@ -76,7 +78,9 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
 
         binding.btnLike.setOnClickListener(v -> toggleLike());
 
-        binding.btnCollect.setOnClickListener(v -> toggleCollect());
+        binding.btnCollect.setOnClickListener(v -> {
+            toggleCollect();
+        });
 
         binding.vpPostImages.setAdapter(imageAdapter);
         binding.vpPostImages.setOffscreenPageLimit(1);
@@ -91,6 +95,7 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         setupBottomSheet();
         setupCommentInput();
     }
+
     private void toggleLike() {
         if (currentPostId <= 0) {
             ToastUtils.INSTANCE.showShort(this, "帖子加载中");
@@ -344,201 +349,201 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         if (currentPostId > 0) {
             viewModel.sendComment(currentPostId, content);
             binding.etComment.setText("");
+        }
+    }
+
+    @Override
+    public void initData() {
+        viewModel.getPostLiveData().observe(this, this::bindPost);
+
+        viewModel.getCommentsLiveData().observe(this, comments -> {
+            if (comments != null) {
+                commentAdapter.setList(comments);
+                binding.tvCommentHeader.setText(comments.size() + "条评论");
+            }
+        });
+
+        viewModel.getLoadingLiveData().observe(this, isLoading -> {
+            if (isLoading != null && isLoading) {
+                showLoading("加载中...");
+            } else {
+                hideLoading();
+            }
+        });
+
+        viewModel.getErrorLiveData().observe(this, errorMsg -> {
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                ToastUtils.INSTANCE.showShort(this, errorMsg);
+            }
+        });
+
+        viewModel.getCommentSendSuccessLiveData().observe(this, success -> {
+            if (success != null && success) {
+                ToastUtils.INSTANCE.showShort(this, "评论发送成功");
+            }
+        });
+
+        viewModel.getLikeLoadingLiveData().observe(this, isLoading -> {
+            binding.btnLike.setEnabled(isLoading == null || !isLoading);
+        });
+
+        viewModel.getCollectLoadingLiveData().observe(this, isLoading -> {
+            binding.btnCollect.setEnabled(isLoading == null || !isLoading);
+        });
+
+        long postId = getIntent().getLongExtra(EXTRA_POST_ID, -1);
+        if (postId > 0) {
+            currentPostId = postId;
+            viewModel.loadPost(postId);
+            viewModel.loadComments(postId);
+        } else {
+            ToastUtils.INSTANCE.showShort(this, "无效的帖子");
+            finish();
+        }
+    }
+
+    private void bindPost(PostResponseDto post) {
+        try {
+            if (post == null) {
+                return;
+            }
+            binding.tvPostTitle.setText(post.getTitle());
+            binding.tvPostContent.setText(post.getContent());
+            binding.tvAuthorName.setText(post.getAuthorName());
+
+            Integer likeCount = post.getLikeCount();
+            int currentLikeCount = likeCount != null ? likeCount : 0;
+            boolean currentIsLiked = post.isLiked() != null && post.isLiked();
+            updateLikeUI(currentIsLiked, currentLikeCount);
+
+            Integer favoriteCount = post.getFavoriteCount();
+            int currentFavoriteCount = favoriteCount != null ? favoriteCount : 0;
+            boolean currentIsFavorited = post.isFavorited() != null && post.isFavorited();
+            updateCollectUI(currentIsFavorited, currentFavoriteCount);
+
+            String authorAvatar = post.getAuthorAvatar();
+            if (authorAvatar != null && !authorAvatar.isEmpty()) {
+                ImageRequest avatarRequest = new ImageRequest.Builder(this)
+                        .data(authorAvatar)
+                        .placeholder(R.drawable.bg_community_post_avatar)
+                        .error(R.drawable.bg_community_post_avatar)
+                        .target(binding.ivAuthorAvatar)
+                        .transformations(new CircleCropTransformation())
+                        .build();
+                Coil.imageLoader(this).enqueue(avatarRequest);
+            }
+
+            List<String> images = post.getImages();
+            if (images != null && !images.isEmpty()) {
+                List<String> validImages = new ArrayList<>();
+                for (String img : images) {
+                    if (img != null && !img.trim().isEmpty()) {
+                        validImages.add(img);
+                    }
                 }
+                if (validImages.isEmpty()) {
+                    imageAdapter.setList(new ArrayList<>());
+                    binding.layoutViewPager.setVisibility(View.GONE);
+                    binding.layoutPageIndicator.removeAllViews();
+                } else {
+                    int screenWidth = getResources().getDisplayMetrics().widthPixels;
+                    binding.layoutViewPager.setVisibility(View.VISIBLE);
+                    binding.layoutPageIndicator.removeAllViews();
+                    setupPageIndicator(validImages.size(), 0);
+                    maxImageHeight = (int) (screenWidth * 0.75f);
+                    applyViewPagerHeight(screenWidth);
+                    imageAdapter.setList(validImages);
+                    calculateMaxImageHeight(validImages, 0, screenWidth);
+                }
+            } else {
+                imageAdapter.setList(new ArrayList<>());
+                binding.layoutViewPager.setVisibility(View.GONE);
+                binding.layoutPageIndicator.removeAllViews();
+            }
+            Integer commentCount = post.getCommentCount();
+            binding.tvCommentHeader.setText((commentCount != null ? commentCount : 0) + "条评论");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void calculateMaxImageHeight(List<String> images, int index, int screenWidth) {
+        if (index >= images.size()) {
+            applyViewPagerHeight(screenWidth);
+            imageAdapter.setList(images);
+            return;
+        }
+        String url = images.get(index);
+        Target target = new Target() {
+            @Override
+            public void onStart(Drawable placeholder) {
             }
 
             @Override
-            public void initData() {
-                viewModel.getPostLiveData().observe(this, this::bindPost);
-
-                viewModel.getCommentsLiveData().observe(this, comments -> {
-                    if (comments != null) {
-                        commentAdapter.setList(comments);
-                        binding.tvCommentHeader.setText(comments.size() + "条评论");
+            public void onSuccess(Drawable result) {
+                int intrinsicHeight = result.getIntrinsicHeight();
+                int intrinsicWidth = result.getIntrinsicWidth();
+                if (intrinsicWidth > 0 && intrinsicHeight > 0) {
+                    int scaledHeight = screenWidth * intrinsicHeight / intrinsicWidth;
+                    if (scaledHeight > maxImageHeight) {
+                        maxImageHeight = scaledHeight;
                     }
-                });
-
-                viewModel.getLoadingLiveData().observe(this, isLoading -> {
-                    if (isLoading != null && isLoading) {
-                        showLoading("加载中...");
-                    } else {
-                        hideLoading();
-                    }
-                });
-
-                viewModel.getErrorLiveData().observe(this, errorMsg -> {
-                    if (errorMsg != null && !errorMsg.isEmpty()) {
-                        ToastUtils.INSTANCE.showShort(this, errorMsg);
-                    }
-                });
-
-                viewModel.getCommentSendSuccessLiveData().observe(this, success -> {
-                    if (success != null && success) {
-                        ToastUtils.INSTANCE.showShort(this, "评论发送成功");
-                    }
-                });
-
-                viewModel.getLikeLoadingLiveData().observe(this, isLoading -> {
-                    binding.btnLike.setEnabled(isLoading == null || !isLoading);
-                });
-
-                viewModel.getCollectLoadingLiveData().observe(this, isLoading -> {
-                    binding.btnCollect.setEnabled(isLoading == null || !isLoading);
-                });
-
-                long postId = getIntent().getLongExtra(EXTRA_POST_ID, -1);
-                if (postId > 0) {
-                    currentPostId = postId;
-                    viewModel.loadPost(postId);
-                    viewModel.loadComments(postId);
-                } else {
-                    ToastUtils.INSTANCE.showShort(this, "无效的帖子");
-                    finish();
                 }
+                calculateMaxImageHeight(images, index + 1, screenWidth);
             }
 
-            private void bindPost(PostResponseDto post) {
-                try {
-                    if (post == null) {
-                        return;
-                    }
-                    binding.tvPostTitle.setText(post.getTitle());
-                    binding.tvPostContent.setText(post.getContent());
-                    binding.tvAuthorName.setText(post.getAuthorName());
-
-                    Integer likeCount = post.getLikeCount();
-                    int currentLikeCount = likeCount != null ? likeCount : 0;
-                    boolean currentIsLiked = post.isLiked() != null && post.isLiked();
-                    updateLikeUI(currentIsLiked, currentLikeCount);
-
-                    Integer favoriteCount = post.getFavoriteCount();
-                    int currentFavoriteCount = favoriteCount != null ? favoriteCount : 0;
-                    boolean currentIsFavorited = post.isFavorited() != null && post.isFavorited();
-                    updateCollectUI(currentIsFavorited, currentFavoriteCount);
-
-                    String authorAvatar = post.getAuthorAvatar();
-                    if (authorAvatar != null && !authorAvatar.isEmpty()) {
-                        ImageRequest avatarRequest = new ImageRequest.Builder(this)
-                                .data(authorAvatar)
-                                .placeholder(R.drawable.bg_community_post_avatar)
-                                .error(R.drawable.bg_community_post_avatar)
-                                .target(binding.ivAuthorAvatar)
-                                .transformations(new CircleCropTransformation())
-                                .build();
-                        Coil.imageLoader(this).enqueue(avatarRequest);
-                    }
-
-                    List<String> images = post.getImages();
-                    if (images != null && !images.isEmpty()) {
-                        List<String> validImages = new ArrayList<>();
-                        for (String img : images) {
-                            if (img != null && !img.trim().isEmpty()) {
-                                validImages.add(img);
-                            }
-                        }
-                        if (validImages.isEmpty()) {
-                            imageAdapter.setList(new ArrayList<>());
-                            binding.layoutViewPager.setVisibility(View.GONE);
-                            binding.layoutPageIndicator.removeAllViews();
-                        } else {
-                            int screenWidth = getResources().getDisplayMetrics().widthPixels;
-                            binding.layoutViewPager.setVisibility(View.VISIBLE);
-                            binding.layoutPageIndicator.removeAllViews();
-                            setupPageIndicator(validImages.size(), 0);
-                            maxImageHeight = (int) (screenWidth * 0.75f);
-                            applyViewPagerHeight(screenWidth);
-                            imageAdapter.setList(validImages);
-                            calculateMaxImageHeight(validImages, 0, screenWidth);
-                        }
-                    } else {
-                        imageAdapter.setList(new ArrayList<>());
-                        binding.layoutViewPager.setVisibility(View.GONE);
-                        binding.layoutPageIndicator.removeAllViews();
-                    }
-                    Integer commentCount = post.getCommentCount();
-                    binding.tvCommentHeader.setText((commentCount != null ? commentCount : 0) + "条评论");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            @Override
+            public void onError(Drawable error) {
+                calculateMaxImageHeight(images, index + 1, screenWidth);
             }
+        };
+        ImageRequest request = new ImageRequest.Builder(this)
+                .data(url)
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.placeholder_image)
+                .target(target)
+                .build();
+        coil.ImageLoader imageLoader = coil.Coil.imageLoader(this);
+        imageLoader.enqueue(request);
+    }
 
-            private void calculateMaxImageHeight(List<String> images, int index, int screenWidth) {
-                if (index >= images.size()) {
-                    applyViewPagerHeight(screenWidth);
-                    imageAdapter.setList(images);
-                    return;
-                }
-                String url = images.get(index);
-                Target target = new Target() {
-                    @Override
-                    public void onStart(Drawable placeholder) {
-                    }
+    private void applyViewPagerHeight(int screenWidth) {
+        ViewGroup.LayoutParams params = binding.layoutViewPager.getLayoutParams();
+        if (maxImageHeight > 0) {
+            params.height = maxImageHeight;
+        } else {
+            params.height = (int) (screenWidth * 0.75f);
+        }
+        binding.layoutViewPager.setLayoutParams(params);
+    }
 
-                    @Override
-                    public void onSuccess(Drawable result) {
-                        int intrinsicHeight = result.getIntrinsicHeight();
-                        int intrinsicWidth = result.getIntrinsicWidth();
-                        if (intrinsicWidth > 0 && intrinsicHeight > 0) {
-                            int scaledHeight = screenWidth * intrinsicHeight / intrinsicWidth;
-                            if (scaledHeight > maxImageHeight) {
-                                maxImageHeight = scaledHeight;
-                            }
-                        }
-                        calculateMaxImageHeight(images, index + 1, screenWidth);
-                    }
+    private void setupPageIndicator(int count, int selected) {
+        binding.layoutPageIndicator.removeAllViews();
+        binding.layoutPageIndicator.setVisibility(count > 1 ? View.VISIBLE : View.GONE);
+        float density = getResources().getDisplayMetrics().density;
+        for (int i = 0; i < count; i++) {
+            View dot = new View(this);
+            int size = (int) (4 * density + 0.5f);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size, size);
+            lp.setMargins(size, 0, size, 0);
+            dot.setLayoutParams(lp);
+            dot.setBackgroundResource(i == selected
+                    ? R.drawable.dot_post_detail_selected
+                    : R.drawable.dot_post_detail_normal);
+            binding.layoutPageIndicator.addView(dot);
+        }
+    }
 
-                    @Override
-                    public void onError(Drawable error) {
-                        calculateMaxImageHeight(images, index + 1, screenWidth);
-                    }
-                };
-                ImageRequest request = new ImageRequest.Builder(this)
-                        .data(url)
-                        .placeholder(R.drawable.placeholder_image)
-                        .error(R.drawable.placeholder_image)
-                        .target(target)
-                        .build();
-                coil.ImageLoader imageLoader = coil.Coil.imageLoader(this);
-                imageLoader.enqueue(request);
-            }
-
-            private void applyViewPagerHeight(int screenWidth) {
-                ViewGroup.LayoutParams params = binding.layoutViewPager.getLayoutParams();
-                if (maxImageHeight > 0) {
-                    params.height = maxImageHeight;
-                } else {
-                    params.height = (int) (screenWidth * 0.75f);
-                }
-                binding.layoutViewPager.setLayoutParams(params);
-            }
-
-            private void setupPageIndicator(int count, int selected) {
-                binding.layoutPageIndicator.removeAllViews();
-                binding.layoutPageIndicator.setVisibility(count > 1 ? View.VISIBLE : View.GONE);
-                float density = getResources().getDisplayMetrics().density;
-                for (int i = 0; i < count; i++) {
-                    View dot = new View(this);
-                    int size = (int) (4 * density + 0.5f);
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size, size);
-                    lp.setMargins(size, 0, size, 0);
-                    dot.setLayoutParams(lp);
-                    dot.setBackgroundResource(i == selected
+    private void updatePageIndicator(int selected) {
+        int count = binding.layoutPageIndicator.getChildCount();
+        if (selected < 0 || selected >= count) return;
+        for (int i = 0; i < count; i++) {
+            binding.layoutPageIndicator.getChildAt(i).setBackgroundResource(
+                    i == selected
                             ? R.drawable.dot_post_detail_selected
                             : R.drawable.dot_post_detail_normal);
-                    binding.layoutPageIndicator.addView(dot);
-                }
-            }
-
-            private void updatePageIndicator(int selected) {
-                int count = binding.layoutPageIndicator.getChildCount();
-                if (selected < 0 || selected >= count) return;
-                for (int i = 0; i < count; i++) {
-                    binding.layoutPageIndicator.getChildAt(i).setBackgroundResource(
-                            i == selected
-                                    ? R.drawable.dot_post_detail_selected
-                                    : R.drawable.dot_post_detail_normal);
-                }
-            }
+        }
+    }
 
     private void showKeyboard() {
         // 让 EditText 获得焦点
@@ -560,24 +565,24 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
 
 
     @Override
-            protected void onResume() {
-                super.onResume();
-                int collapsedHeight = dpToPx(48) + dpToPx(80);
-                bottomSheetBehavior.setPeekHeight(collapsedHeight);
-            }
+    protected void onResume() {
+        super.onResume();
+        int collapsedHeight = dpToPx(48) + dpToPx(80);
+        bottomSheetBehavior.setPeekHeight(collapsedHeight);
+    }
 
-            @Override
-            protected void onPause() {
-                super.onPause();
-                if (isRecording) {
-                    stopVoiceRecording();
-                }
-            }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isRecording) {
+            stopVoiceRecording();
+        }
+    }
 
-            @Override
-            protected void onDestroy() {
-                super.onDestroy();
-                VoiceRecognitionManager.INSTANCE.stopListening();
-                VoiceRecognitionManager.INSTANCE.setCallback(null);
-            }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        VoiceRecognitionManager.INSTANCE.stopListening();
+        VoiceRecognitionManager.INSTANCE.setCallback(null);
+    }
 }
