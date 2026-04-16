@@ -201,14 +201,6 @@ public class PlantManageViewModel extends BaseViewModel {
         return updateStateLiveData;
     }
 
-    /**
-     * 修改作物基本信息（纯文本更新，如名称、健康状态、种植日期等）
-     * @param cropId 作物ID
-     * @param plantName 作物名称
-     * @param status 健康状态
-     * @param plantingDate 种植日期
-     * @param maturityDate 成熟时间
-     */
     public void updateCropBasicInfo(Long cropId, String plantName, String status, LocalDate plantingDate, LocalDate maturityDate) {
         if (cropId == null || cropId <= 0) {
             errorMessageLiveData.setValue("作物ID无效");

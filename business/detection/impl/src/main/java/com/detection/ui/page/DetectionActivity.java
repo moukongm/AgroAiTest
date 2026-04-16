@@ -16,6 +16,7 @@ import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import com.detection.viewmodel.DetectionViewModelFactory;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -62,7 +63,9 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
 
     @Override
     public void initView() {
-        viewModel = new ViewModelProvider(this).get(DetectionViewModel.class);
+        // 使用 DetectionViewModelFactory 创建 ViewModel（传入 Application）
+        DetectionViewModelFactory factory = new DetectionViewModelFactory(getApplication());
+        viewModel = new ViewModelProvider(this, factory).get(DetectionViewModel.class);
 
         initCamera();
         binding.btnRecognize.setEnabled(false);
@@ -85,7 +88,8 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
                 binding.previewView.setVisibility(View.GONE);
                 showPreview(uri.toString());
                 showLoading("稍等一下呢...");
-                viewModel.uploadAndRecognizeFromGallery(getApplicationContext(), "这个得了什么病",selectedFile);
+                // 改为双路识别（自动判断网络状态）
+                viewModel.recognizeImage(selectedFile);
                 return null;
             });
         }
@@ -150,6 +154,10 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
 
         // 相册
         binding.llGallery.setOnClickListener(v -> {
+            if(flashOn){
+                flashOn = !flashOn;
+                updateFlashState();
+            }
             PermissionUtils.INSTANCE.request(this, Arrays.asList(Manifest.permission.CAMERA),
                     () -> {
                         imagePickerUtil.getStorage();
@@ -243,16 +251,31 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
             cameraProvider.unbindAll();
             cameraProvider = null;
         }
-        LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY).setValue(false);
         camera = null;
         imageCapture = null;
+
         // 释放图片选择器
         if (imagePickerUtil != null) {
             imagePickerUtil.release();
             imagePickerUtil = null;
         }
+
+        // 清理 LiveDataBus
         LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY).setValue(false);
-        binding.ivSelectedImage.setImageBitmap(null);
+
+        // 清理 ImageView Bitmap
+        if (binding != null && binding.ivSelectedImage != null) {
+            binding.ivSelectedImage.setImageBitmap(null);
+        }
+
+        // 清理 ViewModel 引用
+        viewModel = null;
+
+        // 清理选中文件引用
+        selectedFile = null;
+
+        // 重置闪光灯状态
+        flashOn = false;
     }
 
     @Override

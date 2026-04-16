@@ -28,6 +28,7 @@ import com.detection.model.HistoryItem;
 import com.detection.ui.adapter.HistoryAdapter;
 import com.detection.ui.adapter.HistoryListMapper;
 import com.detection.viewmodel.DetectionViewModel;
+import com.detection.viewmodel.DetectionViewModelFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -47,6 +48,7 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
     private DetectionViewModel viewModel;
     ActivityDetectionHistoryBinding binding;
     List<AgentChatHistory> historyList;
+    List<HistoryItem> notNetworklist=  new ArrayList<>();
     List<HistoryItem> list;
 
     @NonNull
@@ -60,7 +62,10 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
         binding = getBinding();
         LogUtils.INSTANCE.d("home","history");
         showLoading("加载中...");
-        viewModel = new ViewModelProvider(this).get(DetectionViewModel.class);
+        DetectionViewModelFactory factory = new DetectionViewModelFactory(
+            getApplication()
+        );
+        viewModel = new ViewModelProvider(this, factory).get(DetectionViewModel.class);
         adapter = new HistoryAdapter();
         binding.rvStarPosts.setLayoutManager(new GridLayoutManager(this, 2));
         binding.rvStarPosts.setAdapter(adapter);
@@ -122,13 +127,11 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
         // 1. 先观察本地数据，显示本地数据
         viewModel.getLocalRecordsLiveData().observe(this, records -> {
             if (records != null && !records.isEmpty()) {
-                hideLoading();
+
                 LogUtils.INSTANCE.d("opopop","local");
                 list = HistoryListMapper.toMultiListFromLocal(records);
                 LogUtils.INSTANCE.d("opopop",list.size()+"");
-                adapter.setList(list);
-                setupItemClickListener();
-                binding.rvStarPosts.setVisibility(View.VISIBLE);
+                notNetworklist = list;
             }
         });
 
@@ -147,7 +150,12 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
         viewModel.getErrorLiveData().observe(this, error -> {
             hideLoading();
             // 如果 adapter 没有数据，说明本地也没有，显示暂无
-            if (adapter.getItemCount() == 0) {
+            if(notNetworklist!=null && !notNetworklist.isEmpty()){
+                adapter.setList(notNetworklist);
+                notNetworklist.clear();
+                setupItemClickListener();
+                binding.rvStarPosts.setVisibility(View.VISIBLE);
+            }else{
                 binding.consInformationContent.setBackgroundResource(R.drawable.bg_nonehistory);
                 Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
             }
@@ -158,17 +166,21 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-                HistoryItem historyItem = list.get(position);
-                if (historyItem.getChatHistory() != null) {
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fl_history, new RecognitionResultFragment(historyItem.getChatHistory()))
-                            .addToBackStack(null)
-                            .commit();
-                } else if (historyItem.getLocalRecord() != null) {
-                    // 本地记录，点击后可以查看详情
-                    ToastUtils.INSTANCE.showShort(getApplicationContext(), "本地记录详情");
-                }
+               if(list.size()<=position){
+
+               }else{
+                   HistoryItem historyItem = list.get(position);
+                   if (historyItem.getChatHistory() != null) {
+                       getSupportFragmentManager()
+                               .beginTransaction()
+                               .replace(R.id.fl_history, new RecognitionResultFragment(historyItem.getChatHistory()))
+                               .addToBackStack(null)
+                               .commit();
+                   } else if (historyItem.getLocalRecord() != null) {
+                       // 本地记录，点击后可以查看详情
+                       ToastUtils.INSTANCE.showShort(getApplicationContext(), "本地记录详情");
+                   }
+               }
             }
         });
     }

@@ -1,12 +1,16 @@
 package com.user.profile.ui.page;
 
+import static android.app.ProgressDialog.show;
+
 import android.app.Activity;
+import android.content.ClipData;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,6 +21,7 @@ import com.agri.pest.client.model.request.ProfileUpdateRequest;
 import com.common.base.BaseFragment;
 import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
+import com.common.utils.ToastUtils;
 import com.user.databinding.FragmentGuideRegisterBinding;
 import com.user.profile.Utils;
 import com.user.login.data.UserStorageConstant;
@@ -135,13 +140,29 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
             Log.d("ljxljxljx", "hhh");
             if (i == list3.size() - 2) {
             } else if (i == list3.size() - 1) {
-                LogUtils.INSTANCE.d("-1");
-                GuideMultiItem editItem = list3.get(list3.size() - 2);
-                String inputText = editItem.getEditText();
-                if (inputText != null && !inputText.trim().isEmpty()) {
-                    editItem.setEditText("");
-                    list3.add(list3.size() - 2, new GuideMultiItem(GuideMultiItem.TYPE_NEW, inputText.trim()));
-                    adapter.setList(new ArrayList<>(list3));
+                if(list3.size()>5){
+                    Toast.makeText(requireActivity().getApplicationContext() ,"最多添加4个作物哦", Toast.LENGTH_SHORT).show();
+                }else{
+                    LogUtils.INSTANCE.d("klklkl",list3.size()+"");
+                    GuideMultiItem editItem = list3.get(list3.size() - 2);
+                    String inputText = editItem.getEditText();
+                    Boolean ifEuple = false;
+                    for (int i1 = 0; i1 < list3.size()-2; i1++) {
+                        LogUtils.INSTANCE.d("klklkl",i1+"op"+list3.get(i1).getNewCrop()+"kl"+inputText);
+                        if(list3.get(i1).getNewCrop()!=null && list3.get(i1).getNewCrop().equals(inputText)) {
+                            ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(),"不能重复自定义作物！");
+                            ifEuple = true;
+                            break;
+                        }
+                    }
+                    if(!ifEuple){
+                        if (inputText != null && !inputText.trim().isEmpty()) {
+                            editItem.setEditText("");
+                            list3.add(list3.size() - 2, new GuideMultiItem(GuideMultiItem.TYPE_NEW, inputText.trim()));
+                            adapter.setList(new ArrayList<>(list3));
+                        }
+                    }
+
                 }
             } else {
                 String crop = list3.get(i).getNewCrop();

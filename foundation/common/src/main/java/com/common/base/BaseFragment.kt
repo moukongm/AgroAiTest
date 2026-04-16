@@ -19,6 +19,12 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     protected val binding get() = _binding!!
     private var navController: NavigationController? = null
 
+    /**
+     * 安全获取 ViewBinding，在 onDestroyView 后可能为 null
+     * @return ViewBinding 实例或 null
+     */
+    protected fun getBindingSafe(): VB? = _binding
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

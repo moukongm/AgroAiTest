@@ -123,7 +123,7 @@ public class MessageFragment extends BaseFragment<FragmentMessageBinding> {
                             .withLong("post_id",postId)
                             .navigation();
                     //红点消失
-                    viewModel.isRead(id,true);
+                    viewModel.isRead(id,true,false);
 
                 }
 

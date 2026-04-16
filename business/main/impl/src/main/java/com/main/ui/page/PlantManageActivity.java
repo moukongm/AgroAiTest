@@ -232,15 +232,10 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
             }
         });
 
-        // 成熟时间输入框焦点
-        binding.etMatureValue.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                enterEditMode();
-            }
-        });
 
         // 保存按钮
         binding.btnSaveChanges.setOnClickListener(v -> saveChanges());
+
     }
 
     private void enterEditMode() {
@@ -291,6 +286,11 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
         }
 
         viewModel.updateCropWithImage(this, plantId, selectedImageUri, newName, newStatus, plantingDate, maturityDate);
+
+        binding.etPlantNameLabel.clearFocus();
+        binding.etHealthValue.clearFocus();
+        binding.etPlantDateValue.clearFocus();
+        binding.etMatureValue.clearFocus();
     }
 
 

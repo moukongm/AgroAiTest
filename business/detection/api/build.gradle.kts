@@ -19,6 +19,14 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    aaptOptions {
+        noCompress("tflite")  // 防止 TFLite 模型被压缩
+    }
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/assets")
+        }
+    }
 }
 
 dependencies {

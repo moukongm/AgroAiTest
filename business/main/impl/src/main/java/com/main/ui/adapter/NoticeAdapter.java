@@ -13,7 +13,7 @@ public class NoticeAdapter extends BaseBindingAdapter<MessageResponseDto, ItemNo
 
     // Item 点击回调接口
     public interface OnNoticeClickListener {
-        void onNoticeClick(Long id,int location);
+        void onNoticeClick(Long id,int location,Boolean isZk);
     }
 
     // 回调监听器
@@ -47,13 +47,16 @@ public class NoticeAdapter extends BaseBindingAdapter<MessageResponseDto, ItemNo
             binding.mainpageWarningRight.setVisibility(View.GONE);
             binding.mainpageWarningGoneright.setVisibility(View.VISIBLE);
             binding.tvWarnning.setMaxLines(100);
+            if(!item.isRead()){
+                listener.onNoticeClick(item.getId(), position,true);
+            }
         });
         binding.mainpageWarningGoneright.setOnClickListener(v -> {
             binding.mainpageWarningRight.setVisibility(View.VISIBLE);
             binding.mainpageWarningGoneright.setVisibility(View.GONE);
             binding.tvWarnning.setMaxLines(2);
             if(!item.isRead()){
-                listener.onNoticeClick(item.getId(), position);
+                listener.onNoticeClick(item.getId(), position,false);
             }
         });
 

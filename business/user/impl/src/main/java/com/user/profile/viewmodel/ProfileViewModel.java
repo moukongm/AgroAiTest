@@ -2,15 +2,11 @@ package com.user.profile.viewmodel;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.MutableLiveData;
 
-import com.agri.pest.client.model.request.PostCreateRequest;
 import com.agri.pest.client.model.response.PostResponseDto;
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.common.base.BaseViewModel;
 import com.common.router.RouterPath;
 import com.common.storage.MMKVUtils;
@@ -30,17 +26,11 @@ import com.agri.pest.client.model.request.ProfileUpdateRequest;
 import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.common.utils.LogUtils;
 import com.common.utils.ThreadUtils;
-import com.common.utils.ToastUtils;
-import com.detection.HistoryCountService;
 import com.network.NetworkManager;
 import com.user.R;
 import com.user.profile.data.Repository;
-import com.user.profile.ui.page.SettingProfileActivity;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +52,7 @@ public class ProfileViewModel extends BaseViewModel {
     private final MutableLiveData<String> nickNameLivedata = new MutableLiveData<>();
     private final MutableLiveData<Long> historyCountLivedata = new MutableLiveData<>();
     private final SingleLiveEvent<String> phoneLivedata = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> starError = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> passwordLivedata = new SingleLiveEvent<>();
 
     private final MutableLiveData<String> phoneValueLivedata = new MutableLiveData<>();
@@ -92,7 +83,10 @@ public class ProfileViewModel extends BaseViewModel {
     private List<PostResponseDto> list = new ArrayList<>();
     private List<PostResponseDto> favoriteList = new ArrayList<>();
 
-//    public void setpost() {
+    public SingleLiveEvent<String> getStarError() {
+        return starError;
+    }
+    //    public void setpost() {
 //        Log.d("xzr", "fabu");
 //        List<String> list1 = new ArrayList<>();
 //        list1.add("https://s1.aigei.com/src/img/png/86/8624ec6bc43d47ae9a07990cca965d90.png?imageMogr2/auto-orient/thumbnail/!282x282r/gravity/Center/crop/282x282/quality/85/%7CimageView2/2/w/282&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:uRsVTTvJlcApVbNOMB7m5S4eD_4=");
@@ -353,11 +347,12 @@ public class ProfileViewModel extends BaseViewModel {
                                 isHasFavoriteNext = response.getData().getHasNext();
                                 mineFavoritePostsLivedata.setValue(favoriteList);
                             } else {
-
+                                starError.setValue("糟糕，服务端没返回");
                             }
 
                         },
                         error -> {
+                            starError.setValue(error.toString());
                             LogUtils.INSTANCE.d(error.getMessage());
                         }
 

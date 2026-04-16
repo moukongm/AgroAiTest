@@ -25,7 +25,7 @@ public class MyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlantBindi
     private List<MyCropResponseDto> networkData = new ArrayList<>();
     private List<CropRecord> localData = new ArrayList<>();
     private String userAvatarPath;
-    private String userLocation; // 用户定位信息
+    private String userLocation;
 
     public interface OnCropClickListener {
         void onCropClick(Object crop);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 语音搜索弹窗主题 -->
+    <style name="VoiceSearchDialogTheme" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
+        <item name="android:windowAnimationStyle">@style/VoiceSearchAnimation</item>
+    </style>
+
+    <style name="VoiceSearchAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+
+    </style>
+</resources>

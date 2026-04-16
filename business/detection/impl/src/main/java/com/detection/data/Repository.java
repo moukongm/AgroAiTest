@@ -6,6 +6,7 @@ import com.agri.pest.client.model.request.ChatRequest;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
 import com.agri.pest.client.model.response.ResultListDiagnosisItem;
 import com.agri.pest.client.model.response.ResultString;
+import com.agri.pest.client.model.response.SseEmitter;
 import com.common.storage.database.DetectionRecord;
 import com.network.NetworkManager;
 
@@ -40,5 +41,10 @@ public class Repository {
     }
     public List<DetectionRecord> getLocalRecords(Context context) {
        return localDataSource.getLocalRecords(context);
+    }
+
+    public   Single<SseEmitter> getChatStream(ChatRequest chatRequest) {
+
+        return remoteDataSource.getChatStream(chatRequest);
     }
 }

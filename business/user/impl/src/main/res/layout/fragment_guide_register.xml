@@ -129,12 +129,14 @@
 
            <androidx.recyclerview.widget.RecyclerView
                android:id = "@+id/recy2"
+               android:layout_marginBottom="50dp"
                android:nestedScrollingEnabled="false"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                app:flow_horizontalGap="12dp"
                app:flow_verticalGap="12dp"
                app:flow_maxElementsWrap="3"
+               app:layout_constraintBottom_toBottomOf="parent"
                app:layout_constraintTop_toBottomOf="@id/tvVeg"
                app:layout_constraintStart_toStartOf="parent"
                app:layout_constraintEnd_toEndOf="parent"
@@ -163,7 +165,7 @@
             android:background="@drawable/shape_enp_ok"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginBottom="90dp"
+            android:layout_marginBottom="50dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

@@ -22,6 +22,7 @@ import com.common.utils.ToastUtils;
 import com.detection.R;
 import com.detection.databinding.FragmentRecocgnitionResultBinding;
 import com.detection.viewmodel.DetectionViewModel;
+import com.detection.viewmodel.DetectionViewModelFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -63,12 +64,17 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
 
     @Override
     public void initView() {
-        viewModel = new ViewModelProvider(requireActivity()).get(DetectionViewModel.class);
+        // 使用 DetectionViewModelFactory 创建 ViewModel
+        DetectionViewModelFactory factory = new DetectionViewModelFactory(
+            requireActivity().getApplication()
+        );
+        viewModel = new ViewModelProvider(requireActivity(), factory).get(DetectionViewModel.class);
+        
         binding = getBinding();
 
         markwon = Markwon.builder(requireActivity().getApplicationContext())
                 .build();
-        if(history != null){
+        if (history != null) {
             binding.btnCamera.setVisibility(View.INVISIBLE);
         }
         // 设置标签点击事件
@@ -133,6 +139,7 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
     // 切换标签
     private void selectTab(int index) {
         if (index < 0 || index >= 3) return;
+        currentIndex = index;
         updateUI(index);
     }
 
@@ -202,10 +209,23 @@ public class RecognitionResultFragment extends BaseFragment<FragmentRecocgnition
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // 清理 Markwon 实例
+        if (markwon != null) {
+            markwon = null;
+        }
+        // 清理数据引用
+        diagnosisItems = null;
+        history = null;
+        pendingImageUrl = null;
+        // 清理 ViewModel 引用
+        viewModel = null;
+        binding = null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        // 清理 Gson 实例
+        gson = null;
     }
 }

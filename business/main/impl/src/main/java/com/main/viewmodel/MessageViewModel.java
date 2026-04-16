@@ -138,7 +138,7 @@ public class MessageViewModel extends BaseViewModel {
 
         addDisposable(disposable);
     }
-    public void isRead(Long i,Boolean isMF) {
+    public void isRead(Long i,Boolean isMF,Boolean isZk) {
         Disposable disposable = repository.isRead(i)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -149,7 +149,11 @@ public class MessageViewModel extends BaseViewModel {
                                     isReadMF.setValue("yes");
                                 }
                                 else{
-                                    isRead.setValue("yes");
+                                    if(isZk){
+                                        isRead.setValue("zk");
+                                    }else{
+                                        isRead.setValue("yes");
+                                    }
                                 }
                             } else {
                                 isRead.setValue("网络连接出错误");

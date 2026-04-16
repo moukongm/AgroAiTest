@@ -5,6 +5,7 @@ import static androidx.camera.core.impl.utils.ContextUtil.getApplicationContext;
 import android.Manifest;
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -12,11 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,18 +30,23 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.common.base.BaseFragment;
 import com.common.router.RouterPath;
+import com.common.speech.VoiceRecognitionCallback;
+import com.common.speech.VoiceRecognitionManager;
 import com.common.utils.FileUtils;
 import com.common.utils.ImageLoader;
 import com.common.utils.ImagePickerUtil;
 import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
 import com.common.utils.PermissionUtils;
+import com.common.utils.ThreadUtils;
 import com.common.utils.ToastUtils;
 import com.detection.R;
 import com.detection.databinding.FragmentAiMainBinding;
 import com.detection.model.ChatItem;
 import com.detection.ui.adapter.ChatAdapter;
 import com.detection.viewmodel.DetectionViewModel;
+import com.detection.viewmodel.DetectionViewModelFactory;
+import com.permissionx.guolindev.callback.RequestCallback;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -58,8 +67,14 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
     String url = null;
     Boolean isKeyboardVisible = false;
     private Boolean ifold;
+    private String originalInputText = "";
+    Boolean isRecording;
+    private StringBuilder voiceInputBuffer = new StringBuilder();
     private ImagePickerUtil imagePickerUtil;
     ViewTreeObserver.OnGlobalLayoutListener listener;
+
+    // 保存 VoiceRecognitionCallback 引用，用于清理，防止内存泄漏
+    private VoiceRecognitionCallback voiceCallback;
 
     public AIMainFragment(Boolean ifold) {
         this.ifold = ifold;
@@ -73,10 +88,18 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
 
     @Override
     public void initView() {
-        binding = getBinding();
+        // 在 initView 开始时安全获取 binding
+        binding = getBindingSafe();
+        if (binding == null) {
+            return; // 防御性检查
+        }
         adapter = new ChatAdapter();
 
-        viewModel = new ViewModelProvider(requireActivity()).get(DetectionViewModel.class);
+        binding.consYuyin.setVisibility(View.GONE);
+        DetectionViewModelFactory factory = new DetectionViewModelFactory(
+            requireActivity().getApplication()
+        );
+        viewModel = new ViewModelProvider(requireActivity(), factory).get(DetectionViewModel.class);
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         binding.rvMessages.setLayoutManager(layoutManager);
 //        if (ifold) {
@@ -94,6 +117,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
             String input = binding.etInput.getText().toString();
             if (!input.trim().isEmpty() || url != null) {
                 viewModel.recognize(input, url, true);
+                binding.aiBack.cvInformationBack.setEnabled(false);
                 adapter.addData(ChatItem.mine(ChatItem.TYPE_USER, input, url));
                 adapter.addData(ChatItem.ai(ChatItem.TYPE_AI, "稍等一会..."));
                 scrollDialog();
@@ -121,6 +145,13 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                 return null;
             });
         }
+        binding.btnYuyin.setOnClickListener(v->{
+            hideKeyboard();
+            ThreadUtils.INSTANCE.runOnUiThreadDelayed(()->{
+                binding.consYuyin.setVisibility(View.VISIBLE);
+            },50);
+            originalInputText = binding.etInput.getText().toString();
+        });
         //取消添加图片
         binding.rvNoimages.setOnClickListener(v -> {
             showImg("");
@@ -149,6 +180,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
         //ai对话返回
         LiveDataExtKt.observeNonNull(viewModel.getChatChatResult(), this, mes -> {
             hideLoading();
+            binding.aiBack.cvInformationBack.setEnabled(true);
             adapter.setData(adapter.getItemCount() - 1,ChatItem.ai(ChatItem.TYPE_AI, mes));
             scrollDialog();
             binding.btnSend.setEnabled(true);
@@ -157,6 +189,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
         //错误返回
         LiveDataExtKt.observeNonNull(viewModel.getErrorChatMessage(), this, mes -> {
             hideLoading();
+            binding.aiBack.cvInformationBack.setEnabled(true);
             ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(), mes);
             if ("AI连接错误".equals(mes) || "AI 识别失败，请重试".equals(mes)) {
                 binding.btnSend.setEnabled(true);
@@ -191,14 +224,154 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
         });
         setupKeyboardListener();
         binding.rvMessages.setAdapter(adapter);
+        setupVoiceInput();
+    }
+
+    private void setupVoiceInput() {
+        FragmentAiMainBinding currentBinding = getBindingSafe();
+        if (currentBinding == null || currentBinding.ivYuyin == null) return;
+
+        currentBinding.ivYuyin.setOnTouchListener((v, event) -> {
+            ImageView iv = (ImageView) v;
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    iv.setImageResource(R.drawable.ic_ai_yuyining);
+                    startVoiceRecording();
+                    return true;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    iv.setImageResource(R.drawable.ic_ai_yuyinbtn);
+                    stopVoiceRecording();
+                    return true;
+            }
+            return false;
+        });
+    }
+
+    private void stopVoiceRecording() {
+        VoiceRecognitionManager.INSTANCE.stopListening();
+        isRecording = false;
+    }
+
+    private void startVoiceRecording() {
+        if (!VoiceRecognitionManager.INSTANCE.isInitialized()) {
+            ToastUtils.INSTANCE.showShort(requireContext(), "语音识别未初始化");
+            return;
+        }
+
+        PermissionUtils.INSTANCE.requestRecordAudio((AppCompatActivity)getActivity(), new RequestCallback() {
+            @Override
+            public void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList) {
+                requireActivity().runOnUiThread(() -> {
+                    if (allGranted) {
+                        isRecording = true;
+                        voiceInputBuffer.append(originalInputText);
+                        voiceInputBuffer.setLength(0);
+                        ToastUtils.INSTANCE.showShort(requireContext(), "开始说话...");
+
+                        // 保存回调引用，便于在 onDestroyView 中清理，防止内存泄漏
+                        voiceCallback = new VoiceRecognitionCallback() {
+                            @Override
+                            public void onBeginOfSpeech() {
+                            }
+
+                            @Override
+                            public void onEndOfSpeech() {
+                            }
+
+                            @Override
+                            public void onPartialResult(String text) {
+                                requireActivity().runOnUiThread(() -> {
+                                    if (text != null && !text.isEmpty()) {
+                                        voiceInputBuffer.setLength(0);
+                                        voiceInputBuffer.append(originalInputText);
+                                        voiceInputBuffer.append(text);
+                                        originalInputText = originalInputText+text;
+                                        updateSearchText();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFinalResult(String text) {
+                                requireActivity().runOnUiThread(() -> {
+                                    // onFinalResult 只返回标点符号确认，最终结果已在 onPartialResult 累积
+                                    // 如果有缓存内容，则保留；如果如果没有，则使用返回的文本
+                                    String existingText = voiceInputBuffer.toString();
+                                    if (existingText.isEmpty() && text != null && !text.isEmpty()) {
+                                        voiceInputBuffer.setLength(0);
+                                        voiceInputBuffer.append(originalInputText);
+                                        voiceInputBuffer.append(text);
+                                    }
+                                    updateSearchText();
+                                    isRecording = false;
+                                    // 使用 getBindingSafe() 更新语音按钮图片
+                                    FragmentAiMainBinding binding = getBindingSafe();
+                                    if (binding != null && binding.ivYuyin != null) {
+                                        binding.ivYuyin.setImageResource(R.drawable.ic_ai_yuyinbtn);
+                                    }
+
+                                    //更新为这次语音结束之后的逻辑；
+                                    originalInputText = voiceInputBuffer.toString();
+                                });
+                            }
+
+                            @Override
+                            public void onError(int errorCode, String errorMsg) {
+                                requireActivity().runOnUiThread(() -> {
+                                    isRecording = false;
+                                    ToastUtils.INSTANCE.showShort(requireContext(), "识别失败: " + errorMsg);
+                                    close();
+                                });
+                            }
+
+                            @Override
+                            public void onVolumeChanged(int volume) {
+                            }
+                        };
+
+                        VoiceRecognitionManager.INSTANCE.setCallback(voiceCallback);
+
+                        VoiceRecognitionManager.INSTANCE.startListening(requireContext());
+                    } else {
+                        ToastUtils.INSTANCE.showShort(requireContext(), "需要麦克风权限才能使用语音输入");
+                        // 使用 getBindingSafe() 更新语音按钮图片
+                        FragmentAiMainBinding binding = getBindingSafe();
+                        if (binding != null && binding.ivYuyin != null) {
+                            binding.ivYuyin.setImageResource(R.drawable.ic_ai_yuyinbtn);
+                        }
+                    }
+                });
+            }
+        });
+    }
+    private void close(){
+        if (isRecording) {
+            VoiceRecognitionManager.INSTANCE.stopListening();
+            isRecording = false;
+        }
+    }
+
+    private void updateSearchText() {
+        FragmentAiMainBinding currentBinding = getBindingSafe();
+        if (currentBinding == null || currentBinding.etInput == null) return;
+
+        EditText et = currentBinding.etInput;
+        et.setText(voiceInputBuffer.toString());
+        et.setSelection(voiceInputBuffer.length());
     }
 
     //点击输出框，可以弹出软键盘->底部要跟着网上弹。点击空白地方要弹下；
     private void setupKeyboardListener() {
-        final View rootView = binding.getRoot();
+        final View rootView = getBindingSafe() != null ? getBindingSafe().getRoot() : null;
+        if (rootView == null) return;
+
+        // 使用 getBindingSafe() 获取当前 binding，并进行 null 检查
+        FragmentAiMainBinding currentBinding = getBindingSafe();
+        if (currentBinding == null || currentBinding.rvMessages == null) return;
 
         // 点击聊天列表收起键盘
-        binding.rvMessages.setOnClickListener(new View.OnClickListener() {
+        currentBinding.rvMessages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 hideKeyboard();
@@ -209,6 +382,12 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
          listener = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
+                // 使用 getBindingSafe() 获取当前 binding，并进行 null 检查
+                FragmentAiMainBinding bindingInCallback = getBindingSafe();
+                if (bindingInCallback == null || bindingInCallback.inputContainer == null) {
+                    return; // Fragment 已销毁或 binding 已被清理，直接返回
+                }
+
                 Rect r = new Rect();
                 rootView.getWindowVisibleDisplayFrame(r);
                 int screenHeight = rootView.getRootView().getHeight();
@@ -218,24 +397,25 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                     // 键盘弹出
                     if (!isKeyboardVisible) {
                         isKeyboardVisible = true;
+                        bindingInCallback.consYuyin.setVisibility(View.GONE);
                         // 调整 RecyclerView padding，避免输入框被键盘遮挡
-                        binding.inputContainer.setPadding(
-                                binding.inputContainer.getPaddingLeft(),
-                                binding.inputContainer.getPaddingTop(),
-                                binding.inputContainer.getPaddingRight(),
+                        bindingInCallback.inputContainer.setPadding(
+                                bindingInCallback.inputContainer.getPaddingLeft(),
+                                bindingInCallback.inputContainer.getPaddingTop(),
+                                bindingInCallback.inputContainer.getPaddingRight(),
                                 keypadHeight + 20
                         );
                         // 延迟滚动，等布局完成后再滚
-                        binding.rvMessages.postDelayed(() -> scrollDialog(), 150);
+                        bindingInCallback.rvMessages.postDelayed(() -> scrollDialog(), 150);
                     }
                 } else {
                     // 键盘收起
                     if (isKeyboardVisible) {
                         isKeyboardVisible = false;
-                        binding.inputContainer.setPadding(
-                                binding.inputContainer.getPaddingLeft(),
-                                binding.inputContainer.getPaddingTop(),
-                                binding.inputContainer.getPaddingRight(),
+                        bindingInCallback.inputContainer.setPadding(
+                                bindingInCallback.inputContainer.getPaddingLeft(),
+                                bindingInCallback.inputContainer.getPaddingTop(),
+                                bindingInCallback.inputContainer.getPaddingRight(),
                                 20
                         );
                     }
@@ -259,24 +439,32 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
     }
 
     private void scrollDialog(){
-        binding.rvMessages.post(() -> {
-            if (binding.rvMessages == null || adapter == null || adapter.getItemCount() == 0) return;
+        // 使用 getBindingSafe() 获取当前 binding，并进行 null 检查
+        FragmentAiMainBinding currentBinding = getBindingSafe();
+        if (currentBinding == null || currentBinding.rvMessages == null) return;
+
+        currentBinding.rvMessages.post(() -> {
+            FragmentAiMainBinding bindingRef = getBindingSafe();
+            if (bindingRef == null || bindingRef.rvMessages == null || adapter == null || adapter.getItemCount() == 0) return;
             // 判断内容是否溢出（可滚动）
-            boolean canScroll = binding.rvMessages.computeVerticalScrollRange() >binding.rvMessages.getHeight();
+            boolean canScroll = bindingRef.rvMessages.computeVerticalScrollRange() > bindingRef.rvMessages.getHeight();
             if (canScroll) {
-                LinearLayoutManager lm = (LinearLayoutManager) binding.rvMessages.getLayoutManager();
+                LinearLayoutManager lm = (LinearLayoutManager) bindingRef.rvMessages.getLayoutManager();
                 if (lm != null) lm.setStackFromEnd(true);
-                binding.rvMessages.scrollToPosition(adapter.getItemCount() - 1);
+                bindingRef.rvMessages.scrollToPosition(adapter.getItemCount() - 1);
             }
         });
     }
     private void showImg(String imageUrl) {
+        FragmentAiMainBinding currentBinding = getBindingSafe();
+        if (currentBinding == null) return;
+
         if (imageUrl != null && !imageUrl.isEmpty()) {
-            binding.cvImg.setVisibility(View.VISIBLE);
-            ImageLoader.INSTANCE.load(binding.rvImages, imageUrl);
+            currentBinding.cvImg.setVisibility(View.VISIBLE);
+            ImageLoader.INSTANCE.load(currentBinding.rvImages, imageUrl);
             hideLoading();
         } else {
-            binding.cvImg.setVisibility(View.GONE);
+            currentBinding.cvImg.setVisibility(View.GONE);
         }
     }
 
@@ -288,20 +476,52 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        // 先获取当前 binding（用于安全清理）
+        FragmentAiMainBinding currentBinding = getBindingSafe();
+
         // 安全移除 ViewTreeObserver 监听器，防止内存泄漏
-        if (listener != null && binding != null && binding.getRoot() != null) {
-            ViewTreeObserver vto = binding.getRoot().getViewTreeObserver();
+        if (listener != null && currentBinding != null && currentBinding.getRoot() != null) {
+            ViewTreeObserver vto = currentBinding.getRoot().getViewTreeObserver();
             if (vto.isAlive()) {
                 vto.removeOnGlobalLayoutListener(listener);
             }
         }
         listener = null;
+
+        // 清理 ImagePickerUtil
         if (imagePickerUtil != null) {
             imagePickerUtil.release();
             imagePickerUtil = null;
         }
-        binding = null;  // 清除 binding 引用，避免泄漏
+
+        // 清理 VoiceRecognitionCallback 引用
+        if (voiceCallback != null) {
+            VoiceRecognitionManager.INSTANCE.setCallback(null);
+            voiceCallback = null;
+        }
+
+        // 清理适配器
+        if (adapter != null) {
+            adapter.setList(null);
+            adapter = null;
+        }
+
+        // 清理 ChatItem 列表
+        if (list != null) {
+            list.clear();
+            list = null;
+        }
+
+        // 最后清除 binding 引用，避免泄漏
+        binding = null;
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        VoiceRecognitionManager.INSTANCE.stopListening();
+        VoiceRecognitionManager.INSTANCE.setCallback(null);
     }
 
     @Override

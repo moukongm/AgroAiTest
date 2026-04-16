@@ -21,6 +21,7 @@ import com.common.notice.BusKey;
 import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
 import com.common.utils.LogUtils;
+import com.common.utils.ToastUtils;
 import com.detection.model.HistoryItem;
 import com.user.R;
 import com.user.databinding.FragmentStarProfileBinding;
@@ -70,6 +71,10 @@ public class FavoritePostActivity extends BaseActivity<FragmentStarProfileBindin
             hideLoading();
         });
 
+        viewModel.getStarError().observe(this, posts -> {
+            ToastUtils.INSTANCE.showShort(getApplicationContext(),posts);
+            hideLoading();
+        });
         binding.bg.cvInformationBack.setOnClickListener(v -> {
             hideLoading();
             finish();
@@ -91,6 +96,8 @@ public class FavoritePostActivity extends BaseActivity<FragmentStarProfileBindin
                 }
             }
         });
+
+
         starAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {

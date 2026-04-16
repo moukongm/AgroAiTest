@@ -52,6 +52,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
     ActivityHomeBinding binding;
     private MyCropAdapter cropAdapter;
 
+
     private static final int REQUEST_PLANT_ADD = 1001;
 
     @NonNull
@@ -139,9 +140,11 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         });
 
         viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
-            LogUtils.INSTANCE.d("lyy", city);
+            LogUtils.INSTANCE.d("lyy++", city);
             if (city != null && !city.isEmpty()) {
                 binding.mainpagePlacename.setText(city);
+                binding.mainpagePlantLocal.setText(city);
+                cropAdapter.setUserLocation(city);
             }
         });
 
@@ -226,8 +229,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         ), () -> {
             LogUtils.INSTANCE.d("ljx", "定位");
             viewModel.getLocation(getActivity().getApplicationContext());
-            // 同时从数据库加载上次的定位（作为后备）
-            viewModel.loadLocationFromDb();
             return null;
         }, deniedList -> {
             LogUtils.INSTANCE.d("ljx", "定位权限被拒绝");
@@ -236,6 +237,8 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             return null;
         });
         viewModel.getUserInfo();
+
+
         LiveDataBus.getInstance().with(BusKey.PROFILE_CHANGED).observe(getViewLifecycleOwner(),object->{
             LogUtils.INSTANCE.d("init","home");
             if(object instanceof Boolean){
