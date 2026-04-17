@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.agroai.databinding.ActivityMainBinding;
@@ -20,10 +21,15 @@ import com.common.base.BaseActivity;
 import com.common.notice.BusKey;
 import com.common.notice.LiveDataBus;
 import com.common.router.RouterPath;
+import com.common.storage.MMKVUtils;
 import com.common.utils.LogUtils;
 import com.community.ui.CommunityFragment;
+import com.community.ui.ElderCommunityFragment;
+import com.main.ui.page.ElderHomeFragment;
+import com.main.ui.page.ElderMessageFragment;
 import com.main.ui.page.MessageFragment;
 import com.main.ui.page.HomeFragment;
+import com.user.profile.ui.page.ElderProfileFragment;
 import com.user.profile.ui.page.ProfileFragment;
 
 import eightbitlab.com.blurview.BlurView;
@@ -40,8 +46,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
     private ProfileFragment profileFragment;
 
     private MessageFragment messageFragment;
+    private ElderCommunityFragment elderCommunityFragment;
+
+    private ElderHomeFragment elderHomeFragment;
+
+    private ElderProfileFragment elderProfileFragment;
+
+    private ElderMessageFragment elderMessageFragment;
 
     private Fragment activeFragment;
+
+    private boolean isA11yMode = false;
 
     public ActivityMainBinding getViewBinding() {
         return ActivityMainBinding.inflate(getLayoutInflater());
@@ -50,7 +65,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
     @Override
     public void initView() {
         setupFragments();
-        setupBottomNavigation();
+        if (!isA11yMode) {
+            setupBottomNavigation();
+        }
         setupBlurEffect();
     }
 
@@ -73,59 +90,77 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
                         }
                     }
                 });
+        
+        LiveDataBus.getInstance().with(BusKey.ACCESSIBILITY_MODE_CHANGED)
+                .observe(this, isA11y -> {
+                    if (isA11y instanceof Boolean && (Boolean) isA11y) {
+                        switchToA11yMode();
+                    } else {
+                        switchToNormalMode();
+                    }
+                });
     }
 
     private void setupFragments() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        isA11yMode = MMKVUtils.INSTANCE.custom("user_module").getString("selected_mode","normal").equals("senior");
 
-        homeFragment = new HomeFragment();
+        if (isA11yMode) {
+            switchToA11yMode();
+        } else {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        communityFragment = new CommunityFragment();
+            homeFragment = new HomeFragment();
+            communityFragment = new CommunityFragment();
+            profileFragment = new ProfileFragment();
+            messageFragment = new MessageFragment();
 
-        profileFragment = new ProfileFragment();
+            transaction.add(R.id.fragment_container, profileFragment, "profile")
+                    .hide(profileFragment);
+            transaction.add(R.id.fragment_container, messageFragment, "message")
+                    .hide(messageFragment);
+            transaction.add(R.id.fragment_container, communityFragment, "community")
+                    .hide(communityFragment);
+            transaction.add(R.id.fragment_container, homeFragment, "home");
 
-        messageFragment = new MessageFragment();
+            transaction.commit();
 
-        transaction.add(R.id.fragment_container, profileFragment, "profile")
-                .hide(profileFragment);
-        transaction.add(R.id.fragment_container, messageFragment, "message")
-                .hide(messageFragment);
-        transaction.add(R.id.fragment_container, communityFragment, "community")
-                .hide(communityFragment);
-        transaction.add(R.id.fragment_container, homeFragment, "home");
-
-        transaction.commit();
-
-        activeFragment = homeFragment;
+            activeFragment = homeFragment;
+            binding.bottomNavigation.switchMode(false);
+            setupBottomNavigation();
+        }
     }
     private void setupBottomNavigation() {
-        binding.bottomNavigation.setItemIconTintList(null);
-        binding.bottomNavigation.setItemRippleColor(null);
-        binding.bottomNavigation.setItemActiveIndicatorEnabled(false);
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
-                switchFragment(homeFragment);
+                switchFragment(isA11yMode() ? elderHomeFragment : homeFragment);
                 return true;
             } else if (itemId == R.id.nav_community) {
-                switchFragment(communityFragment);
+                switchFragment(isA11yMode() ? elderCommunityFragment : communityFragment);
                 return true;
             } else if (itemId == R.id.nav_message) {
-                switchFragment(messageFragment);
+                switchFragment(isA11yMode() ? elderMessageFragment : messageFragment);
                 return true;
             } else if (itemId == R.id.nav_profile) {
-                switchFragment(profileFragment);
+                switchFragment(isA11yMode() ? elderProfileFragment : profileFragment);
                 return true;
             }
             return false;
         });
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
     }
+
+    private boolean isA11yMode() {
+        return isA11yMode;
+    }
+
     private void switchFragment(Fragment fragment) {
-        if (fragment != activeFragment) {
+        if (fragment != null && fragment != activeFragment) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.hide(activeFragment)
-                    .show(fragment)
+            if (activeFragment != null) {
+                transaction.hide(activeFragment);
+            }
+            transaction.show(fragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
             activeFragment = fragment;
@@ -135,7 +170,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
         BlurView blurView = binding.blurView;
         ViewGroup rootView = (ViewGroup) getWindow().getDecorView().findViewById(android.R.id.content);
         float radius = 15f;
-
         blurView.setupWith(rootView, new RenderScriptBlur(this))
                 .setBlurRadius(radius)
                 .setOverlayColor(0x33FFFFFF);
@@ -155,6 +189,74 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
             homeFragment.stopLocationIfNeeded();
         }
         super.onDestroy();
+    }
+
+    private void switchToA11yMode() {
+        isA11yMode = true;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        if (homeFragment != null && homeFragment.isAdded()) transaction.hide(homeFragment);
+        if (communityFragment != null && communityFragment.isAdded()) transaction.hide(communityFragment);
+        if (messageFragment != null && messageFragment.isAdded()) transaction.hide(messageFragment);
+        if (profileFragment != null && profileFragment.isAdded()) transaction.hide(profileFragment);
+
+        transaction.commit();
+
+        FragmentTransaction newTransaction = getSupportFragmentManager().beginTransaction();
+
+        elderHomeFragment = new ElderHomeFragment();
+        elderCommunityFragment = new ElderCommunityFragment();
+        elderMessageFragment = new ElderMessageFragment();
+        elderProfileFragment = new ElderProfileFragment();
+
+        newTransaction.add(R.id.fragment_container, elderProfileFragment, "elder_profile")
+                .hide(elderProfileFragment);
+        newTransaction.add(R.id.fragment_container, elderMessageFragment, "elder_message")
+                .hide(elderMessageFragment);
+        newTransaction.add(R.id.fragment_container, elderCommunityFragment, "elder_community")
+                .hide(elderCommunityFragment);
+        newTransaction.add(R.id.fragment_container, elderHomeFragment, "elder_home");
+
+        newTransaction.commit();
+
+        activeFragment = elderHomeFragment;
+        binding.bottomNavigation.switchMode(true);
+        setupBottomNavigation();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
+    }
+
+    private void switchToNormalMode() {
+        isA11yMode = false;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        if (elderHomeFragment != null && elderHomeFragment.isAdded()) transaction.hide(elderHomeFragment);
+        if (elderCommunityFragment != null && elderCommunityFragment.isAdded()) transaction.hide(elderCommunityFragment);
+        if (elderMessageFragment != null && elderMessageFragment.isAdded()) transaction.hide(elderMessageFragment);
+        if (elderProfileFragment != null && elderProfileFragment.isAdded()) transaction.hide(elderProfileFragment);
+
+        transaction.commit();
+
+        FragmentTransaction newTransaction = getSupportFragmentManager().beginTransaction();
+
+        homeFragment = new HomeFragment();
+        communityFragment = new CommunityFragment();
+        messageFragment = new MessageFragment();
+        profileFragment = new ProfileFragment();
+
+        newTransaction.add(R.id.fragment_container, profileFragment, "profile")
+                .hide(profileFragment);
+        newTransaction.add(R.id.fragment_container, messageFragment, "message")
+                .hide(messageFragment);
+        newTransaction.add(R.id.fragment_container, communityFragment, "community")
+                .hide(communityFragment);
+        newTransaction.add(R.id.fragment_container, homeFragment, "home");
+
+        newTransaction.commit();
+
+        activeFragment = homeFragment;
+        binding.bottomNavigation.switchMode(false);
+        setupBottomNavigation();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
     }
 
 }

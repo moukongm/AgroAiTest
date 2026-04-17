@@ -1,5 +1,6 @@
 package com.main.ui.page;
 
+import android.app.AlertDialog;
 import android.net.Uri;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -62,12 +63,55 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
         }
         viewModel = new androidx.lifecycle.ViewModelProvider(this).get(PlantManageViewModel.class);
         setupToolbar();
+        setupHealthSpinner();
         setupTabs();
         setupCalendar();
         setupButtons();
         observeViewModel();
         selectTab(0);
         resetAllButtonStyles();
+    }
+
+    private void setupHealthSpinner() {
+        binding.tvHealthStatus.setOnClickListener(v -> {
+            showHealthStatusDialog();
+            enterEditMode();
+        });
+    }
+
+    private void showHealthStatusDialog() {
+        String[] healthOptions = {"良好", "中等", "差"};
+        int currentSelection = getHealthSpinnerSelection();
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("选择健康状况")
+               .setSingleChoiceItems(healthOptions, currentSelection, (dialog, which) -> {
+                   binding.tvHealthStatus.setText(healthOptions[which]);
+                   dialog.dismiss();
+               })
+               .setNegativeButton("取消", null)
+               .show();
+    }
+
+    private int getHealthSpinnerSelection() {
+        String current = binding.tvHealthStatus.getText().toString();
+        String[] options = {"良好", "中等", "差"};
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(current)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private String getHealthSpinnerValue() {
+        return binding.tvHealthStatus.getText().toString();
+    }
+
+    private void setHealthSpinnerSelection(String status) {
+        if (status != null) {
+            binding.tvHealthStatus.setText(status);
+        }
     }
 
     private void observeViewModel() {
@@ -80,7 +124,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
                     ImageLoader.INSTANCE.load(binding.ivHeaderBg, cropDetail.getImageUrl());
                 }
                 if (cropDetail.getStatus() != null) {
-                    binding.etHealthValue.setText(cropDetail.getStatus());
+                    setHealthSpinnerSelection(cropDetail.getStatus());
                 }
                 if (cropDetail.getPlantingDate() != null) {
                     binding.etPlantDateValue.setText(formatDate(cropDetail.getPlantingDate()));
@@ -218,13 +262,6 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
             }
         });
 
-        // 健康状态输入框焦点
-        binding.etHealthValue.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                enterEditMode();
-            }
-        });
-
         // 种植日期输入框焦点
         binding.etPlantDateValue.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
@@ -249,7 +286,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
         isEditMode = false;
         binding.btnSaveChanges.setVisibility(View.GONE);
         binding.etPlantNameLabel.setText(originalPlantName != null ? originalPlantName : "");
-        binding.etHealthValue.setText(originalStatus != null ? originalStatus : "");
+        setHealthSpinnerSelection(originalStatus);
         binding.etPlantDateValue.setText(formatDate(originalPlantingDate));
         binding.etMatureValue.setText(formatDate(originalMaturityDate));
         if (originalImageUrl != null) {
@@ -260,7 +297,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
 
     private void saveChanges() {
         String newName = binding.etPlantNameLabel.getText().toString().trim();
-        String newStatus = binding.etHealthValue.getText().toString().trim();
+        String newStatus = getHealthSpinnerValue();
         String plantDateStr = binding.etPlantDateValue.getText().toString().trim();
         String matureDateStr = binding.etMatureValue.getText().toString().trim();
 
@@ -288,7 +325,6 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
         viewModel.updateCropWithImage(this, plantId, selectedImageUri, newName, newStatus, plantingDate, maturityDate);
 
         binding.etPlantNameLabel.clearFocus();
-        binding.etHealthValue.clearFocus();
         binding.etPlantDateValue.clearFocus();
         binding.etMatureValue.clearFocus();
     }
@@ -362,9 +398,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
 
         for (int i = 0; i < tabs.length; i++) {
             boolean isSelected = (i == selectedPosition);
-            // 选中时显示白色背景，未选中时透明
             tabs[i].setBackgroundResource(isSelected ? R.drawable.bg_tab_selected : android.R.color.transparent);
-            // 更新文字颜色
             tabTexts[i].setTextColor(ContextCompat.getColor(this,
                     isSelected ? R.color.tab_text_selected : R.color.tab_text_normal));
         }
@@ -724,6 +758,8 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
             iconRes = R.drawable.ic_card_medicine;
         } else if (buttonId == R.id.btn_add_medicine_pending) {
             iconRes = R.drawable.ic_card_not_medicine;
+        } else if (buttonId == R.id.btn_add_note_done) {
+            iconRes = selected ? R.drawable.ic_card_notebook : R.drawable.ic_card_not_notebook;
         } else {
             return;
         }

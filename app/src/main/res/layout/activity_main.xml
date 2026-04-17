@@ -39,7 +39,7 @@
             android:background="@drawable/bg_nav_rounded"
             android:outlineProvider="background"
             android:clipToOutline="true" />
-        <com.google.android.material.bottomnavigation.BottomNavigationView
+        <com.agroai.AccessibilityBottomNavBar
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="75dp"

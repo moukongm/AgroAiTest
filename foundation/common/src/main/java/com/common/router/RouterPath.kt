@@ -15,6 +15,7 @@ object RouterPath {
     const val PLANT_ADD_ACTIVITY = "/main/plant_add" // 添加植物页面
     const val HOME_AICHAT = "/home/aichat"
     const val PLANT_MANAGE_ACTIVITY = "/main/plant_manage" // 植物管理页面
+    const val CITY_SELECTOR_ACTIVITY = "/main/city_selector" // 城市选择页面
     // 调试模块 (Demo Module)
     const val DEBUG_DEMO_ACTIVITY = "/demo/debug_demo" // 调试工具页面
     const val RV_DEMO_ACTIVITY = "/demo/rv_demo"       // 列表工具页面

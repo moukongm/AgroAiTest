@@ -13,7 +13,6 @@ public class UserStorageConstant {
 
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_CUSTOM_CROPS = "custom_crops";
-    public static final String KEY_CROP_SELECTION = "crop_selection";
     public static final String KEY_ELDERLY_MODE_SELECTED = "elderly_mode_selected";
 
     public static final String KEY_MODE_NORMAL = "normal";

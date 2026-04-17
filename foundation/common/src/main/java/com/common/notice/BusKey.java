@@ -14,4 +14,6 @@ public class BusKey {
     public static final String CROP_ADDED = "crop_added";
 
     public static final String COLLECT = "collect";
+
+    public static final String ACCESSIBILITY_MODE_CHANGED = "accessibility_mode_changed";
 }

@@ -7,8 +7,8 @@ import android.util.Log;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.List;
 
 import com.agri.pest.client.api.ServiceCode;
 import com.agri.pest.client.model.response.MessageResponseDto;
@@ -100,6 +100,7 @@ public class HomeViewModel extends BaseViewModel {
     }
 
 
+
 //    public void getGeoCode(String name) {
 //        Disposable disposable = repository.getGeoCode(name)
 //                .observeOn(AndroidSchedulers.mainThread())
@@ -178,19 +179,14 @@ public class HomeViewModel extends BaseViewModel {
         }
         ThreadUtils.INSTANCE.executeByIo(() -> {
             UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
-            // 删除之前存储的头像
             AvatarUtils.deleteAvatar(appContext, 0);
-            // 下载并保存新头像
             String localPath = AvatarUtils.downloadAndSaveAvatar(appContext, avatarUrl, 0);
-            // 创建用户记录
             UserRecord userRecord = new UserRecord();
             userRecord.setUserId(0L);
             userRecord.setAvatarUrl(avatarUrl);
             userRecord.setAvatarLocalPath(localPath);
             userRecord.setLastUpdateTime(System.currentTimeMillis());
-            // 插入数据库
             userDao.insert(userRecord);
-            // 通知UI
             userRecordLiveData.postValue(userRecord);
         });
     }
@@ -202,12 +198,17 @@ public class HomeViewModel extends BaseViewModel {
         ThreadUtils.INSTANCE.executeByIo(() -> {
             UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
             UserRecord userRecord = userDao.getUserById(0);
+            DetectionDao detectionDao = AppDatabase.Companion.getInstance(appContext).detectionDao();
+            int detection = detectionDao.getCount();
             if (userRecord != null) {
                 userRecordLiveData.postValue(userRecord);
                 if (userRecord.getAvatarUrl() != null) {
                     avatarUrlLiveData.postValue(userRecord.getAvatarUrl());
                 }
             }
+            ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                historyCountLiveData.setValue(Long.valueOf(detection));
+            });
         });
     }
 
@@ -350,8 +351,6 @@ public class HomeViewModel extends BaseViewModel {
             try {
                 UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
                 UserRecord user = userDao.getUserById(0);
-                DetectionDao detectionDao = AppDatabase.Companion.getInstance(appContext).detectionDao();
-                int detection = detectionDao.getCount();
                 if (user != null && user.getLocation() != null) {
                     String location = user.getLocation();
                     ThreadUtils.INSTANCE.runOnUiThread(() -> {
@@ -359,9 +358,6 @@ public class HomeViewModel extends BaseViewModel {
                         LogUtils.INSTANCE.d("HomeViewModel", "location loaded from database: " + location);
                     });
                 }
-                ThreadUtils.INSTANCE.runOnUiThread(() -> {
-                    historyCountLiveData.setValue(Long.valueOf(detection));
-                });
             } catch (Exception e) {
                 LogUtils.INSTANCE.e("HomeViewModel", "load location from database failed", e);
             }

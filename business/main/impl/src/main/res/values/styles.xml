@@ -12,34 +12,6 @@
         <item name="android:textColor">@color/calendar_weekday_color</item>
     </style>
 
-    <!-- 标签按钮样式 - 浇水 -->
-    <style name="MarkButtonStyle.Water" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textColor">@color/mark_water</item>
-        <item name="strokeColor">@color/mark_water</item>
-        <item name="cornerRadius">20dp</item>
-    </style>
-
-    <!-- 标签按钮样式 - 施肥 -->
-    <style name="MarkButtonStyle.Fertilize" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textColor">@color/mark_fertilize</item>
-        <item name="strokeColor">@color/mark_fertilize</item>
-        <item name="cornerRadius">20dp</item>
-    </style>
-
-    <!-- 标签按钮样式 - 用药 -->
-    <style name="MarkButtonStyle.Medicine" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textColor">@color/mark_medicine</item>
-        <item name="strokeColor">@color/mark_medicine</item>
-        <item name="cornerRadius">20dp</item>
-    </style>
-
-    <!-- 标签按钮样式 - 笔记 -->
-    <style name="MarkButtonStyle.Note" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textColor">@color/mark_note</item>
-        <item name="strokeColor">@color/mark_note</item>
-        <item name="cornerRadius">20dp</item>
-    </style>
-
     <!-- 卡片样式 -->
     <style name="PlantInfoCard">
         <item name="cardCornerRadius">12dp</item>

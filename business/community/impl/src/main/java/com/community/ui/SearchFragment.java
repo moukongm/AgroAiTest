@@ -6,6 +6,7 @@ import android.graphics.RenderEffect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -17,6 +18,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +47,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     private SearchViewModel viewModel;
     private SearchHistoryAdapter historyAdapter;
     private SearchSuggestionAdapter suggestionAdapter;
+    private boolean hasSearched = false;
 
     public interface SearchListener {
         void onSearch(String keyword);
@@ -201,6 +206,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
 
     private void performSearch(String keyword) {
         hideKeyboard();
+        hasSearched = true;
         viewModel.saveToHistory(keyword);
         if (searchListener != null) {
             searchListener.onSearch(keyword);
@@ -217,8 +223,6 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
                 .setBlurRadius(radius)
                 .setOverlayColor(0x40000000);
     }
-
-
     public void openVoiceSearch() {
         if (voiceSearchListener != null) {
             voiceSearchListener.onOpenVoiceSearch();
@@ -235,6 +239,9 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
             if (b.rvSuggestions != null) {
                 b.rvSuggestions.setAdapter(null);
             }
+        }
+        if (!hasSearched && searchListener != null) {
+            searchListener.onClose();
         }
         historyAdapter = null;
         suggestionAdapter = null;

@@ -11,7 +11,12 @@
         <activity android:name="com.main.ui.page.PlantManageActivity" android:exported="false"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
+
         <activity android:name="com.main.ui.page.AiChatActivity" android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity android:name="com.main.ui.page.CitySelectorActivity" android:exported="false"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
         <!-- 高德地图 API Key -->

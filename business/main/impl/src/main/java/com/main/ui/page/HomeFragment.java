@@ -180,11 +180,35 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                     });
         });
 
+        binding.mainpageIconOld.setOnClickListener(v -> {
+            String currentMode = MMKVUtils.INSTANCE.custom("user_module")
+                    .getString("selected_mode", "normal");
+
+            String newMode;
+            boolean isA11y;
+
+            if ("senior".equals(currentMode)) {
+                newMode = "normal";
+                isA11y = false;
+            } else {
+                newMode = "senior";
+                isA11y = true;
+            }
+            MMKVUtils.INSTANCE.custom("user_module").put("selected_mode",newMode);
+            LiveDataBus.getInstance().with(BusKey.ACCESSIBILITY_MODE_CHANGED).setValue(isA11y);
+        });
+
         binding.mainpagePlantPhoto.setOnClickListener(v -> {
             ARouter.getInstance()
                     .build(RouterPath.PLANT_ADD_ACTIVITY)
                     .navigation(requireActivity(), REQUEST_PLANT_ADD);
         });
+        binding.mainpagePlaceArrow.setOnClickListener(v -> {
+            ARouter.getInstance()
+                    .build(RouterPath.CITY_SELECTOR_ACTIVITY)
+                    .navigation(requireActivity());
+        });
+
         binding.mainpageWarningRight.setOnClickListener(v -> {
             binding.mainpageWarningRight.setVisibility(View.GONE);
             binding.mainpageWarningGoneright.setVisibility(View.VISIBLE);
@@ -339,7 +363,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         super.onActivityResult(requestCode, resultCode, data);
         LogUtils.INSTANCE.d("PlantAddActivity", "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
         if (requestCode == REQUEST_PLANT_ADD && resultCode == RESULT_OK) {
-            // 添加成功，刷新作物列表
             viewModel.getMyCrops();
         }
     }

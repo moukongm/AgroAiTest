@@ -13,6 +13,7 @@ import android.widget.EditText;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -148,7 +149,6 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
 
         getBinding().btnBack.setOnClickListener(v -> exitSearchMode());
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), backPressedCallback);
 
         setupSearch();
 
@@ -343,4 +343,5 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
                     }
                 });
     }
+
 }

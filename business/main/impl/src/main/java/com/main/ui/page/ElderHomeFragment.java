@@ -79,6 +79,24 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
             ARouter.getInstance().build(RouterPath.HOME_AICHAT).navigation();
         });
 
+        binding.mainpageIconOld.setOnClickListener(v -> {
+            String currentMode = MMKVUtils.INSTANCE.custom("user_module")
+                    .getString("selected_mode", "normal");
+
+            String newMode;
+            boolean isA11y;
+
+            if ("senior".equals(currentMode)) {
+                newMode = "normal";
+                isA11y = false;
+            } else {
+                newMode = "senior";
+                isA11y = true;
+            }
+            MMKVUtils.INSTANCE.custom("user_module").put("selected_mode",newMode);
+            LiveDataBus.getInstance().with(BusKey.ACCESSIBILITY_MODE_CHANGED).setValue(isA11y);
+        });
+
 
 
         viewModel.getUserNameLiveData().observe(getViewLifecycleOwner(), userName -> {
