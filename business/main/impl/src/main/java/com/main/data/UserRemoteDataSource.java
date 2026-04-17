@@ -6,6 +6,7 @@ import android.util.Log;
 import com.agri.pest.client.api.ServiceCode;
 
 import com.agri.pest.client.model.request.AdminMessageCreateRequest;
+import com.agri.pest.client.model.request.ProfileUpdateRequest;
 import com.agri.pest.client.model.response.AuthResponse;
 import com.agri.pest.client.model.response.ResultMessageGroupResponseDto;
 import com.agri.pest.client.model.response.ResultPageResultMessageResponseDto;
@@ -27,6 +28,7 @@ import com.network.NetworkManager;
 import com.network.model.AlertResponse;
 import com.network.model.GeocodeResponse;
 import com.network.model.IpLocationResponse;
+import com.network.model.SearchCityResponse;
 import com.network.model.WeatherResponse;
 import com.user.TokenService;
 
@@ -79,12 +81,20 @@ public class UserRemoteDataSource {
     public Single<GeocodeResponse> getGeoCode(String name) {
         return LocationRetrofitClient.getLocationApi().getCityCode(name);
     }
+    public Single<ResultUserProfileDto> updateLocation(ProfileUpdateRequest jwd) {
+       return NetworkManager.INSTANCE.getApi().updateProfile(jwd);
+    }
+
     public Single<ResultPageResultMessageResponseDto> getWarnningApi() {
        return NetworkManager.INSTANCE.getApi().getAlertMessages(0, 1);
     }
 
     public Single<WeatherResponse> getWeather(String jwd) {
         return LocationRetrofitClient.getWeatherApiService().getWeather(authorization,jwd);
+    }
+
+    public Single<SearchCityResponse> getCity(String jwd) {
+        return LocationRetrofitClient.getWeatherApiService().searchCity(authorization,jwd);
     }
 
     public Single<AlertResponse> getWarnning(String jd, String wd) {

@@ -2,6 +2,7 @@ package com.network;
 
 import com.network.model.AlertResponse;
 import com.network.model.GeocodeResponse;
+import com.network.model.SearchCityResponse;
 import com.network.model.WeatherResponse;
 
 import io.reactivex.rxjava3.core.Single;
@@ -24,4 +25,13 @@ public interface WeatherApiService {
             @Header("X-QW-Api-Key") String authorization,
             @Path("longitude") String lon,
             @Path("latitude") String lat);
+    //获取城市搜索api
+
+    @GET("geo/v2/city/lookup")
+    Single<SearchCityResponse> searchCity(
+            @Header("Authorization") String authorization,  // 传入 "Bearer your_token"
+            @Query("location") String location
+    );
+
+
 }

@@ -25,6 +25,7 @@ import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
 import com.user.databinding.ActivityProfileBinding;
 import com.user.databinding.ActivityProfileElderBinding;
+import com.user.profile.ui.adapters.ElderMinePostAdapter;
 import com.user.profile.ui.adapters.MinePostAdapter;
 import com.user.profile.viewmodel.ProfileViewModel;
 
@@ -36,7 +37,7 @@ import java.util.List;
 public class ElderProfileFragment extends BaseFragment<ActivityProfileElderBinding> {
 
     private ProfileViewModel viewModel;
-    private MinePostAdapter postAdapter;
+    private ElderMinePostAdapter postAdapter;
     ActivityProfileElderBinding binding;
     List<PostResponseDto> list = new ArrayList<>();
     Boolean needRefresh = false;
@@ -59,7 +60,7 @@ public class ElderProfileFragment extends BaseFragment<ActivityProfileElderBindi
         // 初始化 ViewModel 的 Context，确保本地数据访问正常
         viewModel.initContext(requireActivity());
         binding = getBinding();
-        postAdapter = new MinePostAdapter();
+        postAdapter = new ElderMinePostAdapter();
         binding.userPostRec.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.userPostRec.setAdapter(postAdapter);
 
@@ -184,7 +185,7 @@ public class ElderProfileFragment extends BaseFragment<ActivityProfileElderBindi
             }
         });
 
-        postAdapter.setOnImageClickListener(new MinePostAdapter.OnImageClickListener() {
+        postAdapter.setOnImageClickListener(new ElderMinePostAdapter.OnImageClickListener() {
             @Override
             public void onImageClick(Long id) {
                 ARouter.getInstance()

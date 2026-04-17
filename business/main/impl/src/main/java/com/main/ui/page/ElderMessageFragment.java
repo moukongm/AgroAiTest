@@ -25,6 +25,7 @@ import com.main.MessageCommentResponseDto;
 import com.main.impl.R;
 import com.main.impl.databinding.FragmentMessageBinding;
 import com.main.impl.databinding.FragmentMessageElderBinding;
+import com.main.ui.adapter.ElderMessageAdapter;
 import com.main.ui.adapter.MessageAdapter;
 import com.main.ui.adapter.NoticeRv1Adapter;
 import com.main.viewmodel.MessageViewModel;
@@ -39,7 +40,7 @@ import java.util.List;
 public class ElderMessageFragment extends BaseFragment<FragmentMessageElderBinding> {
     FragmentMessageElderBinding binding;
     MessageViewModel viewModel;
-    private MessageAdapter messageAdapter;
+    private ElderMessageAdapter messageAdapter;
     private boolean isSubFragmentOpen = false;
     List<MessageCommentResponseDto> commentlist = new ArrayList<>();
     List<MessageResponseDto> list = new ArrayList<>();
@@ -67,7 +68,7 @@ public class ElderMessageFragment extends BaseFragment<FragmentMessageElderBindi
         binding.item2.tvTime.setVisibility(View.INVISIBLE);
 
         // 初始化消息列表 RecyclerView
-        messageAdapter = new MessageAdapter();
+        messageAdapter = new ElderMessageAdapter();
         binding.rvMessages.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvMessages.setAdapter(messageAdapter);
 

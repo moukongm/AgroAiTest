@@ -1,11 +1,9 @@
 package com.user.profile.ui.adapters;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSnapHelper;
 
 import com.agri.pest.client.model.response.PostResponseDto;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -13,17 +11,15 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.common.utils.ImageLoader;
 import com.common.utils.LogUtils;
 import com.uikit.base.BaseBindingAdapter;
-import com.user.databinding.ItemMainpPostBinding;
 import com.user.databinding.ItemMainpPostElderBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMainpPostBinding> {
+public class ElderMinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMainpPostElderBinding> {
 
     private OnImageClickListener imageClickListener;
     public interface OnImageClickListener {
@@ -33,12 +29,12 @@ public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMai
         this.imageClickListener = listener;
     }
 
-    public MinePostAdapter() {
+    public ElderMinePostAdapter() {
         super(0, null);
     }
 
     @Override
-    public void convert(@NonNull ItemMainpPostBinding binding, PostResponseDto item, int position) {
+    public void convert(@NonNull ItemMainpPostElderBinding binding, PostResponseDto item, int position) {
         // 用户头像
         if (item.getAuthorAvatar()!= null && !item.getAuthorAvatar().isEmpty()) {
             ImageLoader.INSTANCE.loadCircle(binding.ivPostAvatar, item.getAuthorAvatar());
@@ -55,9 +51,9 @@ public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMai
                 res.append(o).append("、");
             }
             binding.tvPostCrops.setText("关注作物：" + res.deleteCharAt(res.length() - 1));
-            binding.tvPostCrops.setVisibility(android.view.View.VISIBLE);
+            binding.tvPostCrops.setVisibility(View.VISIBLE);
         } else {
-            binding.tvPostCrops.setVisibility(android.view.View.GONE);
+            binding.tvPostCrops.setVisibility(View.GONE);
         }
 
         // 帖子图片列表

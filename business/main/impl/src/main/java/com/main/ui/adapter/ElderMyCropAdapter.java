@@ -17,7 +17,7 @@ import com.uikit.base.BaseBindingAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlantBinding> {
+public class ElderMyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlantElderBinding> {
 
     private OnCropClickListener onCropClickListener;
     private OnDeleteClickListener onDeleteClickListener;
@@ -93,7 +93,7 @@ public class MyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlantBindi
     }
 
     @Override
-    public void convert(@NonNull ItemMainPlantBinding binding, @NonNull Object item, int position) {
+    public void convert(@NonNull ItemMainPlantElderBinding binding, @NonNull Object item, int position) {
         // 加载用户头像（所有item都显示同一个用户头像）
         if (userAvatarPath != null && !userAvatarPath.isEmpty()) {
             ImageLoader.INSTANCE.load(binding.ivSettingTitle, userAvatarPath);

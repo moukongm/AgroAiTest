@@ -328,7 +328,7 @@
                             android:layout_height="13dp"
                             android:layout_marginLeft="20dp"
                             android:layout_marginBottom="10dp"
-
+                            android:visibility="gone"
                             android:background="@drawable/ic_historynotice"
                             android:textColor="@android:color/black"
                             android:textSize="13sp"

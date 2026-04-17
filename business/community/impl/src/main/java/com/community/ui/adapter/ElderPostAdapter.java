@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.agri.pest.client.model.response.PostResponseDto;
 import com.community.R;
-import com.community.databinding.ItemCommunityPostBinding;
 import com.community.databinding.ItemCommunityPostElderBinding;
 import com.uikit.base.BaseBindingAdapter;
 
@@ -16,12 +15,12 @@ import coil.request.ImageRequest;
 import coil.size.Scale;
 import coil.transform.CircleCropTransformation;
 
-public class PostAdapter extends BaseBindingAdapter<PostResponseDto, ItemCommunityPostBinding> {
+public class ElderPostAdapter extends BaseBindingAdapter<PostResponseDto, ItemCommunityPostElderBinding> {
 
     private OnItemClickListener onItemClickListener;
     private OnLikeClickListener onLikeClickListener;
 
-    public PostAdapter() {
+    public ElderPostAdapter() {
         super();
     }
 
@@ -34,7 +33,7 @@ public class PostAdapter extends BaseBindingAdapter<PostResponseDto, ItemCommuni
     }
 
     @Override
-    public void convert(@NonNull ItemCommunityPostBinding binding, @NonNull PostResponseDto item, int position) {
+    public void convert(@NonNull ItemCommunityPostElderBinding binding, @NonNull PostResponseDto item, int position) {
         binding.tvTitle.setText(item.getTitle());
         binding.tvUsername.setText(item.getAuthorName());
 

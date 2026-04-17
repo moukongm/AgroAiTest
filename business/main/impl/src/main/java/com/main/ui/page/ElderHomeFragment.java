@@ -38,6 +38,7 @@ import com.main.Utils;
 import com.main.impl.R;
 import com.main.impl.databinding.ActivityHomeBinding;
 import com.main.impl.databinding.ActivityHomeElderBinding;
+import com.main.ui.adapter.ElderMyCropAdapter;
 import com.main.ui.adapter.MyCropAdapter;
 import com.common.storage.database.CropRecord;
 import com.main.viewmodel.HomeViewModel;
@@ -51,7 +52,7 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
 
     private HomeViewModel viewModel;
     ActivityHomeElderBinding binding;
-    private MyCropAdapter cropAdapter;
+    private ElderMyCropAdapter cropAdapter;
 
 
     private static final int REQUEST_PLANT_ADD = 1001;
@@ -70,7 +71,7 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
         binding=  getBinding();
 
         // 初始化RecyclerView
-        cropAdapter = new MyCropAdapter();
+        cropAdapter = new ElderMyCropAdapter();
         binding.recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recycler.setAdapter(cropAdapter);
 

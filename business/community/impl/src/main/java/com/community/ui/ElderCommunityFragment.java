@@ -30,6 +30,7 @@ import com.common.utils.ToastUtils;
 import com.community.databinding.FragmentCommunityBinding;
 import com.community.databinding.FragmentCommunityElderBinding;
 import com.community.databinding.FragmentSearchBinding;
+import com.community.ui.adapter.ElderPostAdapter;
 import com.community.ui.adapter.PostAdapter;
 import com.community.viewmodel.CommunityViewModel;
 import com.community.viewmodel.SearchViewModel;
@@ -42,7 +43,7 @@ public class ElderCommunityFragment extends BaseFragment<FragmentCommunityElderB
 
     private CommunityViewModel viewModel;
     private SearchViewModel searchViewModel;
-    private PostAdapter postAdapter;
+    private ElderPostAdapter postAdapter;
     private FabDragHelper fabDragHelper;
     private SearchFragment searchFragment;
     private VoiceSearchFragment voiceSearchFragment;
@@ -88,7 +89,7 @@ public class ElderCommunityFragment extends BaseFragment<FragmentCommunityElderB
     public void initView() {
         viewModel = new ViewModelProvider(this).get(CommunityViewModel.class);
         searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
-        postAdapter = new PostAdapter();
+        postAdapter = new ElderPostAdapter();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         getBinding().rvCommunityFeed.setLayoutManager(layoutManager);

@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.List;
 
 import com.agri.pest.client.api.ServiceCode;
+import com.agri.pest.client.model.request.ProfileUpdateRequest;
 import com.agri.pest.client.model.response.MessageResponseDto;
 import com.agri.pest.client.model.response.PageResultMessageResponseDto;
 import com.agri.pest.client.model.response.ResultPageResultMessageResponseDto;
@@ -30,10 +31,12 @@ import com.common.utils.LogUtils;
 import com.agri.pest.client.model.response.MyCropResponseDto;
 import com.agri.pest.client.model.response.ResultListMyCropResponseDto;
 import com.agri.pest.client.model.response.ResultVoid;
+import com.common.utils.SingleLiveEvent;
 import com.common.utils.ThreadUtils;
 import com.main.data.Repository;
 import com.network.NetworkManager;
 import com.network.model.AlertResponse;
+import com.network.model.LocationItem;
 import com.network.model.WeatherResponse;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -49,6 +52,9 @@ public class HomeViewModel extends BaseViewModel {
     private final MutableLiveData<Long> historyCountLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> userNameLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> avatarUrlLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<LocationItem>> cityLiveData = new MutableLiveData<>();
+    private final SingleLiveEvent<String> updateLocationResult = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> cityError = new SingleLiveEvent<>();
     private final MutableLiveData<WeatherResponse.Now> weatherLiveData = new MutableLiveData<>();
 
     private final MutableLiveData<MessageResponseDto> alertLiveData = new MutableLiveData<>();
@@ -60,6 +66,18 @@ public class HomeViewModel extends BaseViewModel {
     private final MutableLiveData<UserRecord> userRecordLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<CropRecord>> localCropListLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isOfflineModeLiveData = new MutableLiveData<>(false);
+
+    public MutableLiveData<String> getCityError() {
+        return cityError;
+    }
+
+    public MutableLiveData<List<LocationItem>> getCityLiveData() {
+        return cityLiveData;
+    }
+
+    public SingleLiveEvent<String> getUpdateLocationResult() {
+        return updateLocationResult;
+    }
 
     public MutableLiveData<Long> getHistoryCountLiveData() {
         return historyCountLiveData;
@@ -94,6 +112,46 @@ public class HomeViewModel extends BaseViewModel {
         location.setLocationListener(listener);
     }
 
+    public void getCity(String jwd){
+        Disposable disposable = repository.getCity(jwd)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            if (response != null && response.getCode().equals("200")) {
+                               cityLiveData.setValue(response.getLocation());
+                            }else{
+                                cityError.setValue("搜索失败");
+                            }
+                        },
+                        error -> {
+                            LogUtils.INSTANCE.e("lyy",  error);
+                            cityError.setValue("搜索失败"+error.getMessage());
+                        }
+                );
+        addDisposable(disposable);
+    }
+
+    public void updateLocation(String jwd){
+        ProfileUpdateRequest request = new ProfileUpdateRequest(null,null,null,jwd,null);
+        Disposable disposable = repository.updateLocation(request)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            if (response != null && response.getCode() == ServiceCode.SUCCESS) {
+                               updateLocation(response.getData().getLocation());
+                            }else{
+                                cityError.setValue("更新失败");
+                            }
+                        },
+                        error -> {
+                            LogUtils.INSTANCE.e("lyy",  error);
+                            cityError.setValue("更新失败"+error.getMessage());
+                        }
+                );
+        addDisposable(disposable);
+    }
 
     public MutableLiveData<String> getLocationLivedata() {
         return locationLivedata;

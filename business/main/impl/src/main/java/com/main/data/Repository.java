@@ -2,6 +2,7 @@ package com.main.data;
 
 import android.content.Context;
 
+import com.agri.pest.client.model.request.ProfileUpdateRequest;
 import com.agri.pest.client.model.response.ResultMessageGroupResponseDto;
 import com.agri.pest.client.model.response.ResultPageResultMessageResponseDto;
 import com.agri.pest.client.model.response.ResultPostResponseDto;
@@ -16,9 +17,11 @@ import com.agri.pest.client.model.response.ResultVoid;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.network.LocationRetrofitClient;
+import com.network.NetworkManager;
 import com.network.model.AlertResponse;
 import com.network.model.GeocodeResponse;
 import com.network.model.IpLocationResponse;
+import com.network.model.SearchCityResponse;
 import com.network.model.WeatherResponse;
 
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -95,11 +98,15 @@ public class Repository {
     public Single<ResultMyCropResponseDto> updateCrop(Long id, MyCropUpdateRequest updateRequest) {
         return remoteDataSource.updateCrop(id, updateRequest);
     }
-
+    public Single<SearchCityResponse> getCity(String jwd) {
+        return remoteDataSource.getCity(jwd);
+    }
     public Single<ResultVoid> addTag(Long cropId, String tagType, LocalDate recordDate, String content, int status) {
         return remoteDataSource.addTag(cropId, tagType, recordDate, content, status);
     }
-
+    public Single<ResultUserProfileDto> updateLocation(ProfileUpdateRequest jwd) {
+        return remoteDataSource.updateLocation(jwd);
+    }
     public Single<ResultVoid> cancelTag(Long cropId, String tagType, LocalDate recordDate, int status) {
         return remoteDataSource.cancelTag(cropId, tagType, recordDate, status);
     }

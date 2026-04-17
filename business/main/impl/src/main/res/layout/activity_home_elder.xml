@@ -101,7 +101,7 @@
                     android:maxLines="1"
                     android:text="3"
                     android:textColor="@android:color/white"
-                    android:textSize="80sp"
+                    android:textSize="65sp"
                     android:textStyle="bold"
                     app:autoSizeStepGranularity="2sp"
                     app:autoSizeTextType="uniform"
@@ -116,7 +116,7 @@
                     android:text="℃/"
 
                     android:textColor="@android:color/white"
-                    android:textSize="30sp"
+                    android:textSize="25sp"
                     app:layout_constraintBottom_toBottomOf="@+id/mainpage_temp"
                     app:layout_constraintStart_toEndOf="@+id/mainpage_temp" />
 
@@ -126,7 +126,7 @@
                     android:layout_height="wrap_content"
                     android:text="晴"
                     android:textColor="@android:color/white"
-                    android:textSize="30sp"
+                    android:textSize="25sp"
                     app:layout_constraintBottom_toBottomOf="@id/mainpage_du"
                     app:layout_constraintStart_toEndOf="@+id/mainpage_du" />
 
@@ -148,6 +148,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:text="杭州"
+                    android:layout_marginTop="3dp"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
                     app:layout_constraintTop_toBottomOf="@+id/mainpage_head"
@@ -167,9 +168,9 @@
                 <!-- 天气图标：紧挨「晴」字右侧偏上，不要约束到屏幕右缘（否则会落到竹叶上） -->
                 <ImageView
                     android:id="@+id/mainpage_weather_icon"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_marginLeft="18dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="15dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_weather_cloudy"
                     app:layout_constraintBottom_toBottomOf="@+id/mainpage_weather"
@@ -297,11 +298,11 @@
 
                         <ImageView
                             android:id="@+id/mainpage_warning_goneright"
-                            android:layout_width="70dp"
-                            android:layout_height="20dp"
-                            android:layout_marginTop="10dp"
+                            android:layout_width="90dp"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="5dp"
                             android:layout_marginRight="20dp"
-                            android:layout_marginBottom="15dp"
+                            android:layout_marginBottom="5dp"
                             android:src="@drawable/ic_shouqixiangxi"
                             android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -309,6 +310,7 @@
                             app:layout_constraintTop_toBottomOf="@+id/tv_warnning" />
 
                         <TextView
+                            android:visibility="gone"
                             android:id="@+id/mainpage_warning_history"
                             android:layout_width="75dp"
                             android:layout_height="18dp"
@@ -398,7 +400,7 @@
                         android:layout_marginTop="15dp"
                         android:text="识别记录"
                         android:textColor="#373737"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -439,7 +441,7 @@
                         android:layout_marginTop="15dp"
                         android:text="AI助手"
                         android:textColor="#373737"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView

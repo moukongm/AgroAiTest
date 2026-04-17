@@ -3,14 +3,10 @@ package com.main.ui.adapter;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
-import com.agri.pest.client.model.response.MessageResponseDto;
-import com.common.utils.DateUtils;
 import com.common.utils.ImageLoader;
 import com.main.MessageCommentResponseDto;
 import com.main.impl.R;
-import com.main.impl.databinding.ItemMessageBinding;
 import com.main.impl.databinding.ItemMessageElderBinding;
 import com.uikit.base.BaseBindingAdapter;
 
@@ -18,18 +14,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
-public class MessageAdapter extends BaseBindingAdapter<MessageCommentResponseDto, ItemMessageBinding> {
+public class ElderMessageAdapter extends BaseBindingAdapter<MessageCommentResponseDto, ItemMessageElderBinding> {
 
-    public MessageAdapter() {
+    public ElderMessageAdapter() {
         super();
     }
 
 
     @Override
-    public void convert(@NonNull ItemMessageBinding binding, @NonNull MessageCommentResponseDto item, int position) {
+    public void convert(@NonNull ItemMessageElderBinding binding, @NonNull MessageCommentResponseDto item, int position) {
         // 设置标题（用户昵称/系统名称）
         binding.tvTitle.setText(item.getMessageResponseDto().getSenderName() != null ? item.getMessageResponseDto().getSenderName() : "未知用户");
 
