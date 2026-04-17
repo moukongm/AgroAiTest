@@ -213,14 +213,9 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
 
         float radius = 15f;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            blurView.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
-            blurView.setOverlayColor(0x40000000);
-        } else {
-            blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
-                    .setBlurRadius(radius)
-                    .setOverlayColor(0x40000000);
-        }
+        blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
+                .setBlurRadius(radius)
+                .setOverlayColor(0x40000000);
     }
 
 

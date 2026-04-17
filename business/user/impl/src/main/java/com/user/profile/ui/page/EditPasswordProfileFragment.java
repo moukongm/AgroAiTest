@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.common.base.BaseFragment;
@@ -37,7 +36,7 @@ public class EditPasswordProfileFragment extends BaseFragment<FragmentEditnamePr
         viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         binding.tvEditnameOk.setOnClickListener(view -> {
             binding.tvEditnameOk.setEnabled(false);
-            viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()),this);
+            viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()));
         });
 
         LiveDataExtKt.observeNonNull(viewModel.getPasswordLivedata(), this, mes -> {

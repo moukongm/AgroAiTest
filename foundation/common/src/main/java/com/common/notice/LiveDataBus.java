@@ -2,32 +2,31 @@ package com.common.notice;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.common.utils.SingleLiveEvent;
-
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class LiveDataBus {
-    private static LiveDataBus liveDataBus;
+    private static volatile LiveDataBus liveDataBus;
 
     private final Map<String, MutableLiveData<Object>> map;
 
-    public LiveDataBus() {
-        map = new HashMap<>();
+    private LiveDataBus() {
+        map = new ConcurrentHashMap<>();
     }
 
     public static LiveDataBus getInstance() {
-        if(liveDataBus == null){
-            liveDataBus = new LiveDataBus();
+        if (liveDataBus == null) {
+            synchronized (LiveDataBus.class) {
+                if (liveDataBus == null) {
+                    liveDataBus = new LiveDataBus();
+                }
+            }
         }
         return liveDataBus;
     }
 
-    public <T> MutableLiveData<T> with(String key){
-        if(!map.containsKey(key)){
-            map.put(key,new MutableLiveData<>());
-        }
-        return (MutableLiveData<T>) map.get(key);
+    @SuppressWarnings("unchecked")
+    public <T> MutableLiveData<T> with(String key) {
+        return (MutableLiveData<T>) map.computeIfAbsent(key, k -> new MutableLiveData<>());
     }
-
 }

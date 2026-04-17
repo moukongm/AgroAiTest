@@ -102,21 +102,22 @@ object FileUtils {
      * 拷贝流数据
      */
     fun copyStream(input: InputStream, output: FileOutputStream): Boolean {
+        val bis = BufferedInputStream(input)
+        val bos = BufferedOutputStream(output)
         return try {
-            val bis = BufferedInputStream(input)
-            val bos = BufferedOutputStream(output)
             val buffer = ByteArray(8192)
             var read: Int
             while (bis.read(buffer).also { read = it } != -1) {
                 bos.write(buffer, 0, read)
             }
             bos.flush()
-            bos.close()
-            bis.close()
             true
         } catch (e: Exception) {
             LogUtils.e(TAG, "copyStream error: ${e.message}")
             false
+        } finally {
+            try { bos.close() } catch (_: Exception) {}
+            try { bis.close() } catch (_: Exception) {}
         }
     }
 

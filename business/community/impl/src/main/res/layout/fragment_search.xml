@@ -10,7 +10,6 @@
         android:id="@+id/blur_mask"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,8 +18,8 @@
         android:layout_marginRight="15dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_community_search"
-        android:alpha="0.7"
         >
+        android:alpha="0.7"
         <ImageView
             android:id="@+id/iv_history"
             android:layout_width="wrap_content"

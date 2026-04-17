@@ -40,7 +40,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import java.util.concurrent.Executors;
 
 public class HomeViewModel extends BaseViewModel {
 
@@ -177,7 +176,7 @@ public class HomeViewModel extends BaseViewModel {
         if (appContext == null) {
             return;
         }
-        Executors.newSingleThreadExecutor().execute(() -> {
+        ThreadUtils.INSTANCE.executeByIo(() -> {
             UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
             // 删除之前存储的头像
             AvatarUtils.deleteAvatar(appContext, 0);
@@ -200,7 +199,7 @@ public class HomeViewModel extends BaseViewModel {
         if (appContext == null) {
             return;
         }
-        Executors.newSingleThreadExecutor().execute(() -> {
+        ThreadUtils.INSTANCE.executeByIo(() -> {
             UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
             UserRecord userRecord = userDao.getUserById(0);
             if (userRecord != null) {
@@ -268,8 +267,10 @@ public class HomeViewModel extends BaseViewModel {
                             if (error instanceof retrofit2.HttpException) {
                                 retrofit2.HttpException httpError = (retrofit2.HttpException) error;
                                 try {
-                                    String errorBody = httpError.response().errorBody().string();
-                                    LogUtils.INSTANCE.d("warn", "HTTP " + httpError.code() + " body: " + errorBody);
+                                    if (httpError.response() != null && httpError.response().errorBody() != null) {
+                                        String errorBody = httpError.response().errorBody().string();
+                                        LogUtils.INSTANCE.d("warn", "HTTP " + httpError.code() + " body: " + errorBody);
+                                    }
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -318,7 +319,7 @@ public class HomeViewModel extends BaseViewModel {
             LogUtils.INSTANCE.d("HomeViewModel", "appContext is null, skip saving location");
             return;
         }
-        Executors.newSingleThreadExecutor().execute(() -> {
+        ThreadUtils.INSTANCE.executeByIo(() -> {
             try {
                 UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
                 UserRecord user = userDao.getUserById(0);
@@ -345,7 +346,7 @@ public class HomeViewModel extends BaseViewModel {
             LogUtils.INSTANCE.d("HomeViewModel", "appContext is null, cannot load location");
             return;
         }
-        Executors.newSingleThreadExecutor().execute(() -> {
+        ThreadUtils.INSTANCE.executeByIo(() -> {
             try {
                 UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
                 UserRecord user = userDao.getUserById(0);
@@ -397,7 +398,7 @@ public class HomeViewModel extends BaseViewModel {
         if (appContext == null) {
             return;
         }
-        Executors.newSingleThreadExecutor().execute(() -> {
+        ThreadUtils.INSTANCE.executeByIo(() -> {
             CropDao cropDao = AppDatabase.Companion.getInstance(appContext).cropDao();
             UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
             // 获取用户头像路径
@@ -405,12 +406,6 @@ public class HomeViewModel extends BaseViewModel {
             String avatarLocalPath = userRecord != null ? userRecord.getAvatarLocalPath() : null;
             // 先清除所有数据
             cropDao.deleteAll();
-            // 等待删除完成后再插入
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             // 最多存三条（仅作物数据）
             int count = Math.min(crops.size(), 3);
             for (int i = 0; i < count; i++) {
@@ -442,7 +437,7 @@ public class HomeViewModel extends BaseViewModel {
         if (appContext == null) {
             return;
         }
-        Executors.newSingleThreadExecutor().execute(() -> {
+        ThreadUtils.INSTANCE.executeByIo(() -> {
             CropDao cropDao = AppDatabase.Companion.getInstance(appContext).cropDao();
             UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
             // 加载用户信息

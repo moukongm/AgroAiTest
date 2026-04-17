@@ -11,7 +11,6 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.agri.pest.client.api.ServiceCode;
 import com.agri.pest.client.model.request.ChatRequest;
@@ -30,12 +29,10 @@ import com.common.utils.LogUtils;
 import com.common.utils.NetworkUtil;
 import com.common.utils.SingleLiveEvent;
 import com.common.utils.ThreadUtils;
-import com.detection.Utils;
 import com.detection.cloudmodel.Recognition;
 import com.detection.cloudmodel.TFLiteClassifier;
 import com.detection.data.Repository;
 import com.detection.data.UserLocalDataSource;
-import com.detection.ui.page.DetectionActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -128,17 +125,17 @@ public class DetectionViewModel extends BaseViewModel {
         }
     }
 
-    public void takePhoto(DetectionActivity detectionActivity, ImageCapture imageCapture) {
+    public void takePhoto(Context context, ImageCapture imageCapture) {
         loadingState.setValue(true);
 
         File photoFile = new File(
-                detectionActivity.getCacheDir(),
+                context.getCacheDir(),
                 "detection_" + System.currentTimeMillis() + ".jpg"
         );
         LogUtils.INSTANCE.d("uiuiui", photoFile + "");
         ImageCapture.OutputFileOptions outputOptions =
                 new ImageCapture.OutputFileOptions.Builder(photoFile).build();
-        imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(detectionActivity),
+        imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(context),
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
@@ -243,12 +240,14 @@ public class DetectionViewModel extends BaseViewModel {
                 targetHeight = (int) (height * ratio);
             }
             Bitmap scaled = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
-            FileOutputStream fos = new FileOutputStream(file);
-            scaled.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-            fos.close();
-            bitmap.recycle();
-            if (scaled != bitmap) {
-                scaled.recycle();
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                scaled.compress(Bitmap.CompressFormat.JPEG, 80, fos);
+                fos.flush();
+            } finally {
+                bitmap.recycle();
+                if (scaled != bitmap) {
+                    scaled.recycle();
+                }
             }
             return file;
         } catch (Exception e) {

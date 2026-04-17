@@ -19,7 +19,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class SearchViewModel extends BaseViewModel {
@@ -199,16 +198,17 @@ public class SearchViewModel extends BaseViewModel {
         if (currentSearchPosts == null || currentSearchPosts.isEmpty()) {
             return;
         }
-        Disposable disposable = repository.searchPosts(currentSearchQuery, 0, currentSearchPosts.size())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(posts -> {
-                    if (posts != null && !posts.isEmpty()) {
-                        currentSearchPosts = posts;
-                        searchResultsLiveData.setValue(currentSearchPosts);
-                    }
-                }, throwable -> {});
-        addDisposable(disposable);
+        disposables.add(
+                repository.searchPosts(currentSearchQuery, 0, currentSearchPosts.size())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(posts -> {
+                            if (posts != null && !posts.isEmpty()) {
+                                currentSearchPosts = posts;
+                                searchResultsLiveData.setValue(currentSearchPosts);
+                            }
+                        }, throwable -> {})
+        );
     }
 
     @Override

@@ -78,23 +78,23 @@ public class TFLiteClassifier {
 
     //把context.getAssets().open("model.tflite")）文件流存到直接缓冲区并且返回缓冲区，解释器需要缓冲区；
     private ByteBuffer loadModelFile(InputStream modelStream) throws IOException {
-        BufferedInputStream bis = new BufferedInputStream(modelStream);
-        //获取可以自动扩容的ByteArrayOutputStream，因为要存完整的模型文件
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[8192];
-        int bytesRead;
-        while ((bytesRead = bis.read(buffer)) != -1) {
-            baos.write(buffer, 0, bytesRead);
+        try (BufferedInputStream bis = new BufferedInputStream(modelStream);
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = bis.read(buffer)) != -1) {
+                baos.write(buffer, 0, bytesRead);
+            }
+            byte[] modelBytes = baos.toByteArray();
+
+            // 创建直接缓冲区并复制数据，如果你存到堆内缓冲区，最后也是会复制到直接缓冲区的。
+            ByteBuffer result = ByteBuffer.allocateDirect(modelBytes.length);
+            //把模型放进去
+            result.put(modelBytes);
+            //翻转，不然指针在最后，你怎么读文件
+            result.flip();
+            return result;
         }
-        byte[] modelBytes = baos.toByteArray();
-        
-        // 创建直接缓冲区并复制数据，如果你存到堆内缓冲区，最后也是会复制到直接缓冲区的。
-        ByteBuffer result = ByteBuffer.allocateDirect(modelBytes.length);
-        //把模型放进去
-        result.put(modelBytes);
-        //翻转，不然指针在最后，你怎么读文件
-        result.flip();
-        return result;
     }
     // 执行推理，模型要求是bytebuffer
     public List<Recognition> recognizeImage(ByteBuffer inputBuffer) {

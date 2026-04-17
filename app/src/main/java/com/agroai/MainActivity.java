@@ -136,14 +136,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
         ViewGroup rootView = (ViewGroup) getWindow().getDecorView().findViewById(android.R.id.content);
         float radius = 15f;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            blurView.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
-            blurView.setOverlayColor(0x33FFFFFF);
-        } else {
-            blurView.setupWith(rootView, new RenderScriptBlur(this))
-                    .setBlurRadius(radius)
-                    .setOverlayColor(0x33FFFFFF);
-        }
+        blurView.setupWith(rootView, new RenderScriptBlur(this))
+                .setBlurRadius(radius)
+                .setOverlayColor(0x33FFFFFF);
     }
     public void hideBottomNavigation() {
         binding.navContainer.setVisibility(View.GONE);

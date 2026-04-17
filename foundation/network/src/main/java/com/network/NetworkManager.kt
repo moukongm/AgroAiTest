@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
  */
 object NetworkManager {
     // 基础 URL
-    private const val BASE_URL = "http://115.191.67.35:8080/"
+    const val BASE_URL = "http://115.191.67.35:8080/"
 
     /**
      * 全局共享的 OkHttpClient

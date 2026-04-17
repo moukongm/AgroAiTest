@@ -1,24 +1,15 @@
 package com.user.profile.viewmodel;
 
-import android.app.Activity;
 import android.content.Context;
-
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
 import com.agri.pest.client.model.response.PostResponseDto;
 import com.common.base.BaseViewModel;
-import com.common.router.RouterPath;
 import com.common.storage.MMKVUtils;
 import com.common.storage.database.UserRecord;
 import com.common.utils.FileUtils;
 import com.common.utils.SingleLiveEvent;
-
-import android.app.Dialog;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.agri.pest.client.api.ServiceCode;
 import com.agri.pest.client.model.request.ChangePhoneRequest;
@@ -517,7 +508,7 @@ public class ProfileViewModel extends BaseViewModel {
     }
 
     //修改密码
-    public void updatePassword(String password, Fragment fragment) {
+    public void updatePassword(String password) {
         Disposable disposable = repository.updatePassword(password).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -546,37 +537,6 @@ public class ProfileViewModel extends BaseViewModel {
 //        return MultipartBody.Part.createFormData("avatar", file.getName(), requestBody);
 //    }
 
-
-    public void showDialog(Context context, String mes) {
-        if (context instanceof Activity) {
-            Activity activity = (Activity) context;
-            if (activity.isFinishing() || activity.isDestroyed()) {
-                return;
-            }
-        }
-        Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_edit_profile);
-        TextView tv = dialog.findViewById(R.id.dialog_setOk);
-        tv.setText(mes);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        try {
-            dialog.show();
-        } catch (Exception e) {
-            return;
-        }
-        ThreadUtils.INSTANCE.runOnUiThreadDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
-                } catch (IllegalArgumentException e) {
-                    // Dialog already detached from window manager
-                }
-            }
-        }, 1000);
-    }
 
         // 上传头像（ViewModel 不依赖 Context）
         public void uploadAvatar (File file){
@@ -650,14 +610,6 @@ public class ProfileViewModel extends BaseViewModel {
             mesNameLivedata.setValue("ok");
             return true;
         }
-
-        //退出返回栈
-        public void popBackstackFragment (Fragment fragment){
-            if (fragment != null && fragment.getActivity() != null) {
-                fragment.getActivity().getSupportFragmentManager().popBackStack();
-            }
-        }
-
 
         private final MutableLiveData<ResultUserProfileDto> userProfileMes = new MutableLiveData<>();
 
@@ -738,5 +690,4 @@ public class ProfileViewModel extends BaseViewModel {
             return profileUpdatedLivedata;
         }
 }
-
 

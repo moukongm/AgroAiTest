@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -151,24 +152,30 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(View bottomSheet, int newState) {
-                switch (newState) {
-                    case BottomSheetBehavior.STATE_EXPANDED:
-                        binding.btnToggleSheet.setRotation(180);
-                        expandContent();
-                        break;
-                    case BottomSheetBehavior.STATE_COLLAPSED:
-                        binding.btnToggleSheet.setRotation(0);
-                        collapseContent();
-                        break;
-                }
             }
 
             @Override
             public void onSlide(View bottomSheet, float slideOffset) {
+                float offset = Math.max(0f, Math.min(1f, slideOffset));
+                binding.btnToggleSheet.setRotation(offset * 180f);
+                int fullHeight = maxImageHeight > 0 ? maxImageHeight : dpToPx(300);
+                ViewGroup.LayoutParams params = binding.layoutViewPager.getLayoutParams();
+                params.height = (int) (fullHeight * (1f - offset));
+                binding.layoutViewPager.setLayoutParams(params);
+                binding.layoutViewPager.setAlpha(1f - offset);
             }
         });
 
         binding.btnToggleSheet.setOnClickListener(v -> {
+            v.animate()
+                    .scaleX(0.85f).scaleY(0.85f)
+                    .setDuration(100)
+                    .withEndAction(() -> v.animate()
+                            .scaleX(1f).scaleY(1f)
+                            .setDuration(200)
+                            .setInterpolator(new OvershootInterpolator(2f))
+                            .start())
+                    .start();
             if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else {
