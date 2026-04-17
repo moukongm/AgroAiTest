@@ -240,8 +240,13 @@ public class HomeViewModel extends BaseViewModel {
             UserDao userDao = AppDatabase.Companion.getInstance(appContext).userDao();
             AvatarUtils.deleteAvatar(appContext, 0);
             String localPath = AvatarUtils.downloadAndSaveAvatar(appContext, avatarUrl, 0);
-            UserRecord userRecord = new UserRecord();
-            userRecord.setUserId(0L);
+            
+            // 先查询现有用户，保留其他字段
+            UserRecord userRecord = userDao.getUserById(0);
+            if (userRecord == null) {
+                userRecord = new UserRecord();
+                userRecord.setUserId(0L);
+            }
             userRecord.setAvatarUrl(avatarUrl);
             userRecord.setAvatarLocalPath(localPath);
             userRecord.setLastUpdateTime(System.currentTimeMillis());
