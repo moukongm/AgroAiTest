@@ -1,5 +1,6 @@
 package com.main.ui.page;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -167,13 +168,19 @@ public class MessageFragment extends BaseFragment<FragmentMessageBinding> {
             return null;
         });
         LiveDataExtKt.observeNonNull(viewModel.getGetPostAvr(), this, result -> {
-            String[] split = result.split(",");
-            MessageCommentResponseDto messageCommentResponseDto = commentlist.get(Integer.parseInt(split[1]));
-            MessageResponseDto messageResponseDto = messageCommentResponseDto.getMessageResponseDto();
-            MessageCommentResponseDto newMes = new MessageCommentResponseDto(messageResponseDto, split[0]);
-            commentlist.set(Integer.parseInt(split[1]), newMes);
-            messageAdapter.setList(commentlist);
-
+            try {
+                String[] split = result.split(",");
+                if (split.length < 2) return null;
+                int index = Integer.parseInt(split[1]);
+                if (index < 0 || index >= commentlist.size()) return null;
+                MessageCommentResponseDto messageCommentResponseDto = commentlist.get(index);
+                MessageResponseDto messageResponseDto = messageCommentResponseDto.getMessageResponseDto();
+                MessageCommentResponseDto newMes = new MessageCommentResponseDto(messageResponseDto, split[0]);
+                commentlist.set(index, newMes);
+                messageAdapter.setList(commentlist);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
             return null;
         });
         LiveDataExtKt.observeNonNull(viewModel.getHaveNotSeeTz(), this, result -> {
@@ -199,7 +206,10 @@ public class MessageFragment extends BaseFragment<FragmentMessageBinding> {
                 //红点消失
                 viewModel.getFirstMessageUser();
             } else {
-                ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(),result);
+                Context ctx = getContext();
+                if (ctx != null) {
+                    ToastUtils.INSTANCE.showShort(ctx.getApplicationContext(), result);
+                }
             }
             return null;
         });

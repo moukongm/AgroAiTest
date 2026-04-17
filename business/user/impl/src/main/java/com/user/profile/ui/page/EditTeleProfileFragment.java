@@ -58,7 +58,7 @@ public class EditTeleProfileFragment extends BaseFragment<FragmentEditnameProfil
             }
             else if("获取成功".equals(mes)){
             }else {
-                Utils.showDialog(getActivity(), "修改失败");
+                if (getActivity() != null) Utils.showDialog(getActivity(), "修改失败");
             }
             binding.etSettitleEdit.setText("");
             return null;

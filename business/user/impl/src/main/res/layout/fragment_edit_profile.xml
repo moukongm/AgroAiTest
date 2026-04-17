@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:text="编辑资料"
             android:textColor="#FFFFFF"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/cv_information_back"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -170,7 +170,7 @@
                     android:layout_marginRight="24dp"
                     android:text="王建军"
                     android:textColor="#6C6C6C"
-                    android:textSize="13.3dp" />
+                    android:textSize="13.3sp" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -204,7 +204,7 @@
                     android:layout_marginRight="24dp"
                     android:text="18888888888"
                     android:textColor="#6C6C6C"
-                    android:textSize="13.3dp" />
+                    android:textSize="13.3sp" />
             </androidx.cardview.widget.CardView>
             <!--  关注的作物  -->
             <androidx.cardview.widget.CardView
@@ -237,7 +237,7 @@
                     android:layout_marginRight="24dp"
                     android:text="水稻"
                     android:textColor="#6C6C6C"
-                    android:textSize="13.3dp" />
+                    android:textSize="13.3sp" />
             </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView
                 android:id="@+id/password_container"
@@ -272,7 +272,7 @@
                     android:layout_marginRight="24dp"
                     android:text="***"
                     android:textColor="#6C6C6C"
-                    android:textSize="13.3dp" />
+                    android:textSize="13.3sp" />
             </androidx.cardview.widget.CardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

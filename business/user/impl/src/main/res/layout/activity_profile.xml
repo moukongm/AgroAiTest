@@ -62,7 +62,7 @@
                     android:layout_marginTop="10dp"
                     android:text="用户2759"
                     android:textColor="@android:color/white"
-                    android:textSize="23.3dp"
+                    android:textSize="23.3sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cv_user_head" />
@@ -75,7 +75,7 @@
                     android:layout_marginTop="200.1dp"
                     android:text="8"
                     android:textColor="@android:color/white"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -85,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:text="他的收藏"
                     android:textColor="@android:color/white"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     app:layout_constraintLeft_toLeftOf="@+id/user_fanscnt"
                     app:layout_constraintRight_toRightOf="@+id/user_fanscnt"
                     app:layout_constraintTop_toBottomOf="@+id/user_fanscnt" />
@@ -97,7 +97,7 @@
                     android:layout_marginTop="200.1dp"
                     android:text="16"
                     android:textColor="@android:color/white"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -108,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:text="识别记录"
                     android:textColor="@android:color/white"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     app:layout_constraintLeft_toLeftOf="@+id/user_historycnt"
                     app:layout_constraintRight_toRightOf="@+id/user_historycnt"
                     app:layout_constraintTop_toBottomOf="@id/user_historycnt" />

@@ -100,27 +100,31 @@ public class DetectionActivity extends BaseActivity<ActivityDetectionBinding> {
             try {
                 cameraProvider = ProcessCameraProvider.getInstance(this).get();
                 bindCameraPreview();
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                LogUtils.INSTANCE.d("DetectionActivity", "Camera init failed: " + e.getMessage());
             }
         }, ContextCompat.getMainExecutor(this));
     }
 
     private void bindCameraPreview() {
-        Preview preview = new Preview.Builder().build();
-        preview.setSurfaceProvider(binding.previewView.getSurfaceProvider());
+        try {
+            Preview preview = new Preview.Builder().build();
+            preview.setSurfaceProvider(binding.previewView.getSurfaceProvider());
 
-        CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
+            CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
 
-        imageCapture = new ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .setFlashMode(flashOn ? ImageCapture.FLASH_MODE_ON : ImageCapture.FLASH_MODE_OFF)
-                .build();
+            imageCapture = new ImageCapture.Builder()
+                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                    .setFlashMode(flashOn ? ImageCapture.FLASH_MODE_ON : ImageCapture.FLASH_MODE_OFF)
+                    .build();
 
-        if (cameraProvider != null) {
-            cameraProvider.unbindAll();
-            camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
-            binding.btnRecognize.setEnabled(true);
+            if (cameraProvider != null) {
+                cameraProvider.unbindAll();
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+                binding.btnRecognize.setEnabled(true);
+            }
+        } catch (Exception e) {
+            LogUtils.INSTANCE.d("DetectionActivity", "bindCameraPreview failed: " + e.getMessage());
         }
     }
 

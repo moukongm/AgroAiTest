@@ -64,7 +64,7 @@ public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfil
                 binding.tvEditnameOk.setEnabled(false);
             } else {
                 binding.etSettitleEdit.setText("");
-                Utils.showDialog(getActivity(), mes);
+                if (getActivity() != null) Utils.showDialog(getActivity(), mes);
 //                viewModel.showDialog(getContext(), mes);
             }
 

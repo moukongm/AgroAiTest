@@ -1,6 +1,9 @@
 package com.agroai;
 
 import android.content.Intent;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -130,12 +133,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
     }
     private void setupBlurEffect() {
         BlurView blurView = binding.blurView;
-
         ViewGroup rootView = (ViewGroup) getWindow().getDecorView().findViewById(android.R.id.content);
+        float radius = 15f;
 
-        blurView.setupWith(rootView, new RenderScriptBlur(this))
-                .setBlurRadius(15f)
-                .setOverlayColor(0x33FFFFFF);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            blurView.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
+            blurView.setOverlayColor(0x33FFFFFF);
+        } else {
+            blurView.setupWith(rootView, new RenderScriptBlur(this))
+                    .setBlurRadius(radius)
+                    .setOverlayColor(0x33FFFFFF);
+        }
     }
     public void hideBottomNavigation() {
         binding.navContainer.setVisibility(View.GONE);

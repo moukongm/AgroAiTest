@@ -25,7 +25,7 @@
             android:maxWidth="270dp"
             android:text="sdkfjhadsd"
             android:textColor="#ffffff"
-            android:textSize="15dp">
+            android:textSize="15sp">
 
         </TextView>
         <ImageView

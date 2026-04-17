@@ -26,7 +26,7 @@
         <TextView
             android:text="识别记录"
             android:textColor="#FFFFFF"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="50dp"
             android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
             android:id = "@+id/xz"
             android:text="筛选"
             android:textColor="#FFFFFF"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginRight="20dp"
             android:layout_marginTop="50dp"

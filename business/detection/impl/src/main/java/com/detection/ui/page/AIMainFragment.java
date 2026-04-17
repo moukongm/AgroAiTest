@@ -95,6 +95,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
         }
         adapter = new ChatAdapter();
 
+        if (!isAdded() || getActivity() == null) return;
         binding.consYuyin.setVisibility(View.GONE);
         DetectionViewModelFactory factory = new DetectionViewModelFactory(
             requireActivity().getApplication()
@@ -128,16 +129,19 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                 url = null;
             }
             else{
-                ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(),"请输入文本");
+                Context ctx = getContext();
+                if (ctx != null) ToastUtils.INSTANCE.showShort(ctx, "请输入文本");
             }
         });
         //添加图片返回相册url
         if (imagePickerUtil == null) {
             imagePickerUtil = new ImagePickerUtil(getActivity(), uri -> {
-                File file1 = FileUtils.INSTANCE.uriToFile(requireActivity().getApplicationContext(), uri, requireActivity().getCacheDir());
+                if (!isAdded() || getActivity() == null) return null;
+                Context appCtx = getActivity().getApplicationContext();
+                File file1 = FileUtils.INSTANCE.uriToFile(appCtx, uri, getActivity().getCacheDir());
                 if (file1 != null) {
                     LogUtils.INSTANCE.d("ljx", "file1 path: " + file1.getPath() + ", size: " + file1.length());
-                    viewModel.uploadAndRecognizeFromGallery(requireActivity().getApplicationContext(), "", file1);
+                    viewModel.uploadAndRecognizeFromGallery(appCtx, "", file1);
                     showLoading("加载中...");
                 } else {
                     LogUtils.INSTANCE.d("ljx", "file1 is null!");
@@ -165,7 +169,8 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
 //        });
         //我添加的图片
         LiveDataExtKt.observeNonNull(viewModel.getPhotoNewUriResult(), this, url -> {
-            ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(), "图片添加成功");
+            if (!isAdded() || getActivity() == null) return null;
+            ToastUtils.INSTANCE.showShort(getActivity().getApplicationContext(), "图片添加成功");
             showImg(url);
             this.url = url;
             return null;
@@ -188,9 +193,10 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
         });
         //错误返回
         LiveDataExtKt.observeNonNull(viewModel.getErrorChatMessage(), this, mes -> {
+            if (!isAdded() || getActivity() == null) return null;
             hideLoading();
             binding.aiBack.cvInformationBack.setEnabled(true);
-            ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(), mes);
+            ToastUtils.INSTANCE.showShort(getActivity().getApplicationContext(), mes);
             if ("AI连接错误".equals(mes) || "AI 识别失败，请重试".equals(mes)) {
                 binding.btnSend.setEnabled(true);
                 adapter.setData(adapter.getItemCount() - 1,ChatItem.ai(ChatItem.TYPE_AI, mes));
@@ -207,6 +213,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                         return null;
                     },
                     deniedList -> {
+                        if (!isAdded() || getActivity() == null) return null;
                         ToastUtils.INSTANCE.showShort(getActivity().getApplicationContext(), "您拒绝了权限，功能无法使用");
                         return null;
                     });
@@ -218,7 +225,9 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                         return null;
                     },
                     deniedList -> {
-                        Toast.makeText(requireContext(), "您拒绝了权限，功能无法使用", Toast.LENGTH_SHORT).show();
+                        if (!isAdded() || getActivity() == null) return null;
+                        Context ctx = getContext();
+                        if (ctx != null) Toast.makeText(ctx, "您拒绝了权限，功能无法使用", Toast.LENGTH_SHORT).show();
                         return null;
                     });
         });
@@ -254,22 +263,26 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
     }
 
     private void startVoiceRecording() {
+        if (!isAdded() || getContext() == null) return;
         if (!VoiceRecognitionManager.INSTANCE.isInitialized()) {
-            ToastUtils.INSTANCE.showShort(requireContext(), "语音识别未初始化");
+            ToastUtils.INSTANCE.showShort(getContext(), "语音识别未初始化");
             return;
         }
 
+        if (getActivity() == null) return;
         PermissionUtils.INSTANCE.requestRecordAudio((AppCompatActivity)getActivity(), new RequestCallback() {
             @Override
             public void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList) {
-                requireActivity().runOnUiThread(() -> {
+                if (!isAdded() || getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    if (!isAdded() || getActivity() == null) return;
                     if (allGranted) {
                         isRecording = true;
                         voiceInputBuffer.append(originalInputText);
                         voiceInputBuffer.setLength(0);
-                        ToastUtils.INSTANCE.showShort(requireContext(), "开始说话...");
+                        Context ctx = getContext();
+                        if (ctx != null) ToastUtils.INSTANCE.showShort(ctx, "开始说话...");
 
-                        // 保存回调引用，便于在 onDestroyView 中清理，防止内存泄漏
                         voiceCallback = new VoiceRecognitionCallback() {
                             @Override
                             public void onBeginOfSpeech() {
@@ -281,7 +294,9 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
 
                             @Override
                             public void onPartialResult(String text) {
-                                requireActivity().runOnUiThread(() -> {
+                                if (!isAdded() || getActivity() == null) return;
+                                getActivity().runOnUiThread(() -> {
+                                    if (!isAdded() || getActivity() == null) return;
                                     if (text != null && !text.isEmpty()) {
                                         voiceInputBuffer.setLength(0);
                                         voiceInputBuffer.append(originalInputText);
@@ -294,9 +309,9 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
 
                             @Override
                             public void onFinalResult(String text) {
-                                requireActivity().runOnUiThread(() -> {
-                                    // onFinalResult 只返回标点符号确认，最终结果已在 onPartialResult 累积
-                                    // 如果有缓存内容，则保留；如果如果没有，则使用返回的文本
+                                if (!isAdded() || getActivity() == null) return;
+                                getActivity().runOnUiThread(() -> {
+                                    if (!isAdded() || getActivity() == null) return;
                                     String existingText = voiceInputBuffer.toString();
                                     if (existingText.isEmpty() && text != null && !text.isEmpty()) {
                                         voiceInputBuffer.setLength(0);
@@ -305,22 +320,23 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                                     }
                                     updateSearchText();
                                     isRecording = false;
-                                    // 使用 getBindingSafe() 更新语音按钮图片
                                     FragmentAiMainBinding binding = getBindingSafe();
                                     if (binding != null && binding.ivYuyin != null) {
                                         binding.ivYuyin.setImageResource(R.drawable.ic_ai_yuyinbtn);
                                     }
 
-                                    //更新为这次语音结束之后的逻辑；
                                     originalInputText = voiceInputBuffer.toString();
                                 });
                             }
 
                             @Override
                             public void onError(int errorCode, String errorMsg) {
-                                requireActivity().runOnUiThread(() -> {
+                                if (!isAdded() || getActivity() == null) return;
+                                getActivity().runOnUiThread(() -> {
+                                    if (!isAdded() || getActivity() == null) return;
                                     isRecording = false;
-                                    ToastUtils.INSTANCE.showShort(requireContext(), "识别失败: " + errorMsg);
+                                    Context ctx1 = getContext();
+                                    if (ctx1 != null) ToastUtils.INSTANCE.showShort(ctx1, "识别失败: " + errorMsg);
                                     close();
                                 });
                             }
@@ -332,10 +348,11 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
 
                         VoiceRecognitionManager.INSTANCE.setCallback(voiceCallback);
 
-                        VoiceRecognitionManager.INSTANCE.startListening(requireContext());
+                        Context listenCtx = getContext();
+                        if (listenCtx != null) VoiceRecognitionManager.INSTANCE.startListening(listenCtx);
                     } else {
-                        ToastUtils.INSTANCE.showShort(requireContext(), "需要麦克风权限才能使用语音输入");
-                        // 使用 getBindingSafe() 更新语音按钮图片
+                        Context ctx2 = getContext();
+                        if (ctx2 != null) ToastUtils.INSTANCE.showShort(ctx2, "需要麦克风权限才能使用语音输入");
                         FragmentAiMainBinding binding = getBindingSafe();
                         if (binding != null && binding.ivYuyin != null) {
                             binding.ivYuyin.setImageResource(R.drawable.ic_ai_yuyinbtn);
@@ -429,9 +446,12 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
     }
 
     private boolean hideKeyboard() {
-        View view = requireActivity().getCurrentFocus();
+        if (getActivity() == null) return false;
+        View view = getActivity().getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            Context ctx = getContext();
+            if (ctx == null) return false;
+            InputMethodManager imm = (InputMethodManager) ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             return true;
         }

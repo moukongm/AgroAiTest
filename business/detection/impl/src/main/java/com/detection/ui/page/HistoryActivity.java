@@ -1,5 +1,8 @@
 package com.detection.ui.page;
 
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,9 +105,16 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
 
     private void setupBlurView() {
         ViewGroup rootView = findViewById(android.R.id.content);
-        binding.blurMask.setupWith(rootView, new RenderScriptBlur(this))
-                .setBlurRadius(2f)
-                .setOverlayColor(0x40000000);
+        float radius = 2f;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            binding.blurMask.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
+            binding.blurMask.setOverlayColor(0x40000000);
+        } else {
+            binding.blurMask.setupWith(rootView, new RenderScriptBlur(this))
+                    .setBlurRadius(radius)
+                    .setOverlayColor(0x40000000);
+        }
     }
 
     private void showBlurMask() {

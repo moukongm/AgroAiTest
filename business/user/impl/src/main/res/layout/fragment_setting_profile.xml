@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:text="设置"
         android:textColor="#FFFFFF"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/cv_settingprofile_back"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -79,7 +79,7 @@
                     android:layout_marginLeft="11.6dp"
                     android:text="系统消息通知"
                     android:textColor="#333333"
-                    android:textSize="16dp" />
+                    android:textSize="16sp" />
                 <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
                 android:layout_marginLeft="14dp"
                 android:text="关于我们"
                 android:textColor="#333333"
-                android:textSize="16dp" />
+                android:textSize="16sp" />
 
             <ImageView
                 android:layout_width="20dp"
@@ -147,7 +147,7 @@
                 android:layout_marginLeft="14dp"
                 android:text="我要反馈"
                 android:textColor="#333333"
-                android:textSize="16dp"/>
+                android:textSize="16sp"/>
 
             <ImageView
                 android:layout_width="20dp"
@@ -174,7 +174,7 @@
                 android:layout_marginLeft="14dp"
                 android:text="系统权限"
                 android:textColor="#333333"
-                android:textSize="16dp" />
+                android:textSize="16sp" />
 
             <ImageView
                 android:layout_width="20dp"
@@ -201,7 +201,7 @@
                 android:layout_marginLeft="14dp"
                 android:text="用户协议"
                 android:textColor="#333333"
-                android:textSize="16dp" />
+                android:textSize="16sp" />
 
             <ImageView
                 android:layout_width="20dp"
@@ -228,7 +228,7 @@
                 android:layout_marginLeft="14dp"
                 android:text="隐私政策"
                 android:textColor="#333333"
-                android:textSize="16dp" />
+                android:textSize="16sp" />
 
             <ImageView
                 android:layout_width="20dp"

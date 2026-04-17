@@ -168,7 +168,9 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                         return null;
                     },
                     deniedList -> {
-                        Toast.makeText(requireContext(),"您拒绝了权限，功能无法使用", Toast.LENGTH_SHORT).show();
+                        if (isAdded()) {
+                            Toast.makeText(requireContext(),"您拒绝了权限，功能无法使用", Toast.LENGTH_SHORT).show();
+                        }
                         return null;
                     });
         });
@@ -228,7 +230,10 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                 Manifest.permission.ACCESS_COARSE_LOCATION
         ), () -> {
             LogUtils.INSTANCE.d("ljx", "定位");
-            viewModel.getLocation(getActivity().getApplicationContext());
+            android.app.Activity act = getActivity();
+            if (act != null) {
+                viewModel.getLocation(act.getApplicationContext());
+            }
             return null;
         }, deniedList -> {
             LogUtils.INSTANCE.d("ljx", "定位权限被拒绝");
@@ -296,6 +301,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         cropAdapter.setOnDeleteClickListener((crop, position) -> {
             if (crop instanceof MyCropResponseDto) {
                 MyCropResponseDto dto = (MyCropResponseDto) crop;
+                if (!isAdded()) return;
                 new AlertDialog.Builder(requireContext())
                         .setTitle("删除确认")
                         .setMessage("确定要删除 \"" + dto.getPlantName() + "\" 吗？")

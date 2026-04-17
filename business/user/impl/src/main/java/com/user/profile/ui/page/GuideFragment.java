@@ -76,6 +76,7 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
         getBinding().btnBack.setVisibility("post".equals(returnTo) ? View.VISIBLE : View.GONE);
 
         getBinding().btnBack.setOnClickListener(v -> {
+            if (!isAdded() || getActivity() == null) return;
             if ("post".equals(returnTo)) {
                 Bundle result = new Bundle();
                 result.putString("selected_crop", TextUtils.join(",", cropSet));
@@ -137,6 +138,7 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
         }
 
         adapter.setOnItemClickListener((baseQuickAdapter, v, i) -> {
+            if (!isAdded() || getActivity() == null) return;
             Log.d("ljxljxljx", "hhh");
             if (i == list3.size() - 2) {
             } else if (i == list3.size() - 1) {
@@ -262,6 +264,7 @@ public class GuideFragment extends BaseFragment<FragmentGuideRegisterBinding> {
     }
 
     private void saveCustomCrops() {
+        if (!isAdded() || getActivity() == null) return;
         List<String> newCrops = new ArrayList<>();
         for (int i = 0; i < list3.size() - 2; i++) {
             GuideMultiItem item = list3.get(i);

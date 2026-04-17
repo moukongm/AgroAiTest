@@ -238,6 +238,7 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
                 });
 
                 searchFragment.setVoiceSearchListener(() -> openVoiceSearch());
+                if (getActivity() == null) return;
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .add(getBinding().fragmentContainer.getId(), searchFragment)
@@ -289,6 +290,7 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
 
         // 添加 VoiceSearchFragment
         if (voiceSearchFragment == null || !voiceSearchFragment.isAdded()) {
+            if (getActivity() == null) return;
             voiceSearchFragment = new VoiceSearchFragment();
             getActivity().getSupportFragmentManager()
                     .beginTransaction()
@@ -301,6 +303,7 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
 
 
     private void closeSearchFragment(boolean showNavigation) {
+        if (getActivity() == null) return;
         if (searchFragment != null && searchFragment.isAdded()) {
             getActivity().getSupportFragmentManager().popBackStack();
             searchFragment = null;

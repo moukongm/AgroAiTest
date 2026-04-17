@@ -2,7 +2,10 @@ package com.community.ui;
 
 
 import android.content.Context;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -66,6 +69,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
 
     @Override
     public void initView() {
+        if (!isAdded() || getActivity() == null) return;
         viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         viewModel.init(requireActivity().getApplication());
 
@@ -144,7 +148,10 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         getBinding().btnInputMic.setOnClickListener(v -> openVoiceSearch());
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            EditText et = getBinding().etSearch;
+            if (!isAdded() || getContext() == null) return;
+            FragmentSearchBinding b = getBindingSafe();
+            if (b == null) return;
+            EditText et = b.etSearch;
             et.requestFocus();
             InputMethodManager imm = (InputMethodManager) requireContext()
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -166,21 +173,30 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     }
 
     private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) requireContext()
+        Context ctx = getContext();
+        if (ctx == null) return;
+        FragmentSearchBinding b = getBindingSafe();
+        if (b == null) return;
+        InputMethodManager imm = (InputMethodManager) ctx
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null && getBinding().etSearch != null) {
-            imm.hideSoftInputFromWindow(getBinding().etSearch.getWindowToken(), 0);
+        if (imm != null && b.etSearch != null) {
+            imm.hideSoftInputFromWindow(b.etSearch.getWindowToken(), 0);
         }
     }
     public void close() {
         hideKeyboard();
-        getBinding().etSearch.setText("");
+        FragmentSearchBinding b = getBindingSafe();
+        if (b != null) {
+            b.etSearch.setText("");
+        }
         if (searchListener != null) {
             searchListener.onClose();
         }
     }
     public String getSearchKeyword() {
-        return getBinding().etSearch.getText().toString().trim();
+        FragmentSearchBinding b = getBindingSafe();
+        if (b == null) return "";
+        return b.etSearch.getText().toString().trim();
     }
 
     private void performSearch(String keyword) {
@@ -191,14 +207,20 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         }
     }
     private void setupBlurView() {
+        if (!isAdded() || getActivity() == null) return;
         BlurView blurView = getBinding().blurMask;
         ViewGroup rootView = requireActivity().findViewById(android.R.id.content);
 
         float radius = 15f;
 
-        blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
-                .setBlurRadius(radius)
-                .setOverlayColor(0x40000000);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            blurView.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
+            blurView.setOverlayColor(0x40000000);
+        } else {
+            blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
+                    .setBlurRadius(radius)
+                    .setOverlayColor(0x40000000);
+        }
     }
 
 
@@ -210,11 +232,14 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     }
     @Override
     public void onDestroyView() {
-        if (getBinding().rvHistory != null) {
-            getBinding().rvHistory.setAdapter(null);
-        }
-        if (getBinding().rvSuggestions != null) {
-            getBinding().rvSuggestions.setAdapter(null);
+        FragmentSearchBinding b = getBindingSafe();
+        if (b != null) {
+            if (b.rvHistory != null) {
+                b.rvHistory.setAdapter(null);
+            }
+            if (b.rvSuggestions != null) {
+                b.rvSuggestions.setAdapter(null);
+            }
         }
         historyAdapter = null;
         suggestionAdapter = null;

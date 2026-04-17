@@ -68,7 +68,9 @@ public class SmsLoginFragment extends BaseFragment<FragmentSmsloginBinding> {
             if(loginFragment == null){
                 loginFragment = new LoginFragment();
                 LoginActivity activity = (LoginActivity) getActivity();
-                activity.replaceFragment(loginFragment);
+                if (activity != null) {
+                    activity.replaceFragment(loginFragment);
+                }
             }
         });
     }

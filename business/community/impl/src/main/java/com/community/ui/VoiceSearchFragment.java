@@ -1,6 +1,9 @@
 package com.community.ui;
 
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -59,14 +62,20 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
     }
 
     private void setupBlurView() {
+        if (!isAdded() || getActivity() == null) return;
         BlurView blurView = getBinding().blurMask;
         ViewGroup rootView = requireActivity().findViewById(android.R.id.content);
 
         float radius = 15f;
 
-        blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
-                .setBlurRadius(radius)
-                .setOverlayColor(0x40000000);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            blurView.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
+            blurView.setOverlayColor(0x40000000);
+        } else {
+            blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
+                    .setBlurRadius(radius)
+                    .setOverlayColor(0x40000000);
+        }
     }
 
     private void setupVoiceInput() {
@@ -94,15 +103,21 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
     }
 
     private void startVoiceRecording() {
+        if (!isAdded() || getActivity() == null) return;
         if (!VoiceRecognitionManager.INSTANCE.isInitialized()) {
             ToastUtils.INSTANCE.showShort(requireContext(), "语音识别未初始化");
             return;
         }
 
-        PermissionUtils.INSTANCE.requestRecordAudio((AppCompatActivity) getActivity(), new RequestCallback() {
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity == null) return;
+
+        PermissionUtils.INSTANCE.requestRecordAudio(activity, new RequestCallback() {
             @Override
             public void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList) {
+                if (!isAdded() || getActivity() == null) return;
                 requireActivity().runOnUiThread(() -> {
+                    if (!isAdded() || getActivity() == null) return;
                     if (allGranted) {
                         isRecording = true;
                         voiceInputBuffer.setLength(0);
@@ -119,10 +134,10 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
 
                             @Override
                             public void onPartialResult(String text) {
+                                if (!isAdded() || getActivity() == null) return;
                                 requireActivity().runOnUiThread(() -> {
+                                    if (!isAdded() || getActivity() == null) return;
                                     if (text != null && !text.isEmpty()) {
-                                        // 科大讯飞 onPartialResult 返回实时片段结果（非累积）
-                                        // 先清空之前的内容再加新的，避免重复
                                         voiceInputBuffer.setLength(0);
                                         voiceInputBuffer.append(text);
                                         updateSearchText();
@@ -132,9 +147,9 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
 
                             @Override
                             public void onFinalResult(String text) {
+                                if (!isAdded() || getActivity() == null) return;
                                 requireActivity().runOnUiThread(() -> {
-                                    // onFinalResult 只返回标点符号确认，最终结果已在 onPartialResult 累积
-                                    // 如果有缓存内容，则保留；如果没有，则使用返回的文本
+                                    if (!isAdded() || getActivity() == null) return;
                                     String existingText = voiceInputBuffer.toString();
                                     if (existingText.isEmpty() && text != null && !text.isEmpty()) {
                                         voiceInputBuffer.setLength(0);
@@ -143,20 +158,24 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
                                     updateSearchText();
                                     isRecording = false;
                                     String finalText = voiceInputBuffer.toString().trim();
-                                    // 去除末尾的标点符号
                                     if (!finalText.isEmpty()) {
                                         finalText = finalText.replaceAll("[。！？，、；：]$", "");
                                         performSearch(finalText);
                                     } else {
-                                        getBinding().icInput.setVisibility(View.GONE);
-                                        getBinding().icVoiceInput.setImageResource(R.drawable.ic_voice_input);
+                                        FragmentVoiceSearchBinding b = getBindingSafe();
+                                        if (b != null) {
+                                            b.icInput.setVisibility(View.GONE);
+                                            b.icVoiceInput.setImageResource(R.drawable.ic_voice_input);
+                                        }
                                     }
                                 });
                             }
 
                             @Override
                             public void onError(int errorCode, String errorMsg) {
+                                if (!isAdded() || getActivity() == null) return;
                                 requireActivity().runOnUiThread(() -> {
+                                    if (!isAdded() || getActivity() == null) return;
                                     isRecording = false;
                                     ToastUtils.INSTANCE.showShort(requireContext(), "识别失败: " + errorMsg);
                                     close();
@@ -171,7 +190,10 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
                         VoiceRecognitionManager.INSTANCE.startListening(requireContext());
                     } else {
                         ToastUtils.INSTANCE.showShort(requireContext(), "需要麦克风权限才能使用语音输入");
-                        getBinding().icVoiceInput.setImageResource(R.drawable.ic_voice_input);
+                        FragmentVoiceSearchBinding b = getBindingSafe();
+                        if (b != null) {
+                            b.icVoiceInput.setImageResource(R.drawable.ic_voice_input);
+                        }
                     }
                 });
             }
@@ -184,7 +206,9 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
     }
 
     private void updateSearchText() {
-        EditText et = getBinding().etSearch;
+        FragmentVoiceSearchBinding b = getBindingSafe();
+        if (b == null) return;
+        EditText et = b.etSearch;
         et.setText(voiceInputBuffer.toString());
         et.setSelection(voiceInputBuffer.length());
     }
@@ -201,6 +225,7 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
             VoiceRecognitionManager.INSTANCE.stopListening();
             isRecording = false;
         }
+        if (!isAdded() || getActivity() == null) return;
         requireActivity().getSupportFragmentManager().popBackStack();
     }
 

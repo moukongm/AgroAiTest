@@ -54,7 +54,7 @@ public class EditPasswordProfileFragment extends BaseFragment<FragmentEditnamePr
         LiveDataExtKt.observeNonNull(viewModel.getUnLogin(),this,mes ->{
             if("yes".equals(mes)){
                 LiveDataBus.getInstance().with(BusKey.UNLOGIN).setValue(true);
-                requireActivity().finish();
+                if (isAdded()) requireActivity().finish();
             }
             return null;
         });
