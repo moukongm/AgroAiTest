@@ -420,7 +420,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                                 bindingInCallback.inputContainer.getPaddingLeft(),
                                 bindingInCallback.inputContainer.getPaddingTop(),
                                 bindingInCallback.inputContainer.getPaddingRight(),
-                                keypadHeight + 20
+                                keypadHeight + 0
                         );
                         // 延迟滚动，等布局完成后再滚
                         bindingInCallback.rvMessages.postDelayed(() -> scrollDialog(), 150);
@@ -433,7 +433,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                                 bindingInCallback.inputContainer.getPaddingLeft(),
                                 bindingInCallback.inputContainer.getPaddingTop(),
                                 bindingInCallback.inputContainer.getPaddingRight(),
-                                20
+                                0
                         );
                     }
                 }
