@@ -1,11 +1,13 @@
 package com.detection.ui.page;
 
+import android.content.Context;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -205,9 +207,13 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
 
     @Override
     protected void onDestroy() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
         super.onDestroy();
     }
-
     private void scrollToMonth(String yearMonth) {
         if (list == null || list.isEmpty()) {
             return;

@@ -85,6 +85,12 @@ public class CitySelectorActivity extends BaseActivity<ActivityCitySelectorBindi
     }
 
     @Override
+    protected void onDestroy() {
+        searchFragment = null;
+        defaultFragment = null;
+        super.onDestroy();
+    }
+    @Override
     public void initData() {
 
     }

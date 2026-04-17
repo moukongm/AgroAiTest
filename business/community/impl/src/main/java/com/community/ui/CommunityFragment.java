@@ -330,6 +330,11 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
             viewModel.refreshPosts();
         }
     }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        searchFragment = null;
+    }
 
     private void setupVoiceSearchResultListener() {
         getParentFragmentManager().setFragmentResultListener(
