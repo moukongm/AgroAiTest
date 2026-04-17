@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
@@ -53,6 +54,8 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
     List<AgentChatHistory> historyList;
     List<HistoryItem> notNetworklist=  new ArrayList<>();
     List<HistoryItem> list;
+    private Observer<Object> filterObserver;
+    private boolean isObserverRegistered = false;
 
     @NonNull
     @Override
@@ -76,17 +79,22 @@ public class HistoryActivity extends BaseActivity<ActivityDetectionHistoryBindin
             showBlurMask();
             CalendarFragment calendarFragment = new CalendarFragment();
 
-            LiveDataBus.getInstance().with(BusKey.FILTER).observe(this,observe->{
-                String res = (String) observe;
-                if(!res.isEmpty()){
-                  if("close".equals(res))  {
-                      hideBlurMask();
-                  }else{
-                      scrollToMonth(res);
-                      hideBlurMask();
-                  }
-                }
-            });
+            // 只注册一次观察者
+            if (!isObserverRegistered) {
+                LiveDataBus.getInstance().with(BusKey.FILTER).observe(this, observe->{
+                    String res = (String) observe;
+                    if(!res.isEmpty()){
+                      if("close".equals(res))  {
+                          hideBlurMask();
+                      }else{
+                          scrollToMonth(res);
+                          hideBlurMask();
+                      }
+                    }
+                });
+                isObserverRegistered = true;
+            }
+            
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fl_fragment_container, calendarFragment)

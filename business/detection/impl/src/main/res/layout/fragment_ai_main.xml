@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_ai_main">
+    android:background="@drawable/bg_ai">
 
     <include
         android:id = "@+id/ai_back"
@@ -56,6 +56,8 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
         android:background="@drawable/bg_ai_center"
         app:layout_constraintBottom_toTopOf="@id/input_container"
         app:layout_constraintTop_toBottomOf="@id/top_bar" />
@@ -113,16 +115,19 @@
 
         <androidx.cardview.widget.CardView
             android:id = "@+id/cv_send"
-            app:layout_constraintTop_toBottomOf="@id/cv_img"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/btn_send"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             app:cardElevation="0dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             app:cardCornerRadius="30dp"
-            android:layout_marginBottom="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/cons_yuyin"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintTop_toBottomOf="@id/cv_img"
+            app:layout_constraintBottom_toTopOf="@+id/cons_yuyinandmore"
             app:cardBackgroundColor="#99ffffff">
             <LinearLayout
                 android:id="@+id/input_row"
@@ -133,16 +138,6 @@
                 android:padding="6dp"
                 app:layout_constraintTop_toBottomOf="@id/rv_images">
 
-                <!-- 添加图片按钮 -->
-                <ImageView
-                    android:id="@+id/btn_add_image"
-                    android:layout_width="40dp"
-                    android:layout_height="44dp"
-                    android:padding="7dp"
-                    android:layout_marginLeft="7dp"
-                    android:src="@drawable/ic_ai_takephoto"
-                />
-
                 <!-- 输入框 -->
                 <EditText
                     android:id="@+id/et_input"
@@ -151,6 +146,7 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:hint="请输入文本"
+                    android:layout_marginLeft="10dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -170,43 +166,219 @@
                     android:src="@drawable/ic_ai_yuyin"
                     />
                 <ImageView
-                    android:id="@+id/btn_xc"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="9dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:src="@drawable/ic_ai_xc"
-                    />
-                <!-- 发送按钮 -->
-                <ImageView
-                    android:id="@+id/btn_send"
+                    android:id="@+id/btn_send_more"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="7dp"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="1dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:src="@drawable/ic_ai_send"
                     />
+
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id = "@+id/cons_yuyin"
+            android:id="@+id/btn_send"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/cv_send"
+            app:layout_constraintLeft_toRightOf="@+id/cv_send"
+            app:layout_constraintBottom_toBottomOf="@+id/cv_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/btn_sendwai"
+                android:layout_width="60dp"
+                android:layout_height="54dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/btn_ai_sentmsg"
+                />
+            <ImageView
+                android:id="@+id/btn_sendli"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="7dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/btn_ai_sentmsgcontent"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id = "@+id/cons_yuyinandmore"
             android:layout_width="match_parent"
             android:layout_height="230dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            
             app:layout_constraintVertical_bias="1"
             >
+
+            <!-- 三个功能按钮组，使用Guideline分隔 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/nav_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintWidth_percent="0.65"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <!-- Guideline 1: 第一个分隔点 -->
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.35" />
+
+                <!-- Guideline 2: 第二个分隔点 -->
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.70" />
+
+                <!-- 第一组：图标+文字 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_item_1"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintWidth_percent="0.25"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_1">
+
+                    <ImageView
+                        android:id="@+id/nav_icon_1"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/ic_more_xiangji"
+                        android:scaleType="fitCenter"
+                        app:layout_constraintWidth_percent="1"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintVertical_bias="0.15"
+                        app:layout_constraintHeight_percent="0.35"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+                    <TextView
+                        android:id="@+id/nav_text_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="相机"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp"
+                        android:layout_marginTop="5dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_icon_1"
+                        app:layout_constraintVertical_bias="0" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- 第二组：图标+文字 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_item_2"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintWidth_percent="0.25"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_1"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_2">
+
+                    <ImageView
+                        android:id="@+id/nav_icon_2"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/ic_more_paizhao"
+                        android:scaleType="fitCenter"
+                        app:layout_constraintWidth_percent="0.5"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintVertical_bias="0.15"
+                        app:layout_constraintHeight_percent="0.35"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+                    <TextView
+                        android:id="@+id/nav_text_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="相册"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp"
+                        android:layout_marginTop="5dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_icon_2"
+                        app:layout_constraintVertical_bias="0" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- 第三组：图标+文字 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_item_3"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintWidth_percent="0.25"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_2"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <ImageView
+                        android:id="@+id/nav_icon_3"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/ic_more_aicall"
+                        android:scaleType="fitCenter"
+                        app:layout_constraintWidth_percent="0.5"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintVertical_bias="0.15"
+                        app:layout_constraintHeight_percent="0.35"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+                    <TextView
+                        android:id="@+id/nav_text_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI通话"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp"
+                        android:layout_marginTop="5dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_icon_3"
+                        app:layout_constraintVertical_bias="0" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <ImageView
+                android:visibility="gone"
                 android:id = "@+id/iv_yuyin"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:src="@drawable/ic_ai_yuyinbtn">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_ai_yuyinbtn"
+                app:layout_constraintWidth_percent="0.4"
+                app:layout_constraintHeight_percent="0.6">
 
             </ImageView>
         </androidx.constraintlayout.widget.ConstraintLayout>

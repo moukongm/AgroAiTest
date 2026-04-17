@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.agri.pest.client.model.request.ChatRequest;
 import com.agri.pest.client.model.response.AgentChatHistory;
+import com.agri.pest.client.model.response.ResultChatProfileResponse;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
 import com.agri.pest.client.model.response.ResultListDiagnosisItem;
 import com.agri.pest.client.model.response.ResultString;
@@ -40,6 +41,17 @@ public class UserRemoteDataSource {
                     }
                     return Flowable.error(error);
                 }));
+    }
+    public  Single<ResultChatProfileResponse> getAiChat(ChatRequest chatRequest) {
+
+        return NetworkManager.INSTANCE.getApi().chatProfile(chatRequest)
+                .retryWhen(errors -> errors
+                        .flatMap(error -> {
+                            if (isTokenExpired(error)) {
+                                return refreshTokenAndRetry();
+                            }
+                            return Flowable.error(error);
+                        }));
     }
     public   Single<SseEmitter> getChatStream(ChatRequest chatRequest) {
 

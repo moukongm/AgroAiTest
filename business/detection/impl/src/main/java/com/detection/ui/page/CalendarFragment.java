@@ -90,15 +90,8 @@ public class CalendarFragment extends BaseFragment<DialogDatePickerBinding> {
         });
 
         binding.tvConfirm.setOnClickListener(v -> {
-            String dateStr = new SimpleDateFormat("yyyy-MM", Locale.getDefault())
-                    .format(Calendar.getInstance().getTime())
-                    .replace(Calendar.getInstance().get(Calendar.YEAR) + "", String.valueOf(currentYear));
-            String[] parts = dateStr.split("-");
-            parts[0] = String.valueOf(currentYear);
-            dateStr = String.format("%s-%02d", parts[0], selectedMonth);
-
-                LiveDataBus.getInstance().with(BusKey.FILTER).setValue(dateStr);
-
+            String dateStr = String.format("%d-%02d", currentYear, selectedMonth);
+            LiveDataBus.getInstance().with(BusKey.FILTER).setValue(dateStr);
             close();
         });
         

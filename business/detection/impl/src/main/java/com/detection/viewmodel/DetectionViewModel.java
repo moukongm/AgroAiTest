@@ -366,7 +366,7 @@ public class DetectionViewModel extends BaseViewModel {
     public void recognize(String mes, String imageUrl, Boolean ischat) {
         ChatRequest chatRequest;
         if (ischat) {
-            chatRequest = new ChatRequest("这次是和ai聊天，不用返回json，这是聊天，直接讲内容,下面是用户发的话: " + mes, imageUrl, null, null, false);
+            chatRequest = new ChatRequest(  mes, imageUrl, null, null, false);
         } else {
             chatRequest = new ChatRequest(mes + "如果要存到历史记录里面，请在返回的agentResponse字段上返回List<DiagnosisItem>json供我们解析", imageUrl, null, null, true);
         }
@@ -380,7 +380,7 @@ public class DetectionViewModel extends BaseViewModel {
                                     if (response.getCode() == ServiceCode.SUCCESS) {
                                         if (ischat) {
                                             if (response.getData() != null && !response.getData().isEmpty()) {
-                                                chatChatResult.setValue(response.getData().get(0).getControlPlan());
+                                                chatChatResult.setValue(response.getData().get(0).getDiseaseName().toString()+"\n\n"+response.getData().get(0).getControlPlan());
                                             } else {
                                                 chatChatResult.setValue(response.getData().toString());
                                             }

@@ -3,6 +3,7 @@ package com.detection.data;
 import android.content.Context;
 
 import com.agri.pest.client.model.request.ChatRequest;
+import com.agri.pest.client.model.response.ResultChatProfileResponse;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
 import com.agri.pest.client.model.response.ResultListDiagnosisItem;
 import com.agri.pest.client.model.response.ResultString;
@@ -41,6 +42,10 @@ public class Repository {
     }
     public List<DetectionRecord> getLocalRecords(Context context) {
        return localDataSource.getLocalRecords(context);
+    }
+    public  Single<ResultChatProfileResponse> getAiChat(ChatRequest chatRequest) {
+
+        return remoteDataSource.getAiChat(chatRequest);
     }
 
     public   Single<SseEmitter> getChatStream(ChatRequest chatRequest) {

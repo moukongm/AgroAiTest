@@ -37,6 +37,7 @@ import com.common.utils.PermissionUtils;
 import com.main.Utils;
 import com.main.impl.R;
 import com.main.impl.databinding.ActivityHomeBinding;
+import com.main.impl.databinding.ActivityHomeElderBinding;
 import com.main.ui.adapter.MyCropAdapter;
 import com.common.storage.database.CropRecord;
 import com.main.viewmodel.HomeViewModel;
@@ -46,10 +47,10 @@ import java.util.Arrays;
 import java.util.concurrent.Executors;
 
 @Route(path = RouterPath.HOME_FRAGMENT)
-public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
+public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
 
     private HomeViewModel viewModel;
-    ActivityHomeBinding binding;
+    ActivityHomeElderBinding binding;
     private MyCropAdapter cropAdapter;
 
 
@@ -57,8 +58,8 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
     @NonNull
     @Override
-    public ActivityHomeBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return ActivityHomeBinding.inflate(inflater, container, false);
+    public ActivityHomeElderBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return ActivityHomeElderBinding.inflate(inflater, container, false);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         viewModel.getHistoryCountLiveData().observe(getViewLifecycleOwner(), avatarUrl -> {
             if (avatarUrl != null ) {
                 String s = String.valueOf(avatarUrl);
-               binding.mianpageCnt.setText("共"+s+"次识别记录");
+                binding.mianpageCnt.setText("共"+s+"次识别记录");
             }
         });
         LiveDataBus.getInstance().with(BusKey.DETECTIONHISTORY)
@@ -199,7 +200,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         });
         binding.mainpageHistory.setOnClickListener(v -> {
             LogUtils.INSTANCE.d("ljx","history");
-           ARouter.getInstance().build(RouterPath.DETECTION_HISTORY).navigation();
+            ARouter.getInstance().build(RouterPath.DETECTION_HISTORY).navigation();
 
         });
 

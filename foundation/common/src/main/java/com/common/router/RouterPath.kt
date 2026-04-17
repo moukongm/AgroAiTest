@@ -13,6 +13,7 @@ object RouterPath {
     const val NOTICE_MESSAGE_FRAGMENT = "/main/notice_message" // 通知消息页面
     const val NOTICE_CONTENT_FRAGMENT = "/main/notice_content" // 通知内容页面（ViewPager2 内容页）
     const val PLANT_ADD_ACTIVITY = "/main/plant_add" // 添加植物页面
+    const val HOME_AICHAT = "/home/aichat"
     const val PLANT_MANAGE_ACTIVITY = "/main/plant_manage" // 植物管理页面
     // 调试模块 (Demo Module)
     const val DEBUG_DEMO_ACTIVITY = "/demo/debug_demo" // 调试工具页面
@@ -22,6 +23,7 @@ object RouterPath {
     // 检测模块 (Detection Module)
     const val DETECTION_ACTIVITY = "/detection/activity" // 识别检测页面
     const val DETECTION_SERVICE = "/detection/service"   // 检测服务接口
+    const val DETECTION_AICHAT = "/detection/aichat"   // 检测服务接口
     const val DETECTION_HISTORY = "/detection/history" // 识别历史记录页面
     const val HISTORY_COUNT_SERVICE = "/detection/history_count" // 历史记录数量服务
 
