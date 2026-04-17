@@ -140,7 +140,7 @@ public class HomeViewModel extends BaseViewModel {
                 .subscribe(
                         response -> {
                             if (response != null && response.getCode() == ServiceCode.SUCCESS) {
-                               updateLocation(response.getData().getLocation());
+                               updateLocationResult.setValue(response.getData().getLocation());
                             }else{
                                 cityError.setValue("更新失败");
                             }
@@ -214,6 +214,7 @@ public class HomeViewModel extends BaseViewModel {
                                 userNameLiveData.setValue(response.getData().getFullName());
                                 avatarUrlLiveData.setValue(response.getData().getAvatarUrl());
                                 historyCountLiveData.setValue(response.getData().getHistoryRecognitionCount());
+                                locationLivedata.setValue(response.getData().getLocation());
                                 saveUserToDatabase(response.getData().getAvatarUrl());
                             }
                         },

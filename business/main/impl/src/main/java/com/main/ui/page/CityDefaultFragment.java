@@ -5,14 +5,21 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.common.base.BaseFragment;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
+import com.common.utils.LogUtils;
 import com.main.impl.databinding.FragmentCityDefaultBinding;
 import com.main.ui.adapter.CityListAdapter;
+import com.main.ui.adapter.HotCityRowAdapter;
 import com.main.ui.adapter.LetterNavAdapter;
+import com.main.viewmodel.HomeViewModel;
+import com.main.viewmodel.MessageViewModel;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,6 +30,8 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
 
     private CityListAdapter cityListAdapter;
     private LetterNavAdapter letterNavAdapter;
+    private HotCityRowAdapter hotCityRowAdapter;
+    private HomeViewModel viewModel;
     private List<String> hotCityList = new ArrayList<>();
     private List<String> letterList = new ArrayList<>();
     private Map<String, List<String>> cityDataMap = new LinkedHashMap<>();
@@ -35,21 +44,40 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
 
     @Override
     public void initView() {
+        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+
+        viewModel.getUserInfo();
+
+        viewModel.getUpdateLocationResult().observe(getViewLifecycleOwner(), city -> {
+            if (city != null && !city.isEmpty()) {
+                getBinding().tvCurrentCity.setText(city);
+                LiveDataBus.getInstance().with(BusKey.LOCATION).setValue(true);
+            }
+        });
+
         initRecyclerView();
         initData();
         initListeners();
     }
 
     private void initRecyclerView() {
+        // 推荐城市 - 3行4列（使用垂直LinearLayoutManager，每行4个城市）
+        hotCityRowAdapter = new HotCityRowAdapter();
+        getBinding().rvHotCity.setLayoutManager(new LinearLayoutManager(requireContext()));
+        getBinding().rvHotCity.setAdapter(hotCityRowAdapter);
+        hotCityRowAdapter.setOnCityClickListener(cityName -> {
+            viewModel.updateLocation(cityName);
+        });
+
+        // 字母导航 - 4行6列网格
+        getBinding().rvLetterNav.setLayoutManager(new GridLayoutManager(requireContext(), 6));
+        letterNavAdapter = new LetterNavAdapter();
+        getBinding().rvLetterNav.setAdapter(letterNavAdapter);
+
         // 城市列表（主列表）
         cityListAdapter = new CityListAdapter();
         getBinding().rvCityList.setLayoutManager(new LinearLayoutManager(requireContext()));
         getBinding().rvCityList.setAdapter(cityListAdapter);
-
-        // 右侧字母导航
-        letterNavAdapter = new LetterNavAdapter();
-        getBinding().rvLetterNav.setLayoutManager(new LinearLayoutManager(requireContext()));
-        getBinding().rvLetterNav.setAdapter(letterNavAdapter);
 
         // 列表滚动监听，同步右侧字母高亮
         getBinding().rvCityList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -69,25 +97,16 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
 
     private String getLetterAtPosition(int position) {
         int currentPos = 0;
-        // 跳过热门城市头部
-        currentPos++;
-        for (int i = 0; i < hotCityList.size(); i++) {
-            currentPos++;
-        }
-        if (position < currentPos) {
-            return "";
-        }
-        position -= currentPos;
         
         for (Map.Entry<String, List<String>> entry : cityDataMap.entrySet()) {
-            if (position == 0) {
+            if (position == currentPos) {
                 return entry.getKey();
             }
-            position--;
-            if (position < entry.getValue().size()) {
+            currentPos++;
+            if (position < currentPos + entry.getValue().size()) {
                 return entry.getKey();
             }
-            position -= entry.getValue().size();
+            currentPos += entry.getValue().size();
         }
         return null;
     }
@@ -108,12 +127,19 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         hotCityList.add("天津");
         hotCityList.add("苏州");
 
+        // 设置推荐城市数据（3行4列）
+        if (hotCityRowAdapter != null) {
+            hotCityRowAdapter.setData(hotCityList);
+        }
+
         // 字母列表
         letterList.clear();
         for (char c = 'A'; c <= 'Z'; c++) {
             letterList.add(String.valueOf(c));
         }
-        letterNavAdapter.setNewInstance(letterList);
+        if (letterNavAdapter != null) {
+            letterNavAdapter.setNewInstance(letterList);
+        }
 
         // 城市数据
         cityDataMap.clear();
@@ -138,7 +164,16 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         cityDataMap.put("X", createList("西安", "西宁", "西双版纳傣族自治州", "锡林郭勒盟", "厦门", "咸宁", "咸阳", "湘潭", "湘西土家族苗族自治州", "襄阳", "孝感", "忻州", "新乡", "新余", "信阳", "兴安盟", "邢台", "徐州", "许昌", "宣城", "雅安", "烟台", "延安", "延边朝鲜族自治州", "盐城", "扬州", "阳江", "阳泉", "伊春", "伊犁哈萨克自治州", "宜宾", "宜昌", "宜春", "益阳", "银川", "鹰潭", "营口", "永州", "榆林", "玉林", "玉树藏族自治州", "玉溪", "岳阳", "云浮", "运城"));
         cityDataMap.put("Z", createList("枣庄", "湛江", "张家界", "张家口", "张掖", "漳州", "昭通", "肇庆", "镇江", "郑州", "中山", "中卫", "周口", "株洲", "珠海", "驻马店", "淄博", "自贡", "资阳", "遵义"));
 
-        cityListAdapter.setData(hotCityList, letterList, cityDataMap);
+        // 城市列表只包含按字母分组的数据，不包含热门城市
+        if (cityListAdapter != null) {
+            cityListAdapter.setData(letterList, cityDataMap);
+        }
+
+        LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).observe(getViewLifecycleOwner(),result -> {
+            if(result instanceof Boolean && (Boolean) result){
+                viewModel.getUserInfo();
+            }
+        });
     }
 
     private List<String> createList(String... items) {
@@ -157,24 +192,21 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
 
         // 城市点击
         cityListAdapter.setOnCityClickListener(cityName -> {
-            if (getActivity() instanceof CitySelectorActivity) {
-                ((CitySelectorActivity) getActivity()).onCitySelected(cityName);
-            }
+            viewModel.updateLocation(cityName);
         });
     }
 
     private void scrollToLetter(String letter) {
         int position = getPositionForLetter(letter);
         if (position >= 0) {
-            ((LinearLayoutManager) getBinding().rvCityList.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+            LinearLayoutManager lm = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
+            lm.scrollToPositionWithOffset(position, 0);
+            getBinding().rvCityList.post(() -> lm.smoothScrollToPosition(getBinding().rvCityList, new RecyclerView.State(), position));
         }
     }
 
     private int getPositionForLetter(String letter) {
         int position = 0;
-        // 热门城市头部 + 热门城市数量
-        position++;
-        position += hotCityList.size();
         
         // 遍历城市数据找对应字母
         for (Map.Entry<String, List<String>> entry : cityDataMap.entrySet()) {

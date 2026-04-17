@@ -11,25 +11,21 @@ import com.main.impl.databinding.ItemCityNameBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int TYPE_HOT_HEADER = 0;
-    private static final int TYPE_LETTER_HEADER = 2;
-    private static final int TYPE_CITY_NAME = 3;
+    private static final int TYPE_LETTER_HEADER = 0;
+    private static final int TYPE_CITY_NAME = 1;
 
     private final List<Object> allItems = new ArrayList<>();
     private OnCityClickListener cityClickListener;
 
-    public void setData(List<String> hotCities, List<String> letterNav, java.util.Map<String, List<String>> cityDataMap) {
+    public void setData(List<String> letterNav, Map<String, List<String>> cityDataMap) {
         allItems.clear();
         
-        // 添加热门城市区域
-        allItems.add(new HotHeader());
-        allItems.addAll(hotCities.stream().map(CityItem::new).toList());
-        
         // 添加城市列表（按字母分组）
-        for (java.util.Map.Entry<String, List<String>> entry : cityDataMap.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : cityDataMap.entrySet()) {
             allItems.add(new LetterHeader(entry.getKey()));
             for (String city : entry.getValue()) {
                 allItems.add(new CityItem(city));
@@ -42,7 +38,6 @@ public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemViewType(int position) {
         Object item = allItems.get(position);
-        if (item instanceof HotHeader) return TYPE_HOT_HEADER;
         if (item instanceof LetterHeader) return TYPE_LETTER_HEADER;
         return TYPE_CITY_NAME;
     }
@@ -51,7 +46,7 @@ public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        if (viewType == TYPE_HOT_HEADER || viewType == TYPE_LETTER_HEADER) {
+        if (viewType == TYPE_LETTER_HEADER) {
             ItemCityLetterHeaderBinding binding = ItemCityLetterHeaderBinding.inflate(inflater, parent, false);
             return new LetterHeaderViewHolder(binding);
         }
@@ -63,7 +58,7 @@ public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Object item = allItems.get(position);
         if (holder instanceof LetterHeaderViewHolder) {
-            ((LetterHeaderViewHolder) holder).bind(item);
+            ((LetterHeaderViewHolder) holder).bind((LetterHeader) item);
         } else if (holder instanceof CityNameViewHolder) {
             ((CityNameViewHolder) holder).bind((CityItem) item);
         }
@@ -82,12 +77,8 @@ public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.binding = binding;
         }
 
-        void bind(Object item) {
-            if (item instanceof HotHeader) {
-                binding.tvLetter.setText("推荐城市");
-            } else if (item instanceof LetterHeader) {
-                binding.tvLetter.setText(((LetterHeader) item).letter);
-            }
+        void bind(LetterHeader item) {
+            binding.tvLetter.setText(item.letter);
         }
     }
 
@@ -117,13 +108,13 @@ public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void onCityClick(String cityName);
     }
 
-    static class HotHeader {}
-    static class LetterHeader {
-        String letter;
-        LetterHeader(String letter) { this.letter = letter; }
+    public static class LetterHeader {
+        public String letter;
+        public LetterHeader(String letter) { this.letter = letter; }
     }
-    static class CityItem {
-        String name;
-        CityItem(String name) { this.name = name; }
+
+    public static class CityItem {
+        public String name;
+        public CityItem(String name) { this.name = name; }
     }
 }

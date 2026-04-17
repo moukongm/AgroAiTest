@@ -5,16 +5,15 @@ import androidx.annotation.NonNull;
 import com.main.impl.databinding.ItemCitySearchResultBinding;
 import com.uikit.base.BaseBindingAdapter;
 
-public class CitySearchAdapter extends BaseBindingAdapter<CityInfo, ItemCitySearchResultBinding> {
+public class CitySearchAdapter extends BaseBindingAdapter<String, ItemCitySearchResultBinding> {
 
     public CitySearchAdapter() {
         super();
     }
 
     @Override
-    public void convert(@NonNull ItemCitySearchResultBinding binding, @NonNull CityInfo item, int position) {
-        binding.tvCityName.setText(item.name);
-        binding.tvCityPinyin.setText(item.pinyin);
+    public void convert(@NonNull ItemCitySearchResultBinding binding, @NonNull String item, int position) {
+        binding.tvCityName.setText(item);
         
         binding.getRoot().setOnClickListener(v -> {
             if (listener != null) {
@@ -30,6 +29,6 @@ public class CitySearchAdapter extends BaseBindingAdapter<CityInfo, ItemCitySear
     }
 
     public interface OnItemClickListener {
-        void onItemClick(CityInfo cityInfo);
+        void onItemClick(String cityInfo);
     }
 }

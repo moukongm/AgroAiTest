@@ -6,12 +6,18 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.common.base.BaseFragment;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
+import com.common.utils.LogUtils;
+import com.main.data.CityParser;
 import com.main.impl.databinding.FragmentCitySearchBinding;
 import com.main.ui.adapter.CityInfo;
 import com.main.ui.adapter.CitySearchAdapter;
+import com.main.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +25,8 @@ import java.util.List;
 public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> {
 
     private CitySearchAdapter adapter;
-    private List<CityInfo> cityList = new ArrayList<>();
     private String searchKeyword;
+    private HomeViewModel viewModel;
 
     @NonNull
     @Override
@@ -30,12 +36,36 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
 
     @Override
     public void initView() {
+        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+
         initRecyclerView();
         searchCity();
     }
 
     @Override
     public void initData() {
+
+        viewModel.getCityLiveData().observe(this,results -> {
+            if (results == null || results.isEmpty()) {
+                showEmptyState(true);
+                LogUtils.INSTANCE.d("citysearch",results.toString());
+                adapter.setNewInstance(new ArrayList<>());
+            } else {
+                showEmptyState(false);
+                LogUtils.INSTANCE.d("citysearch",results.toString());
+                List<String> displayList = CityParser.parseLocationItemsToDisplayList(results);
+                adapter.setNewInstance(displayList);
+            }
+        });
+
+        viewModel.getUpdateLocationResult().observe(this,city -> {
+            if (city != null && !city.isEmpty()) {
+                if (getActivity() != null) {
+                    getActivity().onBackPressed();
+                }
+                LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).setValue(true);
+            }
+        });
 
     }
 
@@ -50,9 +80,7 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
         getBinding().rvSearchResult.setAdapter(adapter);
 
         adapter.setOnItemClickListener(cityInfo -> {
-            if (getActivity() instanceof CitySelectorActivity) {
-                ((CitySelectorActivity) getActivity()).onCitySelected(cityInfo.name);
-            }
+            viewModel.updateLocation(cityInfo);
         });
     }
 
@@ -61,25 +89,12 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
             return;
         }
         if (searchKeyword == null || searchKeyword.isEmpty()) {
-            cityList.clear();
-            adapter.setNewInstance(cityList);
+            viewModel.getCity("");
             showEmptyState(true);
             return;
         }
 
-        cityList.clear();
-        List<CityInfo> allCities = getMockCities();
-        String keyword = searchKeyword.toLowerCase();
-
-        for (CityInfo city : allCities) {
-            if (city.name.contains(searchKeyword) ||
-                city.pinyin.toLowerCase().contains(keyword)) {
-                cityList.add(city);
-            }
-        }
-
-        adapter.setNewInstance(cityList);
-        showEmptyState(cityList.isEmpty());
+        viewModel.getCity(searchKeyword);
     }
 
     private void showEmptyState(boolean show) {
@@ -92,44 +107,4 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
         }
     }
 
-    private List<CityInfo> getMockCities() {
-        List<CityInfo> cities = new ArrayList<>();
-        cities.add(new CityInfo("北京", "beijing"));
-        cities.add(new CityInfo("上海", "shanghai"));
-        cities.add(new CityInfo("广州", "guangzhou"));
-        cities.add(new CityInfo("深圳", "shenzhen"));
-        cities.add(new CityInfo("杭州", "hangzhou"));
-        cities.add(new CityInfo("成都", "chengdu"));
-        cities.add(new CityInfo("武汉", "wuhan"));
-        cities.add(new CityInfo("西安", "xian"));
-        cities.add(new CityInfo("南京", "nanjing"));
-        cities.add(new CityInfo("重庆", "chongqing"));
-        cities.add(new CityInfo("天津", "tianjin"));
-        cities.add(new CityInfo("苏州", "suzhou"));
-        cities.add(new CityInfo("长沙", "changsha"));
-        cities.add(new CityInfo("郑州", "zhengzhou"));
-        cities.add(new CityInfo("青岛", "qingdao"));
-        cities.add(new CityInfo("沈阳", "shenyang"));
-        cities.add(new CityInfo("大连", "dalian"));
-        cities.add(new CityInfo("济南", "jinan"));
-        cities.add(new CityInfo("哈尔滨", "haerbin"));
-        cities.add(new CityInfo("长春", "changchun"));
-        cities.add(new CityInfo("昆明", "kunming"));
-        cities.add(new CityInfo("贵阳", "guiyang"));
-        cities.add(new CityInfo("福州", "fuzhou"));
-        cities.add(new CityInfo("厦门", "xiamen"));
-        cities.add(new CityInfo("南昌", "nanchang"));
-        cities.add(new CityInfo("合肥", "hefei"));
-        cities.add(new CityInfo("石家庄", "shijiazhuang"));
-        cities.add(new CityInfo("太原", "taiyuan"));
-        cities.add(new CityInfo("兰州", "lanzhou"));
-        cities.add(new CityInfo("乌鲁木齐", "wulumuqi"));
-        cities.add(new CityInfo("呼和浩特", "huhehaote"));
-        cities.add(new CityInfo("南宁", "nanning"));
-        cities.add(new CityInfo("海口", "haikou"));
-        cities.add(new CityInfo("银川", "yinchuan"));
-        cities.add(new CityInfo("西宁", "xining"));
-        cities.add(new CityInfo("拉萨", "lasa"));
-        return cities;
-    }
 }

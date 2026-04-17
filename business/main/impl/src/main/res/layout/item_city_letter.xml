@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F5F5F5"
+    android:background="@drawable/bg_hot_city_item"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:paddingHorizontal="15dp"

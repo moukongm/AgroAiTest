@@ -16,4 +16,8 @@ public class BusKey {
     public static final String COLLECT = "collect";
 
     public static final String ACCESSIBILITY_MODE_CHANGED = "accessibility_mode_changed";
+
+    public static final String LOCATION = "location";
+
+    public static final String SEARCH_LOCATION = "search_location";
 }

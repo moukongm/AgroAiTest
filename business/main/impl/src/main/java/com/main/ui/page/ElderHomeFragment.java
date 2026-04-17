@@ -75,6 +75,12 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
         binding.recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recycler.setAdapter(cropAdapter);
 
+        binding.mainpagePlaceArrow.setOnClickListener(v -> {
+            ARouter.getInstance()
+                    .build(RouterPath.CITY_SELECTOR_ACTIVITY)
+                    .navigation(requireActivity());
+        });
+
 
         binding.mainpageAi.setOnClickListener(v -> {
             ARouter.getInstance().build(RouterPath.HOME_AICHAT).navigation();
@@ -350,6 +356,18 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
                             .withLong("plantId", plantId)
                             .navigation();
                 }
+            }
+        });
+
+        LiveDataBus.getInstance().with(BusKey.LOCATION).observe(getViewLifecycleOwner(), added -> {
+            if(added instanceof Boolean && (Boolean) added){
+                viewModel.getUserInfo();
+            }
+        });
+
+        LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).observe(getViewLifecycleOwner(),result -> {
+            if(result instanceof Boolean && (Boolean) result){
+                viewModel.getUserInfo();
             }
         });
 

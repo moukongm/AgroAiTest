@@ -291,6 +291,19 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             }
         });
 
+        LiveDataBus.getInstance().with(BusKey.LOCATION).observe(getViewLifecycleOwner(), added -> {
+            LogUtils.INSTANCE.d("city",added.toString());
+            if(added instanceof Boolean && (Boolean) added){
+                viewModel.getUserInfo();
+            }
+        });
+
+        LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).observe(getViewLifecycleOwner(),result -> {
+            if(result instanceof Boolean && (Boolean) result){
+                viewModel.getUserInfo();
+            }
+        });
+
         viewModel.getMyCrops();
         viewModel.getCropListLiveData().observe(getViewLifecycleOwner(), crops -> {
             if (crops != null) {

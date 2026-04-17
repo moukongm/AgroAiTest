@@ -8,39 +8,25 @@
     android:paddingVertical="14dp">
 
     <ImageView
-        android:id="@+id/ivCityIcon"
+        android:id="@+id/iv_cityIcon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:background="@null"
         android:contentDescription="城市图标"
-        android:src="@null"
+        android:src="@drawable/ic_local"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
-        android:id="@+id/tvCityName"
+        android:id="@+id/tv_cityName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:textColor="#333333"
-        android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@id/ivCityIcon"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/iv_cityIcon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tvCityPinyin" />
-
-    <TextView
-        android:id="@+id/tvCityPinyin"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="2dp"
-        android:textColor="#999999"
-        android:textSize="12sp"
-        app:layout_constraintStart_toEndOf="@id/ivCityIcon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvCityName"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
