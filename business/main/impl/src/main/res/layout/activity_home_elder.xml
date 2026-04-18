@@ -52,6 +52,8 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="48dp"
                     android:orientation="horizontal"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintEnd_toStartOf="@+id/mainpage_laonianban"
                     app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -67,7 +69,9 @@
                         android:id="@+id/mainpage_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:maxLines="1"
                         android:text="王建军"
+                        android:maxWidth="150dp"
                         android:textColor="@android:color/white"
                         android:textSize="28sp"
                         android:textStyle="bold" />
@@ -368,7 +372,7 @@
                         android:id="@+id/mainpage_icon_old"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_main_laonianban" />
+                        android:src="@drawable/ic_normal" />
 
                 </LinearLayout>
 

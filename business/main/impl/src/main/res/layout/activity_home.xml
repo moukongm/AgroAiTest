@@ -67,7 +67,9 @@
                         android:id="@+id/mainpage_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:maxLines="1"
                         android:text="王建军"
+                        android:maxWidth="120dp"
                         android:textColor="@android:color/white"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -209,7 +211,7 @@
                     android:layout_marginTop="5dp"
                     android:background="@android:color/transparent"
                     android:backgroundTint="@android:color/transparent"
-                    android:minHeight="140dp"
+                    android:minHeight="100dp"
                     app:cardBackgroundColor="@android:color/transparent"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"

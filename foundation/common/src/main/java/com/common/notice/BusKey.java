@@ -20,4 +20,9 @@ public class BusKey {
     public static final String LOCATION = "location";
 
     public static final String SEARCH_LOCATION = "search_location";
+
+    // 首页定位成功，携带城市名称
+    public static final String LOCATION_CITY = "location_city";
+
+    public static final String NOTICE_CITY = "notice_city";
 }

@@ -64,7 +64,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
     @Override
     public void initView() {
 
-        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
         viewModel.initContext(requireContext());
         binding=  getBinding();
 
@@ -145,7 +145,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         });
 
         viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
-            LogUtils.INSTANCE.d("lyy++", city);
             if (city != null && !city.isEmpty()) {
                 binding.mainpagePlacename.setText(city);
                 binding.mainpagePlantLocal.setText(city);
@@ -300,6 +299,17 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
 
         LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).observe(getViewLifecycleOwner(),result -> {
             if(result instanceof Boolean && (Boolean) result){
+                viewModel.getUserInfo();
+            }
+        });
+
+        // 使用 activity 作为 lifecycle owner，这样即使 Fragment 不可见也能收到消息
+        LiveDataBus.getInstance().with(BusKey.NOTICE_CITY).observe(requireActivity(), city -> {
+            String mes = (String) city;
+            com.common.utils.LogUtils.INSTANCE.d("HomeFragment", "收到 NOTICE_CITY: " + mes);
+            if(mes != null && !mes.isEmpty()){
+                // 解析城市名（去掉时间戳后缀）
+                String cityName = mes.contains("_") ? mes.substring(0, mes.lastIndexOf("_")) : mes;
                 viewModel.getUserInfo();
             }
         });

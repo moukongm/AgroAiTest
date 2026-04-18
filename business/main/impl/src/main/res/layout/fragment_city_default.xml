@@ -51,7 +51,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
-                        android:text="杭州"
+                        android:text= ""
                         android:textColor="#6C6C6C"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -88,14 +88,16 @@
                         android:layout_marginTop="10dp"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tv_now_location"
-                        android:text="杭州"
+                        android:text=""
                         android:textColor="#333333"
                         android:textSize="18sp" />
                     <ImageView
+                        android:id="@+id/iv_location_icon"
                         android:layout_width="14dp"
                         android:layout_height="14dp"
+                        android:layout_marginEnd="3dp"
                         android:src="@drawable/ic_redingwei"
-                        app:layout_constraintRight_toLeftOf="@+id/tv_relocate"
+                        app:layout_constraintEnd_toStartOf="@+id/tv_relocate"
                         app:layout_constraintTop_toTopOf="@+id/tv_relocate"/>
 
                     <TextView
@@ -134,7 +136,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:overScrollMode="never" />
+                    android:overScrollMode="never"
+                    android:nestedScrollingEnabled="false" />
 
                 <!-- 分隔线 -->
                 <View
@@ -157,7 +160,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:overScrollMode="never" />
+                    android:overScrollMode="never"
+                    android:nestedScrollingEnabled="false" />
 
                 <!-- 分隔线 -->
                 <View
@@ -170,11 +174,11 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvCityList"
                     android:layout_width="match_parent"
-                    android:nestedScrollingEnabled="true"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:minHeight="300dp"
-                    android:overScrollMode="never" />
+                    android:overScrollMode="never"
+                    android:nestedScrollingEnabled="false" />
             </LinearLayout>
 
         </LinearLayout>

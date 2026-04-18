@@ -168,6 +168,16 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
             originalInputText = binding.etInput.getText().toString();
             setBottomNagavitionView(false);
         });
+
+        //切换到豆包语音页
+
+        binding.navIcon3.setOnClickListener(v->{
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .replace(R.id.fl_ai, new SpeechFragment())
+                    .commit();
+        });
         binding.btnSendMore.setOnClickListener(v->{
             hideKeyboard();
 //           if(hideKeyboard()){
@@ -207,12 +217,6 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
                         return null;
                     });
         });
-        binding.navIcon3.setOnClickListener(v->{
-
-        });
-
-
-
         binding.etInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

@@ -94,6 +94,7 @@ public class UserRemoteDataSource {
     }
 
     public Single<SearchCityResponse> getCity(String jwd) {
+        LogUtils.INSTANCE.d("xzrljxyes","resposity");
         return LocationRetrofitClient.getWeatherApiService().searchCity(authorization,jwd);
     }
 

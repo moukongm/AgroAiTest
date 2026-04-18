@@ -29,7 +29,7 @@ public interface WeatherApiService {
 
     @GET("geo/v2/city/lookup")
     Single<SearchCityResponse> searchCity(
-            @Header("Authorization") String authorization,  // 传入 "Bearer your_token"
+            @Header("X-QW-Api-Key") String authorization,  // 传入 "Bearer your_token"
             @Query("location") String location
     );
 

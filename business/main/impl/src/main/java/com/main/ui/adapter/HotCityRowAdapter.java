@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.main.impl.R;
 import com.main.impl.databinding.ItemCityHotRowBinding;
 
 import java.util.ArrayList;
@@ -16,6 +17,14 @@ public class HotCityRowAdapter extends RecyclerView.Adapter<HotCityRowAdapter.Vi
 
     private List<List<String>> rows = new ArrayList<>();
     private OnCityClickListener listener;
+    private String selectedCity = "";
+
+    public void setSelectedCity(String city) {
+        if (!selectedCity.equals(city)) {
+            selectedCity = city;
+            notifyDataSetChanged();
+        }
+    }
 
     public void setData(List<String> hotCities) {
         rows.clear();
@@ -65,22 +74,46 @@ public class HotCityRowAdapter extends RecyclerView.Adapter<HotCityRowAdapter.Vi
             if (row.size() >= 1) {
                 binding.tvCity1.setText(row.get(0));
                 binding.tvCity1.setVisibility(View.VISIBLE);
-                binding.tvCity1.setOnClickListener(v -> notifyClick(row.get(0)));
+                boolean isSelected1 = row.get(0).equals(selectedCity);
+                binding.tvCity1.setSelected(isSelected1);
+                binding.tvCity1.setTextColor(isSelected1 ? 0xFFFFFFFF : 0xFF333333);
+                binding.tvCity1.setOnClickListener(v -> {
+                    notifyClick(row.get(0));
+                    setSelectedCity(row.get(0));
+                });
             }
             if (row.size() >= 2) {
                 binding.tvCity2.setText(row.get(1));
                 binding.tvCity2.setVisibility(View.VISIBLE);
-                binding.tvCity2.setOnClickListener(v -> notifyClick(row.get(1)));
+                boolean isSelected2 = row.get(1).equals(selectedCity);
+                binding.tvCity2.setSelected(isSelected2);
+                binding.tvCity2.setTextColor(isSelected2 ? 0xFFFFFFFF : 0xFF333333);
+                binding.tvCity2.setOnClickListener(v -> {
+                    notifyClick(row.get(1));
+                    setSelectedCity(row.get(1));
+                });
             }
             if (row.size() >= 3) {
                 binding.tvCity3.setText(row.get(2));
                 binding.tvCity3.setVisibility(View.VISIBLE);
-                binding.tvCity3.setOnClickListener(v -> notifyClick(row.get(2)));
+                boolean isSelected3 = row.get(2).equals(selectedCity);
+                binding.tvCity3.setSelected(isSelected3);
+                binding.tvCity3.setTextColor(isSelected3 ? 0xFFFFFFFF : 0xFF333333);
+                binding.tvCity3.setOnClickListener(v -> {
+                    notifyClick(row.get(2));
+                    setSelectedCity(row.get(2));
+                });
             }
             if (row.size() >= 4) {
                 binding.tvCity4.setText(row.get(3));
                 binding.tvCity4.setVisibility(View.VISIBLE);
-                binding.tvCity4.setOnClickListener(v -> notifyClick(row.get(3)));
+                boolean isSelected4 = row.get(3).equals(selectedCity);
+                binding.tvCity4.setSelected(isSelected4);
+                binding.tvCity4.setTextColor(isSelected4 ? 0xFFFFFFFF : 0xFF333333);
+                binding.tvCity4.setOnClickListener(v -> {
+                    notifyClick(row.get(3));
+                    setSelectedCity(row.get(3));
+                });
             }
         }
 

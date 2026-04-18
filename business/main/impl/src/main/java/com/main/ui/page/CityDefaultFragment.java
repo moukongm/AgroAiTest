@@ -1,6 +1,7 @@
 package com.main.ui.page;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -44,14 +45,48 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
 
     @Override
     public void initView() {
-        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        // 使用 Activity 作为 ViewModelStoreOwner，让 CitySearchFragment 和 CityDefaultFragment 共享同一个 ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
 
+        // 先从数据库加载位置
+        // viewModel.loadLocationFromDb();
+
+        showLoading("加载定位中...");
         viewModel.getUserInfo();
 
+        // 监听定位结果，更新定位城市显示
+        viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
+            LogUtils.INSTANCE.d("tvLocation",city);
+            hideLoading();
+            if (city != null && !city.isEmpty()) {
+                getBinding().tvLocationCity.setText(city);
+            }
+        });
+
+        // 监听首页定位成功消息
+        LiveDataBus.getInstance().with(BusKey.LOCATION_CITY).observe(getViewLifecycleOwner(), city -> {
+            hideLoading();
+            LogUtils.INSTANCE.d("sedrfghjmk",city.toString());
+            if (city != null && !((String) city).isEmpty()) {
+//                LiveDataBus.getInstance().with(BusKey.NOTICE_CITY).setValue(city);
+                getBinding().tvLocationCity.setText((String) city);
+            }
+        });
+
+        // 监听用户选择城市结果，更新当前选择城市显示
         viewModel.getUpdateLocationResult().observe(getViewLifecycleOwner(), city -> {
             if (city != null && !city.isEmpty()) {
+                com.common.utils.LogUtils.INSTANCE.d("CityDefault", "发送 NOTICE_CITY: " + city);
+                LiveDataBus.getInstance().with(BusKey.NOTICE_CITY).setValue(city + "_" + System.currentTimeMillis());
                 getBinding().tvCurrentCity.setText(city);
-                LiveDataBus.getInstance().with(BusKey.LOCATION).setValue(true);
+            }
+        });
+
+        // 点击重新定位
+        getBinding().llCurrentLocation.setOnClickListener(v -> {
+            if (viewModel != null) {
+                showLoading("定位中...");
+                viewModel.getLocation(requireContext());
             }
         });
 
@@ -73,6 +108,7 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         getBinding().rvLetterNav.setLayoutManager(new GridLayoutManager(requireContext(), 6));
         letterNavAdapter = new LetterNavAdapter();
         getBinding().rvLetterNav.setAdapter(letterNavAdapter);
+        getBinding().rvLetterNav.setItemAnimator(null);
 
         // 城市列表（主列表）
         cityListAdapter = new CityListAdapter();
@@ -139,6 +175,8 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         }
         if (letterNavAdapter != null) {
             letterNavAdapter.setNewInstance(letterList);
+            // 默认选中 "A"
+            letterNavAdapter.setSelectedLetter("A");
         }
 
         // 城市数据
@@ -169,11 +207,6 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
             cityListAdapter.setData(letterList, cityDataMap);
         }
 
-        LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).observe(getViewLifecycleOwner(),result -> {
-            if(result instanceof Boolean && (Boolean) result){
-                viewModel.getUserInfo();
-            }
-        });
     }
 
     private List<String> createList(String... items) {
@@ -187,22 +220,99 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
     private void initListeners() {
         // 字母导航点击
         letterNavAdapter.setOnItemClickListener(letter -> {
+            // 先更新选中状态
+            letterNavAdapter.setSelectedLetter(letter);
+            // 再滚动到对应位置
             scrollToLetter(letter);
         });
 
-        // 城市点击
+        // 城市点击 - 选择城市后回滚到顶部
         cityListAdapter.setOnCityClickListener(cityName -> {
             viewModel.updateLocation(cityName);
+            // 选择城市后，rvCityList 回滚到顶部
+            scrollToTop();
         });
+    }
+
+    // 回滚到顶部
+    private void scrollToTop() {
+        getBinding().rvCityList.scrollToPosition(0);
+        // 同时滚动 NestedScrollView 到顶部
+        ViewGroup parent = (ViewGroup) getBinding().rvCityList.getParent();
+        while (parent != null && !(parent instanceof androidx.core.widget.NestedScrollView)) {
+            parent = (ViewGroup) parent.getParent();
+        }
+        if (parent instanceof androidx.core.widget.NestedScrollView) {
+            ((androidx.core.widget.NestedScrollView) parent).smoothScrollTo(0, 0);
+        }
     }
 
     private void scrollToLetter(String letter) {
         int position = getPositionForLetter(letter);
-        if (position >= 0) {
-            LinearLayoutManager lm = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
-            lm.scrollToPositionWithOffset(position, 0);
-            getBinding().rvCityList.post(() -> lm.smoothScrollToPosition(getBinding().rvCityList, new RecyclerView.State(), position));
+        if (position < 0) return;
+
+        // 获取 NestedScrollView
+        androidx.core.widget.NestedScrollView nsv = null;
+        ViewGroup parent = (ViewGroup) getBinding().rvCityList.getParent();
+        while (parent != null && !(parent instanceof androidx.core.widget.NestedScrollView)) {
+            parent = (ViewGroup) parent.getParent();
         }
+        if (parent instanceof androidx.core.widget.NestedScrollView) {
+            nsv = (androidx.core.widget.NestedScrollView) parent;
+        }
+
+        if (nsv == null) {
+            // 如果找不到 NestedScrollView，直接用 RecyclerView 滚动
+            LinearLayoutManager lm = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
+            if (lm != null) {
+                lm.scrollToPositionWithOffset(position, 0);
+            }
+            return;
+        }
+
+        // 多次延迟滚动，确保稳定
+        final int finalPosition = position;
+        final androidx.core.widget.NestedScrollView finalNsv = nsv;
+
+        // 第一次滚动：让 RecyclerView 准备
+        LinearLayoutManager lm = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
+        if (lm != null) {
+            lm.scrollToPositionWithOffset(position, 0);
+        }
+
+        // 延迟 200ms 后进行 NestedScrollView 滚动
+        getBinding().rvCityList.postDelayed(() -> {
+            // 计算总高度
+            int totalHeight = 0;
+            LinearLayoutManager layoutManager = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
+            if (layoutManager != null) {
+                for (int i = 0; i < finalPosition; i++) {
+                    View view = layoutManager.findViewByPosition(i);
+                    if (view != null) {
+                        totalHeight += view.getHeight();
+                    }
+                }
+            }
+
+            // 计算 rvCityList 在屏幕上的位置
+            int[] listLocation = new int[2];
+            int[] nsvLocation = new int[2];
+            getBinding().rvCityList.getLocationInWindow(listLocation);
+            finalNsv.getLocationInWindow(nsvLocation);
+
+            // 目标滚动位置 = rvCityList 顶部在 NestedScrollView 中的偏移 + 目标 item 之前的高度
+            int targetScrollY = totalHeight + (listLocation[1] - nsvLocation[1]) - 20;
+            finalNsv.smoothScrollTo(0, Math.max(0, targetScrollY));
+
+            // 再延迟 300ms 确认滚动到位
+            getBinding().rvCityList.postDelayed(() -> {
+                LinearLayoutManager manager = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
+                if (manager != null) {
+                    manager.scrollToPositionWithOffset(finalPosition, 0);
+                }
+            }, 300);
+
+        }, 200);
     }
 
     private int getPositionForLetter(String letter) {

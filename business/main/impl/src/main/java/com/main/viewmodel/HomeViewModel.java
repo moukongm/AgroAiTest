@@ -19,6 +19,8 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationListener;
 import com.common.base.BaseViewModel;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.storage.database.AppDatabase;
 import com.common.storage.database.CropDao;
 import com.common.storage.database.CropRecord;
@@ -98,12 +100,16 @@ public class HomeViewModel extends BaseViewModel {
                     locationLivedata.setValue(city);
                     // 定位成功，保存到数据库
                     saveLocationToDatabase(city);
+                    // 发送消息给 CityDefaultFragment 更新 tv_locationCity
+                    LiveDataBus.getInstance().with(BusKey.LOCATION_CITY).setValue(city);
                     getWeather(String.valueOf(y) + "," + String.valueOf(x));
 //                    String formattedLng = String.format(Locale.US, "%.2f", y);
 //                    String formattedLat = String.format(Locale.US, "%.2f",x);
 //                    LogUtils.INSTANCE.d("lyy","预警参数 - 经度:" + formattedLng + " 纬度:" + formattedLat);
                     getWarning();
                 }else{
+                    locationLivedata.setValue("");
+                    LiveDataBus.getInstance().with(BusKey.LOCATION_CITY).setValue("");
                     loadLocationFromDb();
                 }
             }
@@ -119,28 +125,31 @@ public class HomeViewModel extends BaseViewModel {
                 .subscribe(
                         response -> {
                             if (response != null && response.getCode().equals("200")) {
+                                LogUtils.INSTANCE.d("xzrljxyes",response.getLocation().toString());
                                cityLiveData.setValue(response.getLocation());
                             }else{
+                                LogUtils.INSTANCE.d("xzrljxyes",response.getCode()+"");
                                 cityError.setValue("搜索失败");
                             }
                         },
                         error -> {
-                            LogUtils.INSTANCE.e("lyy",  error);
+                            LogUtils.INSTANCE.e("xzrljxyes",  error);
                             cityError.setValue("搜索失败"+error.getMessage());
                         }
                 );
         addDisposable(disposable);
     }
 
-    public void updateLocation(String jwd){
-        ProfileUpdateRequest request = new ProfileUpdateRequest(null,null,null,jwd,null);
+    public void updateLocation(String cityName){
+        ProfileUpdateRequest request = new ProfileUpdateRequest(null,null,null,cityName,null);
         Disposable disposable = repository.updateLocation(request)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         response -> {
                             if (response != null && response.getCode() == ServiceCode.SUCCESS) {
-                               updateLocationResult.setValue(response.getData().getLocation());
+                               // 返回的是城市名称，用于更新 tv_currentCity
+                               updateLocationResult.setValue(cityName);
                             }else{
                                 cityError.setValue("更新失败");
                             }
@@ -198,6 +207,13 @@ public class HomeViewModel extends BaseViewModel {
     private volatile Context appContext;
 
     public HomeViewModel() {
+        // 监听 updateLocationResult，当城市选择更新时，同步更新 locationLivedata
+        // 这样 HomeFragment 监听 locationLivedata 的 observer 会立即收到更新
+        updateLocationResult.observeForever(cityName -> {
+            if (cityName != null && !cityName.isEmpty()) {
+                locationLivedata.setValue(cityName);
+            }
+        });
     }
 
     public void initContext(Context context) {
@@ -214,7 +230,7 @@ public class HomeViewModel extends BaseViewModel {
                                 userNameLiveData.setValue(response.getData().getFullName());
                                 avatarUrlLiveData.setValue(response.getData().getAvatarUrl());
                                 historyCountLiveData.setValue(response.getData().getHistoryRecognitionCount());
-                                locationLivedata.setValue(response.getData().getLocation());
+                                //locationLivedata.setValue(response.getData().getLocation());
                                 saveUserToDatabase(response.getData().getAvatarUrl());
                             }
                         },

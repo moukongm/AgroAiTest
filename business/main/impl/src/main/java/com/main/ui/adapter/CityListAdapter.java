@@ -88,6 +88,7 @@ public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         CityNameViewHolder(ItemCityNameBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            binding.getRoot().setClickable(true);
         }
 
         void bind(CityItem item) {

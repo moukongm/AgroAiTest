@@ -104,29 +104,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
     private void setupFragments() {
         isA11yMode = MMKVUtils.INSTANCE.custom("user_module").getString("selected_mode","normal").equals("senior");
 
+        // 先清理可能存在的旧 Fragment
+        clearAllFragments();
+
         if (isA11yMode) {
             switchToA11yMode();
         } else {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            homeFragment = new HomeFragment();
-            communityFragment = new CommunityFragment();
-            profileFragment = new ProfileFragment();
-            messageFragment = new MessageFragment();
-
-            transaction.add(R.id.fragment_container, profileFragment, "profile")
-                    .hide(profileFragment);
-            transaction.add(R.id.fragment_container, messageFragment, "message")
-                    .hide(messageFragment);
-            transaction.add(R.id.fragment_container, communityFragment, "community")
-                    .hide(communityFragment);
-            transaction.add(R.id.fragment_container, homeFragment, "home");
-
-            transaction.commit();
-
-            activeFragment = homeFragment;
-            binding.bottomNavigation.switchMode(false);
-            setupBottomNavigation();
+            switchToNormalMode();
         }
     }
     private void setupBottomNavigation() {
@@ -193,31 +177,24 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
 
     private void switchToA11yMode() {
         isA11yMode = true;
+        clearAllFragments();
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        if (homeFragment != null && homeFragment.isAdded()) transaction.hide(homeFragment);
-        if (communityFragment != null && communityFragment.isAdded()) transaction.hide(communityFragment);
-        if (messageFragment != null && messageFragment.isAdded()) transaction.hide(messageFragment);
-        if (profileFragment != null && profileFragment.isAdded()) transaction.hide(profileFragment);
-
-        transaction.commit();
-
-        FragmentTransaction newTransaction = getSupportFragmentManager().beginTransaction();
 
         elderHomeFragment = new ElderHomeFragment();
         elderCommunityFragment = new ElderCommunityFragment();
         elderMessageFragment = new ElderMessageFragment();
         elderProfileFragment = new ElderProfileFragment();
 
-        newTransaction.add(R.id.fragment_container, elderProfileFragment, "elder_profile")
+        transaction.add(R.id.fragment_container, elderProfileFragment, "elder_profile")
                 .hide(elderProfileFragment);
-        newTransaction.add(R.id.fragment_container, elderMessageFragment, "elder_message")
+        transaction.add(R.id.fragment_container, elderMessageFragment, "elder_message")
                 .hide(elderMessageFragment);
-        newTransaction.add(R.id.fragment_container, elderCommunityFragment, "elder_community")
+        transaction.add(R.id.fragment_container, elderCommunityFragment, "elder_community")
                 .hide(elderCommunityFragment);
-        newTransaction.add(R.id.fragment_container, elderHomeFragment, "elder_home");
+        transaction.add(R.id.fragment_container, elderHomeFragment, "elder_home");
 
-        newTransaction.commit();
+        transaction.commit();
 
         activeFragment = elderHomeFragment;
         binding.bottomNavigation.switchMode(true);
@@ -227,36 +204,64 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
 
     private void switchToNormalMode() {
         isA11yMode = false;
+        clearAllFragments();
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        if (elderHomeFragment != null && elderHomeFragment.isAdded()) transaction.hide(elderHomeFragment);
-        if (elderCommunityFragment != null && elderCommunityFragment.isAdded()) transaction.hide(elderCommunityFragment);
-        if (elderMessageFragment != null && elderMessageFragment.isAdded()) transaction.hide(elderMessageFragment);
-        if (elderProfileFragment != null && elderProfileFragment.isAdded()) transaction.hide(elderProfileFragment);
-
-        transaction.commit();
-
-        FragmentTransaction newTransaction = getSupportFragmentManager().beginTransaction();
 
         homeFragment = new HomeFragment();
         communityFragment = new CommunityFragment();
         messageFragment = new MessageFragment();
         profileFragment = new ProfileFragment();
 
-        newTransaction.add(R.id.fragment_container, profileFragment, "profile")
+        transaction.add(R.id.fragment_container, profileFragment, "profile")
                 .hide(profileFragment);
-        newTransaction.add(R.id.fragment_container, messageFragment, "message")
+        transaction.add(R.id.fragment_container, messageFragment, "message")
                 .hide(messageFragment);
-        newTransaction.add(R.id.fragment_container, communityFragment, "community")
+        transaction.add(R.id.fragment_container, communityFragment, "community")
                 .hide(communityFragment);
-        newTransaction.add(R.id.fragment_container, homeFragment, "home");
+        transaction.add(R.id.fragment_container, homeFragment, "home");
 
-        newTransaction.commit();
+        transaction.commit();
 
         activeFragment = homeFragment;
         binding.bottomNavigation.switchMode(false);
         setupBottomNavigation();
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
+    }
+
+    private void clearAllFragments() {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+
+        Fragment oldHome = fm.findFragmentByTag("home");
+        Fragment oldCommunity = fm.findFragmentByTag("community");
+        Fragment oldMessage = fm.findFragmentByTag("message");
+        Fragment oldProfile = fm.findFragmentByTag("profile");
+        Fragment oldElderHome = fm.findFragmentByTag("elder_home");
+        Fragment oldElderCommunity = fm.findFragmentByTag("elder_community");
+        Fragment oldElderMessage = fm.findFragmentByTag("elder_message");
+        Fragment oldElderProfile = fm.findFragmentByTag("elder_profile");
+
+        if (oldHome != null) transaction.remove(oldHome);
+        if (oldCommunity != null) transaction.remove(oldCommunity);
+        if (oldMessage != null) transaction.remove(oldMessage);
+        if (oldProfile != null) transaction.remove(oldProfile);
+        if (oldElderHome != null) transaction.remove(oldElderHome);
+        if (oldElderCommunity != null) transaction.remove(oldElderCommunity);
+        if (oldElderMessage != null) transaction.remove(oldElderMessage);
+        if (oldElderProfile != null) transaction.remove(oldElderProfile);
+
+        transaction.commitAllowingStateLoss();
+
+        homeFragment = null;
+        communityFragment = null;
+        messageFragment = null;
+        profileFragment = null;
+        elderHomeFragment = null;
+        elderCommunityFragment = null;
+        elderMessageFragment = null;
+        elderProfileFragment = null;
+        activeFragment = null;
     }
 
 }

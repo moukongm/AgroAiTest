@@ -99,6 +99,7 @@ public class Repository {
         return remoteDataSource.updateCrop(id, updateRequest);
     }
     public Single<SearchCityResponse> getCity(String jwd) {
+
         return remoteDataSource.getCity(jwd);
     }
     public Single<ResultVoid> addTag(Long cropId, String tagType, LocalDate recordDate, String content, int status) {

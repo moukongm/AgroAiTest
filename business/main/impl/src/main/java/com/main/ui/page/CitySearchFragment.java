@@ -10,8 +10,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.common.base.BaseFragment;
-import com.common.notice.BusKey;
-import com.common.notice.LiveDataBus;
 import com.common.utils.LogUtils;
 import com.main.data.CityParser;
 import com.main.impl.databinding.FragmentCitySearchBinding;
@@ -27,6 +25,15 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
     private CitySearchAdapter adapter;
     private String searchKeyword;
     private HomeViewModel viewModel;
+    private OnCitySelectedListener citySelectedListener;
+
+    public interface OnCitySelectedListener {
+        void onCitySelected(String cityName);
+    }
+
+    public void setOnCitySelectedListener(OnCitySelectedListener listener) {
+        this.citySelectedListener = listener;
+    }
 
     @NonNull
     @Override
@@ -36,37 +43,42 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
 
     @Override
     public void initView() {
-        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        // 使用 Activity 作为 ViewModelStoreOwner，让 CitySearchFragment 和 CityDefaultFragment 共享同一个 ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
 
         initRecyclerView();
-        searchCity();
+
+        // 监听搜索结果
+        viewModel.getCityLiveData().observe(getViewLifecycleOwner(), results -> {
+            LogUtils.INSTANCE.d("CitySearch", "收到结果数量: " + (results == null ? "null" : results.size()));
+            if (results == null || results.isEmpty()) {
+                showEmptyState(true);
+                adapter.setList(new ArrayList<>());
+            } else {
+                showEmptyState(false);
+                for (int i = 0; i < Math.min(3, results.size()); i++) {
+                    LogUtils.INSTANCE.d("CitySearch", "结果" + i + ": name=" + results.get(i).getName() 
+                        + ", adm1=" + results.get(i).getAdm1() + ", adm2=" + results.get(i).getAdm2());
+                }
+                List<String> displayList = CityParser.parseLocationItemsToDisplayList(results);
+                adapter.setList(displayList);
+            }
+        });
+
+        // 监听错误
+        viewModel.getCityError().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                showEmptyState(true);
+            }
+        });
     }
 
     @Override
     public void initData() {
-
-        viewModel.getCityLiveData().observe(this,results -> {
-            if (results == null || results.isEmpty()) {
-                showEmptyState(true);
-                LogUtils.INSTANCE.d("citysearch",results.toString());
-                adapter.setNewInstance(new ArrayList<>());
-            } else {
-                showEmptyState(false);
-                LogUtils.INSTANCE.d("citysearch",results.toString());
-                List<String> displayList = CityParser.parseLocationItemsToDisplayList(results);
-                adapter.setNewInstance(displayList);
-            }
-        });
-
-        viewModel.getUpdateLocationResult().observe(this,city -> {
-            if (city != null && !city.isEmpty()) {
-                if (getActivity() != null) {
-                    getActivity().onBackPressed();
-                }
-                LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).setValue(true);
-            }
-        });
-
+        // 首次进入时执行搜索
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            searchCity();
+        }
     }
 
     public void setSearchKeyword(String keyword) {
@@ -80,7 +92,13 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
         getBinding().rvSearchResult.setAdapter(adapter);
 
         adapter.setOnItemClickListener(cityInfo -> {
-            viewModel.updateLocation(cityInfo);
+            // 只传递 name（第一个 - 之前的部分）
+            String name = cityInfo.split("-")[0];
+            viewModel.updateLocation(name);
+            // 通过回调通知 Activity 切换回默认页面
+            if (citySelectedListener != null) {
+                citySelectedListener.onCitySelected(name);
+            }
         });
     }
 
@@ -89,7 +107,6 @@ public class CitySearchFragment extends BaseFragment<FragmentCitySearchBinding> 
             return;
         }
         if (searchKeyword == null || searchKeyword.isEmpty()) {
-            viewModel.getCity("");
             showEmptyState(true);
             return;
         }
