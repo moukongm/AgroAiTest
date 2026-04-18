@@ -78,6 +78,13 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             ARouter.getInstance().build(RouterPath.HOME_AICHAT).navigation();
         });
 
+        viewModel.getUserLocationLiveData().observe(getViewLifecycleOwner(),city -> {
+            if (city != null && !city.isEmpty()) {
+                LogUtils.INSTANCE.d("init",city);
+                binding.mainpagePlacename.setText(city);
+            }
+        });
+
 
 
         viewModel.getUserNameLiveData().observe(getViewLifecycleOwner(), userName -> {
@@ -203,6 +210,7 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                     .navigation(requireActivity(), REQUEST_PLANT_ADD);
         });
         binding.mainpagePlaceArrow.setOnClickListener(v -> {
+            LogUtils.INSTANCE.d("dfghjk","HomeActivity");
             ARouter.getInstance()
                     .build(RouterPath.CITY_SELECTOR_ACTIVITY)
                     .navigation(requireActivity());
@@ -241,6 +249,16 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                 binding.consHaveWarn.setVisibility(View.GONE);
                 binding.tvNothaveWarn.setVisibility(View.VISIBLE);
                 binding.consNothaveWarn.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // 使用 activity 作为 lifecycle owner，这样即使 Fragment 不可见也能收到消息
+        LiveDataBus.getInstance().with(BusKey.LOCATION).observe(getViewLifecycleOwner(), city -> {
+            String mes = (String) city;
+            com.common.utils.LogUtils.INSTANCE.d("HomeFragment", "收到 NOTICE_CITY: " + mes);
+            if(mes != null && !mes.isEmpty()){
+                viewModel.getUserInfo();
+                viewModel.getGeoCode(mes);
             }
         });
     }
@@ -290,12 +308,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             }
         });
 
-        LiveDataBus.getInstance().with(BusKey.LOCATION).observe(getViewLifecycleOwner(), added -> {
-            LogUtils.INSTANCE.d("city",added.toString());
-            if(added instanceof Boolean && (Boolean) added){
-                viewModel.getUserInfo();
-            }
-        });
 
         LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).observe(getViewLifecycleOwner(),result -> {
             if(result instanceof Boolean && (Boolean) result){
@@ -303,16 +315,6 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             }
         });
 
-        // 使用 activity 作为 lifecycle owner，这样即使 Fragment 不可见也能收到消息
-        LiveDataBus.getInstance().with(BusKey.NOTICE_CITY).observe(requireActivity(), city -> {
-            String mes = (String) city;
-            com.common.utils.LogUtils.INSTANCE.d("HomeFragment", "收到 NOTICE_CITY: " + mes);
-            if(mes != null && !mes.isEmpty()){
-                // 解析城市名（去掉时间戳后缀）
-                String cityName = mes.contains("_") ? mes.substring(0, mes.lastIndexOf("_")) : mes;
-                viewModel.getUserInfo();
-            }
-        });
 
         viewModel.getMyCrops();
         viewModel.getCropListLiveData().observe(getViewLifecycleOwner(), crops -> {

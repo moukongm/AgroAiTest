@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.common.base.BaseActivity;
 import com.common.router.RouterPath;
+import com.common.utils.LogUtils;
 import com.main.impl.R;
 import com.main.impl.databinding.ActivityCitySelectorBinding;
 
@@ -28,10 +29,11 @@ public class CitySelectorActivity extends BaseActivity<ActivityCitySelectorBindi
 
     @Override
     public void initView() {
+        LogUtils.INSTANCE.d("dfghjk","CitySelectorActivity");
+        showDefaultFragment();
         setupToolbar();
         setupSearchInput();
         setupBackHandler();
-        showDefaultFragment();
     }
 
     private void setupToolbar() {

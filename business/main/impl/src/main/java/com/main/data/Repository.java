@@ -16,6 +16,7 @@ import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
+import com.common.utils.LogUtils;
 import com.network.LocationRetrofitClient;
 import com.network.NetworkManager;
 import com.network.model.AlertResponse;
@@ -54,6 +55,7 @@ public class Repository {
     }
 
     public Single<WeatherResponse> getWeather(String jwd) {
+        LogUtils.INSTANCE.d("ftgbjsdkahkfhad,ukfhkashfa", "repository");
         return remoteDataSource.getWeather(jwd);
     }
     public AMapLocationClient getLocation(Context context) {

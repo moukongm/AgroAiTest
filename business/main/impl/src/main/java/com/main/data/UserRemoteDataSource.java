@@ -90,6 +90,7 @@ public class UserRemoteDataSource {
     }
 
     public Single<WeatherResponse> getWeather(String jwd) {
+        LogUtils.INSTANCE.d("ftgbjsdkahkfhad,ukfhkashfa", "data");
         return LocationRetrofitClient.getWeatherApiService().getWeather(authorization,jwd);
     }
 

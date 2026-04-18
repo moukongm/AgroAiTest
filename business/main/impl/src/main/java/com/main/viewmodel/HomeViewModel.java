@@ -56,6 +56,7 @@ public class HomeViewModel extends BaseViewModel {
     private final MutableLiveData<String> avatarUrlLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<LocationItem>> cityLiveData = new MutableLiveData<>();
     private final SingleLiveEvent<String> updateLocationResult = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> userLocationLiveData = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> cityError = new SingleLiveEvent<>();
     private final MutableLiveData<WeatherResponse.Now> weatherLiveData = new MutableLiveData<>();
 
@@ -85,6 +86,10 @@ public class HomeViewModel extends BaseViewModel {
         return historyCountLiveData;
     }
 
+    public SingleLiveEvent<String> getUserLocationLiveData() {
+        return userLocationLiveData;
+    }
+
     private volatile boolean isCropLoading = false;
 
     public void getLocation(Context context) {
@@ -109,6 +114,7 @@ public class HomeViewModel extends BaseViewModel {
                     getWarning();
                 }else{
                     locationLivedata.setValue("");
+                    LogUtils.INSTANCE.d("dfgh",aMapLocation.getErrorCode()+aMapLocation.getErrorInfo()+aMapLocation.getLocationDetail());
                     LiveDataBus.getInstance().with(BusKey.LOCATION_CITY).setValue("");
                     loadLocationFromDb();
                 }
@@ -168,37 +174,32 @@ public class HomeViewModel extends BaseViewModel {
 
 
 
-//    public void getGeoCode(String name) {
-//        Disposable disposable = repository.getGeoCode(name)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(
-//                        response -> {
-//                            if ("1".equals(response.getStatus())
-//                                    && response.getGeocodes() != null
-//                                    && !response.getGeocodes().isEmpty()) {
-//                                String location = response.getGeocodes().get(0).getLocation();
-//                                String[] parts = location.split(",");
-//                                if (parts.length == 2) {
-//                                    getWeather(location);
-//                                    double lng = Double.parseDouble(parts[0]);
-//                                    double lat = Double.parseDouble(parts[1]);
-//                                    String formattedLng = String.format(Locale.US, "%.2f", lng);
-//                                    String formattedLat = String.format(Locale.US, "%.2f", lat);
-//                                    LogUtils.INSTANCE.d("lyy",formattedLat + formattedLng);
-//                                    getWarning(formattedLat, formattedLng);
-//                                }
-//                            }
-//                            else{
-//                                LogUtils.INSTANCE.d("lyy","codenotok");
-//                            }
-//                        },
-//                        error -> {
-//                            LogUtils.INSTANCE.e("lyy",  error);
-//                        }
-//                );
-//        addDisposable(disposable);
-//    }
+    public void getGeoCode(String name) {
+        Disposable disposable = repository.getGeoCode(name)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            if ("1".equals(response.getStatus())
+                                    && response.getGeocodes() != null
+                                    && !response.getGeocodes().isEmpty()) {
+                                String location = response.getGeocodes().get(0).getLocation();
+                                String[] parts = location.split(",");
+                                if (parts.length == 2) {
+                                    getWeather(location);
+
+                                }
+                            }
+                            else{
+                                LogUtils.INSTANCE.d("lyy","codenotok");
+                            }
+                        },
+                        error -> {
+                            LogUtils.INSTANCE.e("lyy",  error);
+                        }
+                );
+        addDisposable(disposable);
+    }
 
     public MutableLiveData<String> getCityCodeLiveData() {
         return cityCodeLiveData;
@@ -207,13 +208,7 @@ public class HomeViewModel extends BaseViewModel {
     private volatile Context appContext;
 
     public HomeViewModel() {
-        // 监听 updateLocationResult，当城市选择更新时，同步更新 locationLivedata
-        // 这样 HomeFragment 监听 locationLivedata 的 observer 会立即收到更新
-        updateLocationResult.observeForever(cityName -> {
-            if (cityName != null && !cityName.isEmpty()) {
-                locationLivedata.setValue(cityName);
-            }
-        });
+
     }
 
     public void initContext(Context context) {
@@ -230,7 +225,7 @@ public class HomeViewModel extends BaseViewModel {
                                 userNameLiveData.setValue(response.getData().getFullName());
                                 avatarUrlLiveData.setValue(response.getData().getAvatarUrl());
                                 historyCountLiveData.setValue(response.getData().getHistoryRecognitionCount());
-                                //locationLivedata.setValue(response.getData().getLocation());
+                                userLocationLiveData.setValue(response.getData().getLocation());
                                 saveUserToDatabase(response.getData().getAvatarUrl());
                             }
                         },
@@ -305,6 +300,7 @@ public class HomeViewModel extends BaseViewModel {
     }
 
     public void getWeather(String jwd) {
+        LogUtils.INSTANCE.d("ftgbjsdkahkfhad,ukfhkashfa", "true");
         Disposable disposable = repository.getWeather(jwd)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -312,13 +308,13 @@ public class HomeViewModel extends BaseViewModel {
                         response -> {
                             if (response != null && response.getNow() != null) {
                                 weatherLiveData.setValue(response.getNow());
-                                LogUtils.INSTANCE.d("lyy", response.getNow().toString());
+                                LogUtils.INSTANCE.d("ftgbjsdkahkfhad,ukfhkashfa", response.getNow().toString());
                             } else {
-                                LogUtils.INSTANCE.d("lyy", "weathernotok");
+                                LogUtils.INSTANCE.d("ftgbjsdkahkfhad,ukfhkashfa", "weathernotok");
                             }
                         },
                         error -> {
-                            LogUtils.INSTANCE.e("weather", error);
+                            LogUtils.INSTANCE.e("ftgbjsdkahkfhad,ukfhkashfa", error);
                         }
                 );
         addDisposable(disposable);

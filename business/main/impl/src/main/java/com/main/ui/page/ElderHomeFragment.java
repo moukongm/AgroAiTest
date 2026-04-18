@@ -246,6 +246,13 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
                 binding.consNothaveWarn.setVisibility(View.VISIBLE);
             }
         });
+
+        viewModel.getUserLocationLiveData().observe(getViewLifecycleOwner(),city -> {
+            if (city != null && !city.isEmpty()) {
+                LogUtils.INSTANCE.d("init",city);
+                binding.mainpagePlacename.setText(city);
+            }
+        });
     }
 
     @Override
@@ -359,11 +366,15 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
             }
         });
 
-        LiveDataBus.getInstance().with(BusKey.LOCATION).observe(getViewLifecycleOwner(), added -> {
-            if(added instanceof Boolean && (Boolean) added){
+        LiveDataBus.getInstance().with(BusKey.LOCATION).observe(getViewLifecycleOwner(), city -> {
+            String mes = (String) city;
+            com.common.utils.LogUtils.INSTANCE.d("HomeFragment", "收到 NOTICE_CITY: " + mes);
+            if(mes != null && !mes.isEmpty()){
                 viewModel.getUserInfo();
+                viewModel.getGeoCode(mes);
             }
         });
+
 
         LiveDataBus.getInstance().with(BusKey.SEARCH_LOCATION).observe(getViewLifecycleOwner(),result -> {
             if(result instanceof Boolean && (Boolean) result){

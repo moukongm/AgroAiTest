@@ -26,4 +26,41 @@ public class LocationItem {
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }
     // 可选字段的getter/setter省略，可按需添加
+
+
+    public String getFxLink() {
+        return fxLink;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getIsDst() {
+        return isDst;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public String getLon() {
+        return lon;
+    }
+
+    public String getRank() {
+        return rank;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getTz() {
+        return tz;
+    }
+
+    public String getUtcOffset() {
+        return utcOffset;
+    }
 }
