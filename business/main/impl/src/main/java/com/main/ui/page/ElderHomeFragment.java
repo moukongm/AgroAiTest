@@ -246,9 +246,7 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
         viewModel.getAlertLiveData().observe(getViewLifecycleOwner(), alerts -> {
             LogUtils.INSTANCE.d("lyy", alerts+"");
             if (alerts != null) {
-                String title = "【" +  alerts.getTitle() +
-                        "】";
-                binding.mainpageWarningTitle.setText(title);
+                binding.mainpageWarningTitle.setText(alerts.getTitle());
                 binding.tvWarnning.setText(alerts.getContent());
                 binding.consHaveWarn.setVisibility(View.VISIBLE);
                 binding.tvNothaveWarn.setVisibility(View.GONE);
