@@ -19,10 +19,10 @@ public class LetterNavAdapter extends BaseBindingAdapter<String, ItemLetterNavBi
         binding.tvLetter.setText(item);
         
         boolean isSelected = item.equals(selectedLetter);
-        binding.tvLetter.setTextColor(isSelected ? 0xFFFFFFFF : 0xFF333333);
-        binding.tvLetter.setBackgroundResource(isSelected ? R.drawable.bg_letter_selected : R.drawable.bg_letter_item);
+        binding.tvLetter.setTextColor(isSelected ? 0xFF00AAD0 : 0xFF999999);
+        binding.tvLetter.setTextSize(isSelected ? 14f : 12f);
         
-        binding.tvLetter.setOnClickListener(v -> {
+        binding.getRoot().setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(item);
             }
