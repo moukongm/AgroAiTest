@@ -309,6 +309,7 @@
                 android:textColor="#1A1A1A"
                 android:textColorHint="#99000000"
                 android:textSize="14sp" />
+
             <ImageView
                 android:id="@+id/btn_input_mic"
                 android:layout_width="30dp"
@@ -321,8 +322,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="4dp"
-                android:src="@drawable/ic_add"
-                app:tint="#00BFA5" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/btn_send" />
 
         </LinearLayout>
 

@@ -294,18 +294,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
             }
             return windowInsets;
         });
-        ViewCompat.setOnApplyWindowInsetsListener(binding.flBackContainer, (view, windowInsets) -> {
-            int statusBarInset = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-            androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams layoutParams =
-                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) view.getLayoutParams();
-            if (layoutParams != null) {
-                layoutParams.topMargin = statusBarInset + dpToPx(8);
-                view.setLayoutParams(layoutParams);
-            }
-            return windowInsets;
-        });
         ViewCompat.requestApplyInsets(binding.toolbar);
-        ViewCompat.requestApplyInsets(binding.flBackContainer);
     }
 
     private int resolveActionBarSize() {
