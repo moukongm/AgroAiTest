@@ -96,7 +96,7 @@ public class ElderMyCropAdapter extends BaseBindingAdapter<Object, ItemMainPlant
     public void convert(@NonNull ItemMainPlantElderBinding binding, @NonNull Object item, int position) {
         // 加载用户头像（所有item都显示同一个用户头像）
         if (userAvatarPath != null && !userAvatarPath.isEmpty()) {
-            ImageLoader.INSTANCE.load(binding.ivSettingTitle, userAvatarPath);
+            ImageLoader.INSTANCE.loadCircle(binding.ivSettingTitle, userAvatarPath);
         }
         // 显示定位信息
         if (userLocation != null && !userLocation.isEmpty()) {

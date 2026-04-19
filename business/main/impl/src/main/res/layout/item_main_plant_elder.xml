@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,7 +27,7 @@
                 android:layout_marginTop="15dp"
                 android:text="种植物管理"
                 android:textColor="#505050"
-                android:textSize="23sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintLeft_toRightOf="@+id/mainpage_plant_head"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -112,8 +113,8 @@
 
                     <ImageView
                         android:id = "@+id/iv_settingTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_main_title"
                         android:scaleType="centerCrop"

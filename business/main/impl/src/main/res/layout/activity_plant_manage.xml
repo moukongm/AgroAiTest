@@ -19,12 +19,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="#01CFAC"
             app:expandedTitleGravity="bottom|center_horizontal"
             app:expandedTitleMarginBottom="48dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.MaterialComponents.Headline5"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <!-- 顶部背景图片区域 -->
             <ImageView
                 android:id="@+id/iv_header_bg"
                 android:layout_width="match_parent"
@@ -34,6 +34,7 @@
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7" />
 
+            <!-- 更换图片按钮 -->
             <ImageView
                 android:id="@+id/iv_change_photo"
                 android:layout_width="100dp"
@@ -45,46 +46,47 @@
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7" />
 
+            <!-- 顶部标题栏 -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:layout_marginTop="30dp"
                 android:fitsSystemWindows="true"
                 app:layout_collapseMode="pin"
                 app:contentInsetStart="0dp"
-                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light">
-
-                <FrameLayout
-                    android:id="@+id/fl_back_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:elevation="0dp">
-
-                    <ImageView
-                        android:id="@+id/iv_back"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_circle_back"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_main_back" />
-                </FrameLayout>
-
-            </androidx.appcompat.widget.Toolbar>
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <FrameLayout
+        android:id="@+id/fl_back_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="top|start"
+        android:elevation="12dp">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_back"
+            android:padding="8dp"
+            android:src="@drawable/ic_main_back" />
+    </FrameLayout>
+
+    <!-- 内容区域 -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="-40dp"
-        android:background="@drawable/bg_plant_manage_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:clipToPadding="false"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:background="@drawable/bg_plant_manage_content"
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -92,69 +94,72 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- 作物名称 -->
             <EditText
                 android:id="@+id/et_plant_name_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:inputType="text"
                 android:text="作物名称"
                 android:textColor="#0D1814"
                 android:textSize="30sp"
                 android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:background="@android:color/transparent"
+                android:inputType="text"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"/>
 
             <ImageView
                 android:id="@+id/ic_plant_name"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:src="@drawable/ic_set_name"
-                app:layout_constraintBottom_toBottomOf="@+id/et_plant_name_label"
-                app:layout_constraintLeft_toRightOf="@+id/et_plant_name_label" />
+                app:layout_constraintLeft_toRightOf="@+id/et_plant_name_label"
+                app:layout_constraintBottom_toBottomOf="@+id/et_plant_name_label" />
 
+            <!-- 作物信息区域 - 四个卡片两两一行 -->
             <LinearLayout
                 android:id="@+id/ll_plant_info_cards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="8dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="10dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/et_plant_name_label">
+                app:layout_constraintTop_toBottomOf="@+id/et_plant_name_label"
+                android:paddingBottom="10dp"
+                android:paddingHorizontal="8dp"
+                android:paddingTop="16dp">
 
+                <!-- 第一行：健康状况 + 种植日期 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:orientation="horizontal"
+                    android:gravity="center"
                     android:paddingHorizontal="2dp">
 
+                    <!-- 健康状况卡片 -->
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cd_health_status"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_margin="6dp"
                         android:layout_weight="1"
-                        app:cardBackgroundColor="#FFFFFF"
+                        android:layout_marginEnd="6dp"
+                        android:layout_margin="6dp"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp">
+                        app:cardBackgroundColor="#FFFFFF">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="12dp">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
                                 android:text="健康状况"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="#666666" />
 
                             <TextView
                                 android:id="@+id/tv_health_status"
@@ -163,110 +168,211 @@
                                 android:layout_marginTop="4dp"
                                 android:gravity="center_vertical"
                                 android:text="良好"
-                                android:textColor="#2BAE7E"
                                 android:textSize="18sp"
+                                android:textColor="#2BAE7E"
                                 android:textStyle="bold" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
+                    <!-- 种植日期卡片 -->
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cd_plant_date"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_margin="6dp"
                         android:layout_weight="1"
-                        app:cardBackgroundColor="#FFFFFF"
+                        android:layout_marginStart="6dp"
+                        android:layout_margin="6dp"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp">
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="12dp">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
                                 android:text="种植日期"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="#666666" />
 
                             <TextView
                                 android:id="@+id/et_plant_date_value"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:text="2026.03.15"
+                                android:textSize="14sp"
+                                android:textColor="#0D1814"
+                                android:textStyle="bold"
                                 android:background="@android:color/transparent"
                                 android:inputType="date"
-                                android:maxLines="1"
-                                android:text="2026.03.15"
-                                android:textColor="#0D1814"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:maxLines="1" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
                 </LinearLayout>
 
+                <!-- 第二行：病害记录 + 成熟时间 -->
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingBottom="10dp"-->
+<!--                    android:paddingHorizontal="2dp"-->
+<!--                    android:layout_marginTop="12dp">-->
+
+<!--                    &lt;!&ndash; 病害记录卡片 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/cd_disease_record"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginEnd="6dp"-->
+<!--                        android:layout_margin="6dp"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="#FFFFFF">-->
+
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:padding="12dp">-->
+<!--                            <TextView-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="6dp"-->
+<!--                                android:text="病害记录"-->
+<!--                                android:textSize="12sp"-->
+<!--                                android:textColor="#666666" />-->
+
+<!--                            <TextView-->
+<!--                                android:id="@+id/tv_disease_value"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="4dp"-->
+<!--                                android:text=""-->
+<!--                                android:textSize="14sp"-->
+<!--                                android:textColor="#0D1814"-->
+<!--                                android:textStyle="bold" />-->
+<!--                        </LinearLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
+
+<!--                    &lt;!&ndash; 成熟时间卡片 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/cd_mature_time"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginStart="6dp"-->
+<!--                        android:layout_margin="6dp"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="#FFFFFF">-->
+
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:padding="12dp">-->
+<!--                            <TextView-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="6dp"-->
+<!--                                android:text="成熟时间"-->
+<!--                                android:textSize="12sp"-->
+<!--                                android:textColor="#666666" />-->
+
+<!--                            <TextView-->
+<!--                                android:id="@+id/et_mature_value"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="4dp"-->
+<!--                                android:text="60天"-->
+<!--                                android:textSize="14sp"-->
+<!--                                android:textColor="#0D1814"-->
+<!--                                android:textStyle="bold"-->
+<!--                                android:background="@android:color/transparent"-->
+<!--                                android:maxLines="1" />-->
+<!--                        </LinearLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
+
+<!--                </LinearLayout>-->
+
             </LinearLayout>
 
+            <!-- 保存修改按钮 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_save_changes"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_confirm_label"
                 android:text="保存修改"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:visibility="gone"
+                android:background="@drawable/bg_confirm_label"
                 app:backgroundTint="@null"
                 app:cornerRadius="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ll_plant_info_cards" />
 
+            <!-- 种植管理 -->
             <TextView
                 android:id="@+id/tv_plant_manage_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_save_changes"
                 android:layout_marginTop="20dp"
                 android:text="种植管理"
                 android:textColor="#0D1014"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_save_changes" />
+                android:textStyle="bold" />
 
+            <!-- Tab标题栏 - 浇水/施肥/用药/笔记 -->
             <LinearLayout
                 android:id="@+id/ll_tab_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_tab_container"
-                android:orientation="vertical"
                 android:padding="4dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_plant_manage_label">
 
+                <!-- Tab标签行 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:background="@android:color/transparent"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:background="@android:color/transparent">
 
+                    <!-- 浇水标签 -->
                     <LinearLayout
                         android:id="@+id/tab_water"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_tab_selected"
+                        android:orientation="horizontal"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:background="@drawable/bg_tab_selected">
+
+                        <ImageView
+                            android:id="@+id/iv_icon_water"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_plant_water"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/tv_tab_water"
@@ -274,19 +380,27 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
                             android:text="浇水"
-                            android:textColor="@color/tab_text_color"
                             android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:textColor="@color/tab_text_color" />
                     </LinearLayout>
 
+                    <!-- 施肥标签 -->
                     <LinearLayout
                         android:id="@+id/tab_fertilize"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@android:color/transparent"
+                        android:orientation="horizontal"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:background="@android:color/transparent">
+
+                        <ImageView
+                            android:id="@+id/iv_icon_fertilize"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_plant_fertilize"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/tv_tab_fertilize"
@@ -294,19 +408,27 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
                             android:text="施肥"
-                            android:textColor="@color/tab_text_color"
                             android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:textColor="@color/tab_text_color" />
                     </LinearLayout>
 
+                    <!-- 用药标签 -->
                     <LinearLayout
                         android:id="@+id/tab_medicine"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@android:color/transparent"
+                        android:orientation="horizontal"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:background="@android:color/transparent">
+
+                        <ImageView
+                            android:id="@+id/iv_icon_medicine"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_plant_medicine"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/tv_tab_medicine"
@@ -314,19 +436,27 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
                             android:text="用药"
-                            android:textColor="@color/tab_text_color"
                             android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:textColor="@color/tab_text_color" />
                     </LinearLayout>
 
+                    <!-- 笔记标签 -->
                     <LinearLayout
                         android:id="@+id/tab_note"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@android:color/transparent"
+                        android:orientation="horizontal"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:background="@android:color/transparent">
+
+                        <ImageView
+                            android:id="@+id/iv_icon_note"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_plant_note"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/tv_tab_note"
@@ -334,23 +464,24 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
                             android:text="笔记"
-                            android:textColor="@color/tab_text_color"
                             android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:textColor="@color/tab_text_color" />
                     </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
 
+            <!-- 日历和按钮卡片 -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cd_calendar_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ll_tab_container">
@@ -360,6 +491,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- 日历头部：月份选择 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -372,9 +504,9 @@
                             android:id="@+id/iv_prev_month"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
                             android:padding="4dp"
-                            android:src="@drawable/ic_chevron_left" />
+                            android:src="@drawable/ic_chevron_left"
+                            android:background="?attr/selectableItemBackgroundBorderless" />
 
                         <TextView
                             android:id="@+id/tv_current_month"
@@ -391,25 +523,27 @@
                             android:id="@+id/iv_next_month"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
                             android:padding="4dp"
-                            android:src="@drawable/ic_chevron_right" />
+                            android:src="@drawable/ic_chevron_right"
+                            android:background="?attr/selectableItemBackgroundBorderless" />
 
                     </LinearLayout>
 
+                    <!-- 日历视图 - huanghaibin CalendarView -->
                     <com.haibin.calendarview.CalendarView
                         android:id="@+id/calendar_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:overScrollMode="never"
                         android:clickable="true"
                         android:focusable="true"
-                        android:overScrollMode="never"
-                        app:day_text_size="14sp"
                         app:month_view="com.main.ui.widget.CustomMonthView"
                         app:scheme_text_color="#FFFFFF"
+                        app:day_text_size="14sp"
                         app:week_text_size="14sp" />
 
+                    <!-- 标签文字 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -420,6 +554,7 @@
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
+                    <!-- 浇水按钮组 - 各占一行 -->
                     <LinearLayout
                         android:id="@+id/ll_water_buttons"
                         android:layout_width="match_parent"
@@ -427,6 +562,7 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
+                        <!-- 已浇水按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_water_done"
                             android:layout_width="match_parent"
@@ -440,6 +576,7 @@
                             app:iconGravity="textStart"
                             app:iconSize="18dp" />
 
+                        <!-- 待浇水按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_water_pending"
                             android:layout_width="match_parent"
@@ -454,32 +591,35 @@
                             app:iconGravity="textStart"
                             app:iconSize="18dp" />
 
+                        <!-- 取消标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_cancel_water"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="取消标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
+                        <!-- 打上标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_confirm_water"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="打上标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
                     </LinearLayout>
 
+                    <!-- 施肥按钮组 - 各占一行 -->
                     <LinearLayout
                         android:id="@+id/ll_fertilize_buttons"
                         android:layout_width="match_parent"
@@ -488,6 +628,7 @@
                         android:padding="16dp"
                         android:visibility="gone">
 
+                        <!-- 已施肥按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_fertilize_done"
                             android:layout_width="match_parent"
@@ -501,6 +642,7 @@
                             app:iconGravity="textStart"
                             app:iconSize="18dp" />
 
+                        <!-- 待施肥按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_fertilize_pending"
                             android:layout_width="match_parent"
@@ -515,32 +657,35 @@
                             app:iconGravity="textStart"
                             app:iconSize="18dp" />
 
+                        <!-- 取消标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_cancel_fertilize"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="取消标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
+                        <!-- 打上标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_confirm_fertilize"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="打上标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
                     </LinearLayout>
 
+                    <!-- 用药按钮组 - 各占一行 -->
                     <LinearLayout
                         android:id="@+id/ll_medicine_buttons"
                         android:layout_width="match_parent"
@@ -549,6 +694,7 @@
                         android:padding="16dp"
                         android:visibility="gone">
 
+                        <!-- 已用药按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_medicine_done"
                             android:layout_width="match_parent"
@@ -562,6 +708,7 @@
                             app:iconGravity="textStart"
                             app:iconSize="18dp" />
 
+                        <!-- 待用药按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_medicine_pending"
                             android:layout_width="match_parent"
@@ -576,32 +723,35 @@
                             app:iconGravity="textStart"
                             app:iconSize="18dp" />
 
+                        <!-- 取消标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_cancel_medicine"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="取消标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
+                        <!-- 打上标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_confirm_medicine"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="打上标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
                     </LinearLayout>
 
+                    <!-- 笔记按钮组 - 各占一行 -->
                     <LinearLayout
                         android:id="@+id/ll_note_buttons"
                         android:layout_width="match_parent"
@@ -610,6 +760,7 @@
                         android:padding="16dp"
                         android:visibility="gone">
 
+                        <!-- 有笔记按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_note_done"
                             android:layout_width="match_parent"
@@ -623,41 +774,44 @@
                             app:iconGravity="textStart"
                             app:iconSize="18dp" />
 
+                        <!-- 笔记输入框 -->
                         <EditText
                             android:id="@+id/et_note_content"
                             android:layout_width="match_parent"
                             android:layout_height="80dp"
                             android:layout_marginTop="8dp"
                             android:background="@drawable/bg_note_input"
+                            android:padding="12dp"
                             android:gravity="top|start"
                             android:hint="点击输入笔记内容"
-                            android:inputType="textMultiLine"
-                            android:padding="12dp"
-                            android:textColor="#333333"
                             android:textColorHint="#999999"
-                            android:textSize="13sp" />
+                            android:textColor="#333333"
+                            android:textSize="13sp"
+                            android:inputType="textMultiLine" />
 
+                        <!-- 取消标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_cancel_note"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="取消标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
+                        <!-- 打上标签按钮 -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_confirm_note"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_confirm_label"
                             android:text="打上标签"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
+                            android:background="@drawable/bg_confirm_label"
                             app:backgroundTint="@null"
                             app:cornerRadius="8dp" />
 
