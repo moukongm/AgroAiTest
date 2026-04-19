@@ -1,12 +1,17 @@
 package com.common.utils
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 object ImageUtils {
     private const val MAX_FILE_SIZE_BYTES = 7_864_320
+    private const val DEFAULT_MAX_DIMENSION = 1024
+    private const val DEFAULT_JPEG_QUALITY = 80
     private const val TAG = "ImageUtils"
 
     /**
@@ -60,6 +65,85 @@ object ImageUtils {
 
         Log.d(TAG, "最终图片大小：${byteArrayOutputStream.size()} bytes")
         return compressedBitmap
+    }
+
+    /**
+     * 压缩图片文件，统一用于上传前的本地文件瘦身。
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun compressImageFile(
+        file: File,
+        maxDimension: Int = DEFAULT_MAX_DIMENSION,
+        quality: Int = DEFAULT_JPEG_QUALITY
+    ): File? {
+        if (!file.exists() || maxDimension <= 0) return null
+
+        return try {
+            val bounds = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+            BitmapFactory.decodeFile(file.absolutePath, bounds)
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) {
+                return null
+            }
+
+            val bitmap = BitmapFactory.decodeFile(
+                file.absolutePath,
+                BitmapFactory.Options().apply {
+                    inSampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight, maxDimension)
+                }
+            ) ?: return null
+
+            val needsScale = bitmap.width > maxDimension || bitmap.height > maxDimension
+            val scaledBitmap = if (needsScale) {
+                val ratio = minOf(
+                    maxDimension.toFloat() / bitmap.width,
+                    maxDimension.toFloat() / bitmap.height
+                )
+                Bitmap.createScaledBitmap(
+                    bitmap,
+                    (bitmap.width * ratio).toInt().coerceAtLeast(1),
+                    (bitmap.height * ratio).toInt().coerceAtLeast(1),
+                    true
+                )
+            } else {
+                bitmap
+            }
+
+            try {
+                FileOutputStream(file).use { fos ->
+                    scaledBitmap.compress(
+                        Bitmap.CompressFormat.JPEG,
+                        quality.coerceIn(10, 100),
+                        fos
+                    )
+                    fos.flush()
+                }
+                file
+            } finally {
+                bitmap.recycle()
+                if (scaledBitmap !== bitmap) {
+                    scaledBitmap.recycle()
+                }
+            }
+        } catch (e: Exception) {
+            LogUtils.e(TAG, "compressImageFile error: ${e.message}")
+            null
+        }
+    }
+
+    private fun calculateInSampleSize(width: Int, height: Int, maxDimension: Int): Int {
+        var inSampleSize = 1
+        if (width <= maxDimension && height <= maxDimension) {
+            return inSampleSize
+        }
+        var halfWidth = width / 2
+        var halfHeight = height / 2
+        while ((halfWidth / inSampleSize) >= maxDimension && (halfHeight / inSampleSize) >= maxDimension) {
+            inSampleSize *= 2
+        }
+        return inSampleSize
     }
 
     /**

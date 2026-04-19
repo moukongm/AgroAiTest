@@ -25,6 +25,7 @@ import com.common.notice.LiveDataBus;
 import com.common.storage.database.DetectionRecord;
 import com.common.utils.AvatarUtils;
 import com.common.utils.FileUtils;
+import com.common.utils.ImageUtils;
 import com.common.utils.LogUtils;
 import com.common.utils.NetworkUtil;
 import com.common.utils.SingleLiveEvent;
@@ -35,7 +36,6 @@ import com.detection.data.Repository;
 import com.detection.data.UserLocalDataSource;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -207,53 +207,7 @@ public class DetectionViewModel extends BaseViewModel {
 
     //压缩图片
     private File compressImage(File file) {
-        try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-            int width = options.outWidth;
-            int height = options.outHeight;
-            if (width <= 0 || height <= 0) {
-                return null;
-            }
-            // 计算采样率，避免OOM
-            int inSampleSize = 1;
-            int maxSize = 1024;
-            if (width > maxSize || height > maxSize) {
-                int halfWidth = width / 2;
-                int halfHeight = height / 2;
-                while ((halfWidth / inSampleSize) >= maxSize && (halfHeight / inSampleSize) >= maxSize) {
-                    inSampleSize *= 2;
-                }
-            }
-            options.inSampleSize = inSampleSize;
-            options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-            if (bitmap == null) {
-                return null;
-            }
-            int targetWidth = width;
-            int targetHeight = height;
-            if (width > maxSize || height > maxSize) {
-                float ratio = Math.min((float) maxSize / width, (float) maxSize / height);
-                targetWidth = (int) (width * ratio);
-                targetHeight = (int) (height * ratio);
-            }
-            Bitmap scaled = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
-            try (FileOutputStream fos = new FileOutputStream(file)) {
-                scaled.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-                fos.flush();
-            } finally {
-                bitmap.recycle();
-                if (scaled != bitmap) {
-                    scaled.recycle();
-                }
-            }
-            return file;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return ImageUtils.compressImageFile(file);
     }
 
     public void uploadAndRecognizeFromGallery(Context context, String mes, File file) {

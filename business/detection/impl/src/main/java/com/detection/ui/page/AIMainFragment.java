@@ -261,7 +261,7 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
         //我添加的图片
         LiveDataExtKt.observeNonNull(viewModel.getPhotoNewUriResult(), this, url -> {
             if (!isAdded() || getActivity() == null) return null;
-            ToastUtils.INSTANCE.showShort(getActivity().getApplicationContext(), "图片添加成功");
+//            ToastUtils.INSTANCE.showShort(getActivity().getApplicationContext(), "图片添加成功");
             showImg(url);
             this.url = url;
             binding.btnSend.setVisibility(View.VISIBLE);
