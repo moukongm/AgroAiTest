@@ -132,25 +132,29 @@ public class MessageFragment extends BaseFragment<FragmentMessageBinding> {
         });
 
         binding.item1.consMainitem.setOnClickListener(v -> {
-            LogUtils.INSTANCE.d("xjl", "show");
-            getChildFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container,NoticeMessageFragment.InstanceNoticeMessageFragment(0))
-                    .addToBackStack(null)
-                    .commit();
-            isSubFragmentOpen = true;
+            openNoticeMessagePage(0);
         });
 
         binding.item2.consMainitem.setOnClickListener(v -> {
-            LogUtils.INSTANCE.d("xjl", "show");
-            getChildFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, NoticeMessageFragment.InstanceNoticeMessageFragment(1))
-                    .addToBackStack(null)
-                    .commit();
-            isSubFragmentOpen = true;
+            openNoticeMessagePage(1);
         });
 
+    }
+
+    public void openNoticeMessagePage(int tab) {
+        if (binding == null || !isAdded()) {
+            return;
+        }
+        LogUtils.INSTANCE.d("xjl", "show");
+        binding.fragmentContainer.setVisibility(View.VISIBLE);
+        binding.messageHeader.setVisibility(View.GONE);
+        binding.cardMessageList.setVisibility(View.GONE);
+        getChildFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, NoticeMessageFragment.InstanceNoticeMessageFragment(tab))
+                .addToBackStack(null)
+                .commit();
+        isSubFragmentOpen = true;
     }
 
     private void setLivedata() {

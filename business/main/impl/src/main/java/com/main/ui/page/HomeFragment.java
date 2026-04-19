@@ -4,7 +4,9 @@ import static android.app.Activity.RESULT_OK;
 
 import android.Manifest;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.TouchDelegate;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import com.common.NavigationController;
 
 import com.agri.pest.client.model.response.MessageResponseDto;
 import com.agri.pest.client.model.response.PageResultMessageResponseDto;
@@ -225,12 +228,19 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
             binding.mainpageWarningGoneright.setVisibility(View.VISIBLE);
             binding.mainpageWarningHistory.setVisibility(View.VISIBLE);
             binding.tvWarnning.setMaxLines(100);
+            expandWarningHistoryTouchArea();
         });
         binding.mainpageWarningGoneright.setOnClickListener(v -> {
             binding.mainpageWarningRight.setVisibility(View.VISIBLE);
             binding.mainpageWarningGoneright.setVisibility(View.GONE);
             binding.mainpageWarningHistory.setVisibility(View.GONE);
             binding.tvWarnning.setMaxLines(2);
+        });
+        binding.mainpageWarningHistory.setOnClickListener(v -> {
+            android.app.Activity activity = getActivity();
+            if (activity instanceof NavigationController) {
+                ((NavigationController) activity).openNoticeMessagePage(2);
+            }
         });
         binding.mainpageHistory.setOnClickListener(v -> {
             LogUtils.INSTANCE.d("ljx","history");
@@ -400,5 +410,22 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
         if (viewModel != null) {
             viewModel.stopLocation();
         }
+    }
+
+    private void expandWarningHistoryTouchArea() {
+        View parent = (View) binding.mainpageWarningHistory.getParent();
+        if (parent == null) {
+            return;
+        }
+        binding.mainpageWarningHistory.post(() -> {
+            Rect rect = new Rect();
+            binding.mainpageWarningHistory.getHitRect(rect);
+            int expandPx = (int) (5 * binding.mainpageWarningHistory.getResources().getDisplayMetrics().density + 0.5f);
+            rect.top -= expandPx;
+            rect.bottom += expandPx;
+            rect.left -= expandPx;
+            rect.right += expandPx;
+            parent.setTouchDelegate(new TouchDelegate(rect, binding.mainpageWarningHistory));
+        });
     }
 }

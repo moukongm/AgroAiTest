@@ -47,7 +47,8 @@ public class NoticeAdapter extends BaseBindingAdapter<MessageResponseDto, ItemNo
             binding.mainpageWarningRight.setVisibility(View.GONE);
             binding.mainpageWarningGoneright.setVisibility(View.VISIBLE);
             binding.tvWarnning.setMaxLines(100);
-            if(!item.isRead()){
+            if (!Boolean.TRUE.equals(item.isRead()) && listener != null) {
+                binding.dotThumb.setVisibility(View.GONE);
                 listener.onNoticeClick(item.getId(), position,true);
             }
         });
@@ -55,9 +56,6 @@ public class NoticeAdapter extends BaseBindingAdapter<MessageResponseDto, ItemNo
             binding.mainpageWarningRight.setVisibility(View.VISIBLE);
             binding.mainpageWarningGoneright.setVisibility(View.GONE);
             binding.tvWarnning.setMaxLines(2);
-            if(!item.isRead()){
-                listener.onNoticeClick(item.getId(), position,false);
-            }
         });
 
         // 设置已读状态（小红点）

@@ -150,6 +150,29 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>
             activeFragment = fragment;
         }
     }
+
+    public void openNoticeMessagePage(int tab) {
+        if (isA11yMode()) {
+            if (activeFragment != elderMessageFragment) {
+                binding.bottomNavigation.setSelectedItemId(R.id.nav_message);
+            } else {
+                switchFragment(elderMessageFragment);
+            }
+            if (elderMessageFragment != null) {
+                elderMessageFragment.openNoticeMessagePage(tab);
+            }
+            return;
+        }
+        if (activeFragment != messageFragment) {
+            binding.bottomNavigation.setSelectedItemId(R.id.nav_message);
+        } else {
+            switchFragment(messageFragment);
+        }
+        if (messageFragment != null) {
+            messageFragment.openNoticeMessagePage(tab);
+        }
+    }
+
     private void setupBlurEffect() {
         BlurView blurView = binding.blurView;
         ViewGroup rootView = (ViewGroup) getWindow().getDecorView().findViewById(android.R.id.content);

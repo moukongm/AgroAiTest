@@ -40,10 +40,7 @@ public class NoticeContentFragment extends BaseFragment<FragmentNoticeContentBin
     private String messageType; // LIKE, COMMENT, SYSTEM, ALERT, 或 null(全部)
 
     private MessageViewModel viewModel;
-    Boolean refrush = false;
     int count = 0;
-    List<MessageResponseDto> dtoList = new ArrayList<>();
-    int location =-1;
 
     public NoticeContentFragment() {
     }
@@ -79,12 +76,9 @@ public class NoticeContentFragment extends BaseFragment<FragmentNoticeContentBin
         noticeAdapter = new NoticeAdapter();
         binding.rvNoticeContent.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvNoticeContent.setAdapter(noticeAdapter);
-        noticeAdapter.setOnNoticeClickListener((lister,i,isZk)->{
-            if(!isZk){
+        noticeAdapter.setOnNoticeClickListener((lister, i, isZk) -> {
+            if (isZk) {
                 viewModel.isRead(lister,false,false);
-                location = i;
-            }else{
-                viewModel.isRead(lister,false,true);
             }
         });
         initLiveData();
@@ -97,9 +91,7 @@ public class NoticeContentFragment extends BaseFragment<FragmentNoticeContentBin
                // 标记已读成功后，刷新当前列表
                refreshCurrentList();
            }
-           else if("zk".equals(result)){
-               refrush = true;
-           }else{
+           else if(!"zk".equals(result)){
                ToastUtils.INSTANCE.showShort(requireActivity().getApplicationContext(),result);
            }
             return null;
@@ -145,14 +137,12 @@ public class NoticeContentFragment extends BaseFragment<FragmentNoticeContentBin
                 LiveDataExtKt.observeNonNull(viewModel.getGetMessageXT(),this,result->{
                     LogUtils.INSTANCE.d("xjl","ncf");
                     noticeAdapter.setList(result);
-                    dtoList = result;
                     return null;
                 });
             }
             else if(messageType.equals("ALERT")){
                 LiveDataExtKt.observeNonNull(viewModel.getGetMessageWarn(),this,result->{
                     noticeAdapter.setList(result);
-                    dtoList = result;
                     return null;
                 });
             }
@@ -180,7 +170,10 @@ public class NoticeContentFragment extends BaseFragment<FragmentNoticeContentBin
     private void undateList(List<MessageResponseDto> list) {
         //排序
         List<MessageResponseDto> newList = new ArrayList<>(list);
-        newList.sort(Comparator.comparing(NoticeContentFragment::createdAtString,Comparator.nullsLast(String :: compareTo)).reversed());
+        newList.sort(Comparator.<MessageResponseDto, String>comparing(
+                NoticeContentFragment::createdAtString,
+                Comparator.nullsLast(String::compareTo)
+        ).reversed());
         noticeAdapter.setList(newList);
     }
 
@@ -191,12 +184,4 @@ public class NoticeContentFragment extends BaseFragment<FragmentNoticeContentBin
         return p.getCreatedAt().toString();
     }
 
-    @Override
-    public void onDestroyView() {
-        if(refrush){
-            refreshCurrentList();
-            refrush = false;
-        }
-        super.onDestroyView();
-    }
 }
