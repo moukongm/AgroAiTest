@@ -129,12 +129,12 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
                 if (cropDetail.getPlantingDate() != null) {
                     binding.etPlantDateValue.setText(formatDate(cropDetail.getPlantingDate()));
                 }
-                if (cropDetail.getPestCount() != null) {
-                    binding.tvDiseaseValue.setText(cropDetail.getPestCount() + "次");
-                }
-                if (cropDetail.getMaturityDate() != null) {
-                    binding.etMatureValue.setText(formatDate(cropDetail.getMaturityDate()));
-                }
+//                if (cropDetail.getPestCount() != null) {
+//                    binding.tvDiseaseValue.setText(cropDetail.getPestCount() + "次");
+//                }
+//                if (cropDetail.getMaturityDate() != null) {
+//                    binding.etMatureValue.setText(formatDate(cropDetail.getMaturityDate()));
+//                }
                 saveOriginalData(cropDetail);
             }
         });
@@ -288,7 +288,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
         binding.etPlantNameLabel.setText(originalPlantName != null ? originalPlantName : "");
         setHealthSpinnerSelection(originalStatus);
         binding.etPlantDateValue.setText(formatDate(originalPlantingDate));
-        binding.etMatureValue.setText(formatDate(originalMaturityDate));
+//        binding.etMatureValue.setText(formatDate(originalMaturityDate));
         if (originalImageUrl != null) {
             ImageLoader.INSTANCE.load(binding.ivHeaderBg, originalImageUrl);
         }
@@ -299,16 +299,16 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
         String newName = binding.etPlantNameLabel.getText().toString().trim();
         String newStatus = getHealthSpinnerValue();
         String plantDateStr = binding.etPlantDateValue.getText().toString().trim();
-        String matureDateStr = binding.etMatureValue.getText().toString().trim();
+//        String matureDateStr = binding.etMatureValue.getText().toString().trim();
 
         if (newName.isEmpty()) {
             Toast.makeText(this, "请输入作物名称", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 解析日期（支持 yyyy.MM.dd 或 yyyy-MM-dd 格式）
+        // 当前布局未提供成熟时间编辑入口，保存时沿用原值避免误清空。
         LocalDate plantingDate = parseDate(plantDateStr);
-        LocalDate maturityDate = parseDate(matureDateStr);
+        LocalDate maturityDate = originalMaturityDate;
 
         // 判断是否有修改
         boolean hasChanges = !newName.equals(originalPlantName)
@@ -326,7 +326,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
 
         binding.etPlantNameLabel.clearFocus();
         binding.etPlantDateValue.clearFocus();
-        binding.etMatureValue.clearFocus();
+//        binding.etMatureValue.clearFocus();
     }
 
 
@@ -665,31 +665,26 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
         resetAllButtonStyles();
         if (selectedType != type || selectedState < 0) return;
 
-        switch (type) {
-            case TYPE_WATER:
-                if (selectedState == STATE_COMPLETE) {
-                    setButtonSelected(binding.btnAddWaterDone, true, true);
-                } else {
-                    setButtonSelected(binding.btnAddWaterPending, true, false);
-                }
-                break;
-            case TYPE_FERTILIZE:
-                if (selectedState == STATE_COMPLETE) {
-                    setButtonSelected(binding.btnAddFertilizeDone, true, true);
-                } else {
-                    setButtonSelected(binding.btnAddFertilizePending, true, false);
-                }
-                break;
-            case TYPE_MEDICINE:
-                if (selectedState == STATE_COMPLETE) {
-                    setButtonSelected(binding.btnAddMedicineDone, true, true);
-                } else {
-                    setButtonSelected(binding.btnAddMedicinePending, true, false);
-                }
-                break;
-            case TYPE_NOTE:
-                updateNoteButtonSelection(true);
-                break;
+        if (type == TYPE_WATER) {
+            if (selectedState == STATE_COMPLETE) {
+                setButtonSelected(binding.btnAddWaterDone, true, true);
+            } else {
+                setButtonSelected(binding.btnAddWaterPending, true, false);
+            }
+        } else if (type == TYPE_FERTILIZE) {
+            if (selectedState == STATE_COMPLETE) {
+                setButtonSelected(binding.btnAddFertilizeDone, true, true);
+            } else {
+                setButtonSelected(binding.btnAddFertilizePending, true, false);
+            }
+        } else if (type == TYPE_MEDICINE) {
+            if (selectedState == STATE_COMPLETE) {
+                setButtonSelected(binding.btnAddMedicineDone, true, true);
+            } else {
+                setButtonSelected(binding.btnAddMedicinePending, true, false);
+            }
+        } else if (type == TYPE_NOTE) {
+            updateNoteButtonSelection(true);
         }
     }
 
@@ -779,13 +774,10 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
     }
 
     private String getTagTypeString(int type) {
-        switch (type) {
-            case TYPE_WATER: return "WATERING";
-            case TYPE_FERTILIZE: return "FERTILIZING";
-            case TYPE_MEDICINE: return "MEDICATION";
-            case TYPE_NOTE: return "NOTE";
-            default: return "WATERING";
-        }
+        if (type == TYPE_FERTILIZE) return "FERTILIZING";
+        if (type == TYPE_MEDICINE) return "MEDICATION";
+        if (type == TYPE_NOTE) return "NOTE";
+        return "WATERING";
     }
 
     private int getStatusValue(int state) {

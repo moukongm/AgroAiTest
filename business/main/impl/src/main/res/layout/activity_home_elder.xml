@@ -63,17 +63,17 @@
                         android:layout_height="wrap_content"
                         android:text="你好，"
                         android:textColor="@android:color/white"
-                        android:textSize="28sp" />
+                        android:textSize="24sp" />
 
                     <TextView
                         android:id="@+id/mainpage_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="王建军"
+                        android:text=""
                         android:maxWidth="150dp"
                         android:textColor="@android:color/white"
-                        android:textSize="28sp"
+                        android:textSize="24sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -414,7 +414,7 @@
                         android:layout_marginLeft="75dp"
                         android:layout_marginTop="40dp"
                         android:alpha="0.35"
-                        android:text="共5次识别记录"
+                        android:text=""
                         android:textColor="#000000"
                         android:textSize="15sp" />
                 </androidx.cardview.widget.CardView>
@@ -610,7 +610,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="15dp"
                                 android:gravity="center"
-                                android:text="新建"
+                                android:text=""
                                 android:textAllCaps="false"
                                 android:textColor="@android:color/white"
                                 android:textSize="14sp"

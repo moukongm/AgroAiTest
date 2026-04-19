@@ -138,7 +138,7 @@
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cd_health_status"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:layout_marginEnd="6dp"
                         android:layout_margin="6dp"
@@ -175,7 +175,7 @@
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cd_plant_date"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:layout_marginStart="6dp"
                         android:layout_margin="6dp"
@@ -214,92 +214,92 @@
                 </LinearLayout>
 
                 <!-- 第二行：病害记录 + 成熟时间 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:paddingBottom="10dp"
-                    android:paddingHorizontal="2dp"
-                    android:layout_marginTop="12dp">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingBottom="10dp"-->
+<!--                    android:paddingHorizontal="2dp"-->
+<!--                    android:layout_marginTop="12dp">-->
 
-                    <!-- 病害记录卡片 -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cd_disease_record"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:layout_margin="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        app:cardBackgroundColor="#FFFFFF">
+<!--                    &lt;!&ndash; 病害记录卡片 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/cd_disease_record"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginEnd="6dp"-->
+<!--                        android:layout_margin="6dp"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="#FFFFFF">-->
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="12dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="病害记录"
-                                android:textSize="12sp"
-                                android:textColor="#666666" />
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:padding="12dp">-->
+<!--                            <TextView-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="6dp"-->
+<!--                                android:text="病害记录"-->
+<!--                                android:textSize="12sp"-->
+<!--                                android:textColor="#666666" />-->
 
-                            <TextView
-                                android:id="@+id/tv_disease_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="0次"
-                                android:textSize="14sp"
-                                android:textColor="#0D1814"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
+<!--                            <TextView-->
+<!--                                android:id="@+id/tv_disease_value"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="4dp"-->
+<!--                                android:text=""-->
+<!--                                android:textSize="14sp"-->
+<!--                                android:textColor="#0D1814"-->
+<!--                                android:textStyle="bold" />-->
+<!--                        </LinearLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
 
-                    <!-- 成熟时间卡片 -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cd_mature_time"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="6dp"
-                        android:layout_margin="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        app:cardBackgroundColor="#FFFFFF">
+<!--                    &lt;!&ndash; 成熟时间卡片 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/cd_mature_time"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginStart="6dp"-->
+<!--                        android:layout_margin="6dp"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="#FFFFFF">-->
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="12dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="成熟时间"
-                                android:textSize="12sp"
-                                android:textColor="#666666" />
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:padding="12dp">-->
+<!--                            <TextView-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="6dp"-->
+<!--                                android:text="成熟时间"-->
+<!--                                android:textSize="12sp"-->
+<!--                                android:textColor="#666666" />-->
 
-                            <TextView
-                                android:id="@+id/et_mature_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="60天"
-                                android:textSize="14sp"
-                                android:textColor="#0D1814"
-                                android:textStyle="bold"
-                                android:background="@android:color/transparent"
-                                android:maxLines="1" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
+<!--                            <TextView-->
+<!--                                android:id="@+id/et_mature_value"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="4dp"-->
+<!--                                android:text="60天"-->
+<!--                                android:textSize="14sp"-->
+<!--                                android:textColor="#0D1814"-->
+<!--                                android:textStyle="bold"-->
+<!--                                android:background="@android:color/transparent"-->
+<!--                                android:maxLines="1" />-->
+<!--                        </LinearLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
 
-                </LinearLayout>
+<!--                </LinearLayout>-->
 
             </LinearLayout>
 

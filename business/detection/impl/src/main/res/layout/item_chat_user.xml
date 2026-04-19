@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:maxWidth="270dp"
-            android:text="sdkfjhadsd"
+            android:text=""
             android:textColor="#ffffff"
             android:textSize="15sp">
 

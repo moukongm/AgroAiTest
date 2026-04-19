@@ -82,7 +82,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:maxLines="2"
-                android:text="预计24小我生产安全。"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="13sp"
                 app:layout_constraintLeft_toLeftOf="parent"

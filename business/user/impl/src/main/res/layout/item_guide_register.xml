@@ -10,7 +10,7 @@
         android:id="@+id/chipMelon"
         style="@style/Widget.Chip"
         android:background="@drawable/bg_chip"
-        android:text="黄瓜"
+        android:text=""
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:layout_marginTop="5dp"

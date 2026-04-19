@@ -25,6 +25,24 @@ android {
         }
     }
 
+    signingConfigs {
+        // 适配高德定位SDK的签名配置
+        create("release") {
+            storeFile = file("keystore/my_app.jks")
+            storePassword = "123456"
+            keyAlias = "mt_app_key"
+            keyPassword = "123456"
+        }
+
+        named("debug") {
+            storeFile = file("keystore/my_app.jks")
+            storePassword = "123456"
+            keyAlias = "mt_app_key"
+            keyPassword = "123456"
+        }
+    }
+
+
     buildTypes {
         release {
             isMinifyEnabled = false

@@ -68,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="王建军"
+                        android:text=""
                         android:maxWidth="120dp"
                         android:textColor="@android:color/white"
                         android:textSize="24sp"
@@ -411,8 +411,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="75dp"
+                        android:layout_marginStart="75dp"
                         android:layout_marginTop="15dp"
+                        android:layout_marginEnd="2dp"
                         android:text="识别记录"
                         android:textColor="#373737"
                         android:textSize="17sp"
@@ -422,12 +423,14 @@
                         android:id="@+id/mianpage_cnt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="75dp"
+                        android:layout_marginStart="75dp"
                         android:layout_marginTop="40dp"
+                        android:layout_marginEnd="5dp"
                         android:alpha="0.35"
-                        android:text="共5次识别记录"
+                        android:text=""
                         android:textColor="#000000"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        tools:text="共13次识别记录" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -445,15 +448,16 @@
                     <ImageView
                         android:layout_width="70dp"
                         android:layout_height="70dp"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:layout_marginTop="12dp"
                         android:src="@drawable/ic_main_ai" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="75dp"
+                        android:layout_marginStart="75dp"
                         android:layout_marginTop="15dp"
+                        android:layout_marginEnd="5dp"
                         android:text="AI助手"
                         android:textColor="#373737"
                         android:textSize="17sp"
@@ -462,8 +466,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="75dp"
+                        android:layout_marginStart="75dp"
                         android:layout_marginTop="40dp"
+                        android:layout_marginEnd="5dp"
                         android:alpha="0.35"
                         android:text="询问病虫害难题"
                         android:textColor="#000000"

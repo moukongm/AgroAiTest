@@ -95,7 +95,7 @@ public class SmsLoginFragment extends BaseFragment<FragmentSmsloginBinding> {
 
         viewModel.getSendCodeLiveData().observe(this, response -> {
             if (response != null && response.getCode() == ServiceCode.SUCCESS) {
-                ToastUtils.INSTANCE.showShort(requireContext(), "验证码发送成功:" + response.getMessage());
+//                ToastUtils.INSTANCE.showShort(requireContext(), "验证码发送成功:" + response.getMessage());
             }
         });
 

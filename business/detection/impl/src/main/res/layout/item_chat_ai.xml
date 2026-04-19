@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="防护服复asfdddua放萨达撒旦sfahdjkfhkasdjfhajdsfhkjfasdjhaksdjfhjhsadfjkfhasjkdfhakjsdfhkajsdfhkajsdfhaskdjfhak合管"
+            android:text=""
             android:maxWidth="270dp"
             android:textColor="#333333"
             android:textSize="15sp"

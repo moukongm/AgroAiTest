@@ -153,7 +153,7 @@
                             android:gravity="center"
                             android:textSize="15sp"
                             android:paddingHorizontal="16dp"
-                            android:text="炭疽病"
+                            android:text=""
                             android:textColor="#FFFFFF" />
 
                         <!-- 置信度 -->
@@ -164,7 +164,7 @@
                             android:layout_gravity="end|top"
                             android:background="@drawable/bg_result_binggailv"
                             android:gravity="center"
-                            android:text="80%"
+                            android:text=""
                             android:textColor="#FFF"
                             android:textSize="10sp" />
                     </FrameLayout>
@@ -188,7 +188,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginTop="8dp"
                         android:lineHeight="25dp"
-                        android:text="1. 清：清病株深埋，轮作豆/花生2-3年。\n2. 管：合理密植，少氮多磷钾，雨后排水。\n3. 药：发病初期喷咪鲜胺/丙环唑，7-10天一次。"
+                        android:text=""
                         android:textColor="#555"
                         android:textSize="14sp" />
 
