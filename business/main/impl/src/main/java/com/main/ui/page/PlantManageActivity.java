@@ -2,12 +2,15 @@ package com.main.ui.page;
 
 import android.app.AlertDialog;
 import android.net.Uri;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.common.base.BaseActivity;
@@ -50,6 +53,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
     private int selectedState = -1;
 
     private static final int[] TAB_IDS = { R.id.tab_water, R.id.tab_fertilize, R.id.tab_medicine, R.id.tab_note };
+    private int toolbarBaseHeight = -1;
 
     @Override
     public ActivityPlantManageBinding getViewBinding() {
@@ -73,7 +77,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
     }
 
     private void setupHealthSpinner() {
-        binding.tvHealthStatus.setOnClickListener(v -> {
+        binding.cdHealthStatus.setOnClickListener(v -> {
             showHealthStatusDialog();
             enterEditMode();
         });
@@ -235,6 +239,8 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
     }
 
     private void setupToolbar() {
+        applyToolbarInsets();
+
         binding.ivBack.setOnClickListener(v -> {
             if (isEditMode) {
                 cancelEditMode();
@@ -275,6 +281,53 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
 
     }
 
+    private void applyToolbarInsets() {
+        if (toolbarBaseHeight <= 0) {
+            toolbarBaseHeight = resolveActionBarSize();
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar, (view, windowInsets) -> {
+            int statusBarInset = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            android.view.ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+            if (layoutParams != null) {
+                layoutParams.height = toolbarBaseHeight + statusBarInset;
+                view.setLayoutParams(layoutParams);
+            }
+            return windowInsets;
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(binding.flBackContainer, (view, windowInsets) -> {
+            int statusBarInset = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams layoutParams =
+                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) view.getLayoutParams();
+            if (layoutParams != null) {
+                layoutParams.topMargin = statusBarInset + dpToPx(8);
+                view.setLayoutParams(layoutParams);
+            }
+            return windowInsets;
+        });
+        ViewCompat.requestApplyInsets(binding.toolbar);
+        ViewCompat.requestApplyInsets(binding.flBackContainer);
+    }
+
+    private int resolveActionBarSize() {
+        TypedValue typedValue = new TypedValue();
+        if (getTheme().resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typedValue, true)) {
+            return TypedValue.complexToDimensionPixelSize(typedValue.data, getResources().getDisplayMetrics());
+        }
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                56,
+                getResources().getDisplayMetrics()
+        );
+    }
+
+    private int dpToPx(int dp) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                getResources().getDisplayMetrics()
+        );
+    }
+
     private void enterEditMode() {
         if (!isEditMode) {
             isEditMode = true;
@@ -306,15 +359,13 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
             return;
         }
 
-        // 当前布局未提供成熟时间编辑入口，保存时沿用原值避免误清空。
+        // 解析日期（支持 yyyy.MM.dd 或 yyyy-MM-dd 格式）
         LocalDate plantingDate = parseDate(plantDateStr);
-        LocalDate maturityDate = originalMaturityDate;
 
         // 判断是否有修改
         boolean hasChanges = !newName.equals(originalPlantName)
                 || !newStatus.equals(originalStatus)
                 || !java.util.Objects.equals(plantingDate, originalPlantingDate)
-                || !java.util.Objects.equals(maturityDate, originalMaturityDate)
                 || selectedImageUri != null;
 
         if (!hasChanges) {
@@ -322,7 +373,7 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
             return;
         }
 
-        viewModel.updateCropWithImage(this, plantId, selectedImageUri, newName, newStatus, plantingDate, maturityDate);
+        viewModel.updateCropWithImage(this, plantId, selectedImageUri, newName, newStatus, plantingDate, originalMaturityDate);
 
         binding.etPlantNameLabel.clearFocus();
         binding.etPlantDateValue.clearFocus();
@@ -774,9 +825,15 @@ public class PlantManageActivity extends BaseActivity<ActivityPlantManageBinding
     }
 
     private String getTagTypeString(int type) {
-        if (type == TYPE_FERTILIZE) return "FERTILIZING";
-        if (type == TYPE_MEDICINE) return "MEDICATION";
-        if (type == TYPE_NOTE) return "NOTE";
+        if (type == TYPE_WATER) {
+            return "WATERING";
+        } else if (type == TYPE_FERTILIZE) {
+            return "FERTILIZING";
+        } else if (type == TYPE_MEDICINE) {
+            return "MEDICATION";
+        } else if (type == TYPE_NOTE) {
+            return "NOTE";
+        }
         return "WATERING";
     }
 

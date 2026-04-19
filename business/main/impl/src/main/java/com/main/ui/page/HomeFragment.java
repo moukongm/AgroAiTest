@@ -209,12 +209,16 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
                     .build(RouterPath.PLANT_ADD_ACTIVITY)
                     .navigation(requireActivity(), REQUEST_PLANT_ADD);
         });
-        binding.mainpagePlaceArrow.setOnClickListener(v -> {
+        View.OnClickListener citySelectorClickListener = v -> {
             LogUtils.INSTANCE.d("dfghjk","HomeActivity");
             ARouter.getInstance()
                     .build(RouterPath.CITY_SELECTOR_ACTIVITY)
                     .navigation(requireActivity());
-        });
+        };
+        binding.mainpagePlaceContainer.setOnClickListener(citySelectorClickListener);
+        binding.mainpagePlaceArrow.setOnClickListener(citySelectorClickListener);
+        binding.mainpagePlacename.setOnClickListener(citySelectorClickListener);
+        binding.mainpageLocal.setOnClickListener(citySelectorClickListener);
 
         binding.mainpageWarningRight.setOnClickListener(v -> {
             binding.mainpageWarningRight.setVisibility(View.GONE);

@@ -136,38 +136,45 @@
 
 
 
-                <ImageView
-                    android:id="@+id/mainpage_local"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:alpha="0.92"
-                    android:layout_marginEnd="6dp"
-                    android:src="@drawable/ic_main_dingwei"
-                    app:layout_constraintEnd_toStartOf="@+id/mainpage_placename"
-                    app:layout_constraintTop_toBottomOf="@+id/mainpage_head" />
-
-                <TextView
-                    android:id="@+id/mainpage_placename"
+                <LinearLayout
+                    android:id="@+id/mainpage_place_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:text="杭州"
-                    android:layout_marginTop="3dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    app:layout_constraintTop_toBottomOf="@+id/mainpage_head"
-                    app:layout_constraintEnd_toStartOf="@+id/mainpage_place_arrow"
-                 />
-
-                <ImageView
-                    android:id="@+id/mainpage_place_arrow"
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_main_dingweixuan"
+                    android:gravity="center_vertical"
+                    android:minHeight="40dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="4dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="6dp"
                     app:layout_constraintEnd_toEndOf="@+id/guideline_content_end"
-                    app:layout_constraintTop_toBottomOf="@+id/mainpage_head" />
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_head">
+
+                    <ImageView
+                        android:id="@+id/mainpage_local"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:alpha="0.92"
+                        android:src="@drawable/ic_main_dingwei" />
+
+                    <TextView
+                        android:id="@+id/mainpage_placename"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="杭州"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp" />
+
+                    <ImageView
+                        android:id="@+id/mainpage_place_arrow"
+                        android:layout_width="20dp"
+                        android:layout_height="15dp"
+                        android:layout_marginStart="6dp"
+                        android:src="@drawable/ic_main_dingweixuan" />
+                </LinearLayout>
 
                 <!-- 天气图标：紧挨「晴」字右侧偏上，不要约束到屏幕右缘（否则会落到竹叶上） -->
                 <ImageView

@@ -75,11 +75,15 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
         binding.recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recycler.setAdapter(cropAdapter);
 
-        binding.mainpagePlaceArrow.setOnClickListener(v -> {
+        View.OnClickListener citySelectorClickListener = v -> {
             ARouter.getInstance()
                     .build(RouterPath.CITY_SELECTOR_ACTIVITY)
                     .navigation(requireActivity());
-        });
+        };
+        binding.mainpagePlaceContainer.setOnClickListener(citySelectorClickListener);
+        binding.mainpagePlaceArrow.setOnClickListener(citySelectorClickListener);
+        binding.mainpagePlacename.setOnClickListener(citySelectorClickListener);
+        binding.mainpageLocal.setOnClickListener(citySelectorClickListener);
 
 
         binding.mainpageAi.setOnClickListener(v -> {

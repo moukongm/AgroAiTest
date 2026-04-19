@@ -67,9 +67,9 @@
                         android:id="@+id/mainpage_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:maxWidth="120dp"
                         android:maxLines="1"
                         android:text=""
-                        android:maxWidth="120dp"
                         android:textColor="@android:color/white"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -87,44 +87,51 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/mainpage_hello" />
 
-                <ImageView
-                    android:id="@+id/mainpage_local"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="5dp"
-                    android:alpha="0.92"
-                    android:src="@drawable/ic_main_dingwei"
-                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
-                    app:layout_constraintTop_toBottomOf="@+id/mainpage_header_decoration" />
-
-                <TextView
-                    android:id="@+id/mainpage_placename"
+                <LinearLayout
+                    android:id="@+id/mainpage_place_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:text="杭州"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/mainpage_local"
-                    app:layout_constraintStart_toEndOf="@+id/mainpage_local"
-                    app:layout_constraintTop_toTopOf="@+id/mainpage_local" />
+                    android:layout_marginStart="5dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="32dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="4dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
+                    app:layout_constraintTop_toBottomOf="@+id/mainpage_header_decoration">
 
-                <ImageView
-                    android:id="@+id/mainpage_place_arrow"
-                    android:layout_width="13dp"
-                    android:layout_height="10dp"
-                    android:layout_marginStart="4dp"
-                    android:src="@drawable/ic_main_dingweixuan"
-                    app:layout_constraintBottom_toBottomOf="@+id/mainpage_placename"
-                    app:layout_constraintStart_toEndOf="@+id/mainpage_placename"
-                    app:layout_constraintTop_toTopOf="@+id/mainpage_placename" />
+                    <ImageView
+                        android:id="@+id/mainpage_local"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:alpha="0.92"
+                        android:src="@drawable/ic_main_dingwei" />
+
+                    <TextView
+                        android:id="@+id/mainpage_placename"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="杭州"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/mainpage_place_arrow"
+                        android:layout_width="13dp"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/ic_main_dingweixuan" />
+                </LinearLayout>
 
                 <androidx.constraintlayout.widget.Barrier
                     android:id="@+id/barrier_header_bottom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:barrierDirection="bottom"
-                    app:constraint_referenced_ids="mainpage_hello,mainpage_local,mainpage_placename,mainpage_place_arrow,mainpage_header_decoration" />
+                    app:constraint_referenced_ids="mainpage_hello,mainpage_place_container,mainpage_header_decoration" />
 
                 <!-- 竹叶：向上延伸到预警卡片顶边（紧贴预警边框），宽度屏宽45%，无高度上限 -->
                 <ImageView
@@ -330,10 +337,10 @@
                             android:layout_height="13dp"
                             android:layout_marginLeft="20dp"
                             android:layout_marginBottom="10dp"
-                            android:visibility="gone"
                             android:background="@drawable/ic_historynotice"
                             android:textColor="@android:color/black"
                             android:textSize="13sp"
+                            android:visibility="gone"
 
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"

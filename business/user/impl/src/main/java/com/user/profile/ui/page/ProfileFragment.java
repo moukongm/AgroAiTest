@@ -3,6 +3,7 @@ package com.user.profile.ui.page;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.SystemClock;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.common.utils.FileUtils;
 import com.common.utils.ImageLoader;
 import com.common.utils.LiveDataExtKt;
 import com.common.utils.LogUtils;
+import com.common.utils.ToastUtils;
 import com.user.databinding.ActivityProfileBinding;
 import com.user.profile.ui.adapters.MinePostAdapter;
 import com.user.profile.viewmodel.ProfileViewModel;
@@ -33,12 +35,16 @@ import java.util.List;
 
 @Route(path = RouterPath.USER_PROFILE_ACTIVITY)
 public class ProfileFragment extends BaseFragment<ActivityProfileBinding> {
+    private static final int DEBUG_ENTRY_REQUIRED_TAPS = 5;
+    private static final long DEBUG_ENTRY_TAP_INTERVAL_MS = 1000L;
 
     private ProfileViewModel viewModel;
     private MinePostAdapter postAdapter;
     ActivityProfileBinding binding;
     List<PostResponseDto> list = new ArrayList<>();
     Boolean needRefresh = false;
+    private int userHeadTapCount = 0;
+    private long lastUserHeadTapTime = 0L;
 
     @NonNull
     @Override
@@ -69,6 +75,7 @@ public class ProfileFragment extends BaseFragment<ActivityProfileBinding> {
                     .build(RouterPath.USER_EDIT_PROFILE_ACTIVITY)
                     .navigation();
         });
+        binding.cvUserHead.setOnClickListener(v -> handleUserHeadMultiTap());
 
         binding.userFanscnt.setOnClickListener(v -> {
             ARouter.getInstance().build(RouterPath.USER_FAVORITE_POST_ACTIVITY).navigation();
@@ -212,6 +219,26 @@ public class ProfileFragment extends BaseFragment<ActivityProfileBinding> {
                     }
                 });
     }
+
+    private void handleUserHeadMultiTap() {
+        long now = SystemClock.elapsedRealtime();
+        if (now - lastUserHeadTapTime > DEBUG_ENTRY_TAP_INTERVAL_MS) {
+            userHeadTapCount = 0;
+        }
+        lastUserHeadTapTime = now;
+        userHeadTapCount++;
+        if (userHeadTapCount < DEBUG_ENTRY_REQUIRED_TAPS) {
+            return;
+        }
+        userHeadTapCount = 0;
+        lastUserHeadTapTime = 0L;
+        if (!isAdded()) {
+            return;
+        }
+        ToastUtils.INSTANCE.showShort(requireContext(), "已进入调试页");
+        ARouter.getInstance().build(RouterPath.DEBUG_DEMO_ACTIVITY).navigation();
+    }
+
 
     @Override
     public void initData() {

@@ -171,13 +171,15 @@ public class AIMainFragment extends BaseFragment<FragmentAiMainBinding> {
 
         //切换到豆包语音页
 
-        binding.navIcon3.setOnClickListener(v->{
+        View.OnClickListener speechPageClickListener = v -> {
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .addToBackStack(null)
                     .replace(R.id.fl_ai, new SpeechFragment())
                     .commit();
-        });
+        };
+        binding.navIcon3.setOnClickListener(speechPageClickListener);
+        binding.navItem3.setOnClickListener(speechPageClickListener);
         binding.btnSendMore.setOnClickListener(v->{
             hideKeyboard();
 //           if(hideKeyboard()){

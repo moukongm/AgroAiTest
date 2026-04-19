@@ -80,7 +80,7 @@ public class SmsLoginFragment extends BaseFragment<FragmentSmsloginBinding> {
         viewModel.getLoginResultLiveData().observe(this, response -> {
             if (response != null && response.getCode() == ServiceCode.SUCCESS) {
                 ToastUtils.INSTANCE.showShort(requireContext(), "登录成功:" + response.getMessage());
-                ToastUtils.INSTANCE.showShort(requireContext(), "默认密码为:" + response.getData().getGeneratedPassword());
+//                ToastUtils.INSTANCE.showShort(requireContext(), "默认密码为:" + response.getData().getGeneratedPassword());
                 handleLoginSuccess();
             }
         });

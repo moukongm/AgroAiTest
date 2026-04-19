@@ -11,17 +11,20 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:background="@android:color/transparent"
+        android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentScrim="@android:color/transparent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="#01CFAC"
             app:expandedTitleGravity="bottom|center_horizontal"
             app:expandedTitleMarginBottom="48dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:statusBarScrim="#01CFAC">
 
             <!-- 顶部背景图片区域 -->
             <ImageView
@@ -50,30 +53,32 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:fitsSystemWindows="true"
                 app:layout_collapseMode="pin"
                 app:contentInsetStart="0dp"
-                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_marginStart="16dp">
-
-                    <ImageView
-                        android:id="@+id/iv_back"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_circle_back"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_main_back" />
-                </FrameLayout>
-
-            </androidx.appcompat.widget.Toolbar>
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_back_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="top|start"
+        android:elevation="12dp">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_back"
+            android:padding="8dp"
+            android:src="@drawable/ic_main_back" />
+    </FrameLayout>
 
     <!-- 内容区域 -->
     <androidx.core.widget.NestedScrollView
@@ -196,7 +201,7 @@
                                 android:textSize="12sp"
                                 android:textColor="#666666" />
 
-                            <EditText
+                            <TextView
                                 android:id="@+id/et_plant_date_value"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

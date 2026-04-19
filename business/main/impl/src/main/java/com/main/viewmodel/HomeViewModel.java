@@ -330,6 +330,7 @@ public class HomeViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         response -> {
+                            LogUtils.INSTANCE.d("warn_sunwenyu", response.toString());
                             if (response.getCode() == ServiceCode.SUCCESS) {
                                 PageResultMessageResponseDto data = response.getData();
                                 MessageResponseDto messageResponseDto = null;
