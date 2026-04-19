@@ -10,7 +10,7 @@
         android:layout_width="48dp"
         android:layout_height="match_parent"
         android:padding="12dp"
-        android:src="@drawable/ic_etp_back"
+        android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView

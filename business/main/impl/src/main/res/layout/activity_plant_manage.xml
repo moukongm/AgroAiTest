@@ -19,12 +19,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="#01CFAC"
+            app:contentScrim="#01CFAC" 
             app:expandedTitleGravity="bottom|center_horizontal"
             app:expandedTitleMarginBottom="48dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:statusBarScrim="#01CFAC">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <!-- 顶部背景图片区域 -->
             <ImageView
