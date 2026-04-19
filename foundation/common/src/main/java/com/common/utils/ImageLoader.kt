@@ -19,7 +19,23 @@ object ImageLoader {
      */
     fun load(imageView: ImageView, url: String?) {
         imageView.load(url) {
-            crossfade(true) // 开启淡入淡出动画
+            crossfade(true)
+        }
+    }
+
+    /**
+     * 加载普通图片（带占位图）
+     *
+     * @param imageView 目标 ImageView
+     * @param url 图片链接
+     * @param placeholderResId 占位图资源 ID
+     * @param errorResId 错误图资源 ID
+     */
+    fun load(imageView: ImageView, url: String?, placeholderResId: Int, errorResId: Int) {
+        imageView.load(url) {
+            crossfade(true)
+            placeholder(placeholderResId)
+            error(errorResId)
         }
     }
 

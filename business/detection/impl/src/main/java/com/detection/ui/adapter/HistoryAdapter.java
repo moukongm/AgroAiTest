@@ -76,7 +76,7 @@ public class HistoryAdapter extends BaseBindingMultiAdapter<HistoryItem> {
                 // 封面图
                 String image = chatHistory.getImageUrl();
                 if (image != null && !image.isEmpty()) {
-                    ImageLoader.INSTANCE.load(b.ivStarPostCover, image);
+                    ImageLoader.INSTANCE.load(b.ivStarPostCover, image, R.drawable.bg_cover_loading, R.drawable.im_history_shili);
                 } else {
                     b.ivStarPostCover.setImageResource(R.drawable.im_history_shili);
                 }

@@ -117,7 +117,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="15dp"
                 android:layout_marginTop="10dp"
-                android:src="@drawable/ic_main_shouqixiangxi"
+                android:src="@drawable/ic_shouqixiangxi"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@+id/tv_warnning"
                 app:layout_constraintBottom_toBottomOf="parent"

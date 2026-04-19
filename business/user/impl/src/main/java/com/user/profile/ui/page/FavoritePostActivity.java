@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.agri.pest.client.model.response.PostResponseDto;
@@ -58,7 +58,17 @@ public class FavoritePostActivity extends BaseActivity<FragmentStarProfileBindin
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
         starAdapter = new StarFavoriteMultiAdapter();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                StarFavoriteMutiItem item = starAdapter.getItem(position);
+                if (item != null && item.getItemType() == StarFavoriteMutiItem.TYPE_DATE) {
+                    return 2; // 日期项跨两列
+                }
+                return 1; // 帖子项占一列
+            }
+        });
         binding.rvStarPosts.setLayoutManager(layoutManager);
         binding.rvStarPosts.setAdapter(starAdapter);
 
@@ -88,7 +98,7 @@ public class FavoritePostActivity extends BaseActivity<FragmentStarProfileBindin
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                LinearLayoutManager lm = (LinearLayoutManager) recyclerView.getLayoutManager();
+                GridLayoutManager lm = (GridLayoutManager) recyclerView.getLayoutManager();
                 if (lm == null) {
                     return;
                 }

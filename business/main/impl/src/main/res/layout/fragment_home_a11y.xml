@@ -303,7 +303,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginRight="20dp"
                             android:layout_marginBottom="15dp"
-                            android:src="@drawable/ic_main_shouqixiangxi"
+                            android:src="@drawable/ic_shouqixiangxi"
                             android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
