@@ -8,10 +8,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 
 import com.agri.pest.client.model.response.PostResponseDto;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.common.utils.ImageLoader;
 import com.common.utils.LogUtils;
 import com.uikit.base.BaseBindingAdapter;
 import com.user.databinding.ItemMainpPostBinding;
+import com.user.databinding.ItemMainpPostElderBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,7 +25,13 @@ import java.util.TimeZone;
 
 public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMainpPostBinding> {
 
-    private final LinearSnapHelper snapHelper = new LinearSnapHelper();
+    private OnImageClickListener imageClickListener;
+    public interface OnImageClickListener {
+        void onImageClick(Long id);
+    }
+    public void setOnImageClickListener(OnImageClickListener listener) {
+        this.imageClickListener = listener;
+    }
 
     public MinePostAdapter() {
         super(0, null);
@@ -55,8 +64,17 @@ public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMai
         PostAvatarAdapter avatarAdapter = new PostAvatarAdapter();
         if (binding.recycler.getLayoutManager() == null) {
             binding.recycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext(), LinearLayoutManager.HORIZONTAL, false));
-            snapHelper.attachToRecyclerView(binding.recycler);
+
         }
+
+        avatarAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                if (imageClickListener != null) {
+                    imageClickListener.onImageClick(item.getId());
+                }
+            }
+        });
         binding.recycler.setAdapter(avatarAdapter);
         List<String> imageUrls = item.getImages();
         LogUtils.INSTANCE.d("ljxandxzr",item.getId() +"");
@@ -68,19 +86,6 @@ public class MinePostAdapter extends BaseBindingAdapter<PostResponseDto, ItemMai
 
         int favCount = item.getFavoriteCount();
         binding.tvPostSaveCount.setText(favCount > 0 ? "+" + favCount + "收藏" : "0收藏");
-        if(favCount == 0){
-            binding.ivSaveAvatar1.setVisibility(View.GONE);
-            binding.ivSaveAvatar2.setVisibility(View.GONE);
-        } else if (favCount == 1) {
-            //后端没给返回的字段；
-//            ImageLoader.INSTANCE.loadCircle(binding.ivSaveAvatar1,);
-            binding.ivSaveAvatar2.setVisibility(View.GONE);
-        }
-        else{
-            binding.ivSaveAvatar1.setVisibility(View.VISIBLE);
-            binding.ivSaveAvatar2.setVisibility(View.VISIBLE);
-        }
-
         binding.tvPostTime.setText(formatTimeAgo(item.getCreatedAt().toString()));
     }
 

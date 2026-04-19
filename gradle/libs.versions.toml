@@ -19,13 +19,19 @@ arouterCompiler = "1.5.2"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
 gson = "2.10.1"
-agriPestSdkVersion = "v1.0.108"
+agriPestSdkVersion = "v1.0.110"
+
+# markwon
+markwon = "4.6.2"
 
 # Image Loading
 coil = "2.6.0"
 
 # camera
 camerax = "1.3.0"
+
+# location
+location = "11.1.000"
 
 # RxJava
 rxjava = "3.1.8"
@@ -56,9 +62,15 @@ leakcanary = "2.13"
 # Voice
 speechengine = "0.0.14.1-bugfix"
 
+# TensorFlow Lite
+tflite = "2.16.1"
+tfliteSupport = "0.4.4"
+
 # Blur
 blurview = "version-2.0.6"
 
+# huanghaibin CalendarView (从Maven Central获取)
+calendarViewVersion = "3.7.1"
 
 [libraries]
 # Android Core
@@ -77,6 +89,12 @@ androidx-viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", vers
 arouter-api = { group = "com.alibaba", name = "arouter-api", version.ref = "arouterApi" }
 arouter-compiler = { group = "com.alibaba", name = "arouter-compiler", version.ref = "arouterCompiler" }
 
+# TensorFlow Lite
+tflite-core = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tflite" }
+tflite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tfliteSupport" }
+tflite-gpu = { group = "org.tensorflow", name = "tensorflow-lite-gpu", version.ref = "tflite" }
+tflite-select-tf-ops = { group = "org.tensorflow", name = "tensorflow-lite-select-tf-ops", version.ref = "tflite" }
+
 # Network
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
@@ -86,9 +104,16 @@ okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-i
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 agriPestSdk = { group = "com.github.lukecc00", name = "AgriPest-Android-SDK", version.ref = "agriPestSdkVersion" }
 
+#markwon
+markwon-core = {group = "io.noties.markwon" ,name = "core", version.ref = "markwon"}
+markwon-highlight = {group = "io.noties.markwon" ,name = "syntax-highlight", version.ref = "markwon"}
+markwon-html = {group = "io.noties.markwon" ,name = "html", version.ref = "markwon"}
 
 # Image Loading
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+
+#Location
+location = {group = "com.amap.api", name = "location",version.ref ="location" }
 
 #camera
 camerax-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
@@ -128,7 +153,11 @@ leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-and
 # Voice
 speechengine-tob = { group = "com.bytedance.speechengine", name = "speechengine_tob", version.ref = "speechengine" }
 
+
 blurview = { group = "com.github.Dimezis", name = "BlurView", version.ref = "blurview" }
+
+# huanghaibin CalendarView (从Maven Central获取)
+calendarview = { group = "com.haibin", name = "calendarview", version.ref = "calendarViewVersion" }
 
 
 [plugins]

@@ -5,9 +5,11 @@ import android.util.Log
 import com.bytedance.speech.speechengine.SpeechEngine
 import com.bytedance.speech.speechengine.SpeechEngineDefines
 import com.bytedance.speech.speechengine.SpeechEngineGenerator
+import java.io.File
 
 object SpeechManager {
     private const val TAG = "SpeechManager"
+    private const val AEC_MODEL_ASSET_NAME = "aec.model"
     private var engine: SpeechEngine? = null
     private lateinit var application: Application
 
@@ -70,9 +72,19 @@ object SpeechManager {
         // 【关键】告知引擎：自动连接并启动会话
         // speechEngine.setOptionBoolean("dialog_enable_auto_connection", true)
         // speechEngine.setOptionBoolean("dialog_enable_auto_session", true)
-        
-        // 开启回声消除 (AEC)
-        speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL, false)
+
+        val aecModelPath = ensureAecModelPath()
+        if (aecModelPath != null) {
+            speechEngine.setOptionString(
+                SpeechEngineDefines.PARAMS_KEY_AEC_MODEL_PATH_STRING,
+                aecModelPath
+            )
+            speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL, true)
+            Log.i(TAG, "AEC enabled with model path: $aecModelPath")
+        } else {
+            speechEngine.setOptionBoolean(SpeechEngineDefines.PARAMS_KEY_ENABLE_AEC_BOOL, false)
+            Log.w(TAG, "AEC model unavailable, keep AEC disabled")
+        }
         
         // 初始化引擎
         val ret = speechEngine.initEngine()
@@ -83,5 +95,34 @@ object SpeechManager {
     
     fun getEngine(): SpeechEngine? {
         return engine
+    }
+
+    private fun ensureAecModelPath(): String? {
+        return try {
+            val targetDir = File(application.filesDir, "speech_models")
+            if (!targetDir.exists() && !targetDir.mkdirs()) {
+                Log.e(TAG, "Failed to create speech model directory: ${targetDir.absolutePath}")
+                return null
+            }
+
+            val targetFile = File(targetDir, AEC_MODEL_ASSET_NAME)
+            val shouldRewrite = !targetFile.exists() || targetFile.length() == 0L
+            if (shouldRewrite) {
+                application.assets.open(AEC_MODEL_ASSET_NAME).use { input ->
+                    targetFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            }
+
+            if (targetFile.exists() && targetFile.length() > 0L) {
+                targetFile.absolutePath
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Prepare aec.model failed", e)
+            null
+        }
     }
 }

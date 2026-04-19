@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.agri.pest.client.model.response.CommentResponseDto;
 import com.agri.pest.client.model.response.PostResponseDto;
 import com.common.base.BaseViewModel;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.community.data.CommunityRepository;
 
 import java.util.List;
@@ -164,6 +166,7 @@ public class PostDetailViewModel extends BaseViewModel {
                     collectLoadingLiveData.setValue(false);
                     if (success) {
                         refreshPost(postId);
+                        LiveDataBus.getInstance().with(BusKey.COLLECT).setValue(true);
                     }
                 }, e -> {
                     collectLoadingLiveData.setValue(false);
@@ -181,6 +184,7 @@ public class PostDetailViewModel extends BaseViewModel {
                     collectLoadingLiveData.setValue(false);
                     if (success) {
                         refreshPost(postId);
+                        LiveDataBus.getInstance().with(BusKey.COLLECT).setValue(true);
                     }
                 }, e -> {
                     collectLoadingLiveData.setValue(false);
@@ -199,7 +203,6 @@ public class PostDetailViewModel extends BaseViewModel {
                 }, e -> {});
         addDisposable(d);
     }
-
     public MutableLiveData<PostResponseDto> getPostLiveData() {
         return postLiveData;
     }

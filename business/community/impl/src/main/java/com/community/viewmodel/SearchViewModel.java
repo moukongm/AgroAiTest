@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.common.base.BaseViewModel;
 import com.common.storage.database.SearchHistoryRecord;
 import com.community.data.SearchRepository;
+import com.agri.pest.client.model.response.PostResponseDto;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -32,6 +33,29 @@ public class SearchViewModel extends BaseViewModel {
     public LiveData<List<String>> getHistoryLiveData() {
         return historyLiveData;
     }
+
+    private final MutableLiveData<List<PostResponseDto>> searchResultsLiveData =
+            new MutableLiveData<>();
+    public LiveData<List<PostResponseDto>> getSearchResultsLiveData() {
+        return searchResultsLiveData;
+    }
+
+    private final MutableLiveData<Boolean> searchLoadingLiveData =
+            new MutableLiveData<>(false);
+    public LiveData<Boolean> getSearchLoadingLiveData() {
+        return searchLoadingLiveData;
+    }
+
+    private final MutableLiveData<Boolean> hasMoreSearchResultsLiveData =
+            new MutableLiveData<>(true);
+    public LiveData<Boolean> getHasMoreSearchResultsLiveData() {
+        return hasMoreSearchResultsLiveData;
+    }
+
+    private String currentSearchQuery;
+    private int currentSearchPage = 0;
+    private static final int SEARCH_PAGE_SIZE = 10;
+    private List<PostResponseDto> currentSearchPosts;
     private SearchRepository repository;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -103,6 +127,62 @@ public class SearchViewModel extends BaseViewModel {
                         .subscribe(this::loadHistory, Throwable::printStackTrace)
         );
     }
+
+    public void searchPosts(String query) {
+        if (query == null || query.trim().isEmpty()) return;
+        currentSearchQuery = query.trim();
+        currentSearchPage = 0;
+        searchLoadingLiveData.setValue(true);
+
+        disposables.add(
+                repository.searchPosts(currentSearchQuery, currentSearchPage, SEARCH_PAGE_SIZE)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(posts -> {
+                            searchLoadingLiveData.setValue(false);
+                            currentSearchPosts = posts;
+                            searchResultsLiveData.setValue(posts);
+                            hasMoreSearchResultsLiveData.setValue(
+                                    posts != null && !posts.isEmpty() && posts.size() >= SEARCH_PAGE_SIZE);
+                        }, throwable -> {
+                            searchLoadingLiveData.setValue(false);
+                            throwable.printStackTrace();
+                            searchResultsLiveData.setValue(Collections.emptyList());
+                        })
+        );
+    }
+
+    public void loadMoreSearchResults() {
+        if (Boolean.TRUE.equals(searchLoadingLiveData.getValue()) ||
+                !Boolean.TRUE.equals(hasMoreSearchResultsLiveData.getValue())) {
+            return;
+        }
+        currentSearchPage++;
+        searchLoadingLiveData.setValue(true);
+
+        disposables.add(
+                repository.searchPosts(currentSearchQuery, currentSearchPage, SEARCH_PAGE_SIZE)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(posts -> {
+                            searchLoadingLiveData.setValue(false);
+                            if (posts != null && !posts.isEmpty()) {
+                                if (currentSearchPosts == null) {
+                                    currentSearchPosts = posts;
+                                } else {
+                                    currentSearchPosts.addAll(posts);
+                                }
+                                searchResultsLiveData.setValue(currentSearchPosts);
+                            }
+                            hasMoreSearchResultsLiveData.setValue(
+                                    posts != null && !posts.isEmpty() && posts.size() >= SEARCH_PAGE_SIZE);
+                        }, throwable -> {
+                            searchLoadingLiveData.setValue(false);
+                            currentSearchPage--;
+                            throwable.printStackTrace();
+                        })
+        );
+    }
     public void clearHistory() {
         disposables.add(
                 repository.clearHistory()
@@ -114,6 +194,23 @@ public class SearchViewModel extends BaseViewModel {
                         )
         );
     }
+    public void refreshSearchResults() {
+        if (currentSearchPosts == null || currentSearchPosts.isEmpty()) {
+            return;
+        }
+        disposables.add(
+                repository.searchPosts(currentSearchQuery, 0, currentSearchPosts.size())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(posts -> {
+                            if (posts != null && !posts.isEmpty()) {
+                                currentSearchPosts = posts;
+                                searchResultsLiveData.setValue(currentSearchPosts);
+                            }
+                        }, throwable -> {})
+        );
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();

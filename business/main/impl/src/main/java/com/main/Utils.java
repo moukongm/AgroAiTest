@@ -55,10 +55,15 @@ public class Utils {
         }
     }
     public static int handleicon(String s){
-        if(s==null){
+        if(s == null || s.isEmpty()){
             return R.drawable.ic_weather_unknown;
         }
-        int l = Integer.parseInt(s);
+        int l;
+        try {
+            l = Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return R.drawable.ic_weather_unknown;
+        }
         switch (l){
             case 100:
                 return R.drawable.ic_weather_sunny;

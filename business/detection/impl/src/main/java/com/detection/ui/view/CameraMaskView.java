@@ -41,10 +41,7 @@ public class CameraMaskView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        BlurView blurView = findViewById(R.id.blur_view);
-//        View decorView = getWindow().getDecorView();
-//
-//        blurView.setupWith(decorView, new CompositeBlur(this));
+
 
         int w = getWidth();
         int h = getHeight();

@@ -37,7 +37,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    configurations.all {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
 }
+
 
 dependencies {
     implementation(project(":foundation:common"))
@@ -52,6 +56,12 @@ dependencies {
     implementation(project(":business:user:api"))
 
 
+    //markdon
+    implementation(libs.markwon.core)
+    implementation(libs.markwon.highlight)
+    implementation(libs.markwon.html)
+
+
     // CameraX
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
@@ -60,5 +70,16 @@ dependencies {
     // BlurView
     implementation(libs.blurview)
 
+    implementation(libs.tflite.core)
+    implementation(libs.tflite.support)
+
+    // 可选：GPU 加速（如果设备支持）
+    implementation(libs.tflite.gpu)
+
+    // 可选：Select TF Ops（某些模型需要）
+    implementation(libs.tflite.select.tf.ops)
+
+
     kapt(libs.arouter.compiler)
 }
+

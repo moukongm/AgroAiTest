@@ -91,7 +91,6 @@ public class UserRemoteDataSource {
     }
 
     public Single<ResultVoid> updatePhone(ChangePhoneRequest request) {
-        LogUtils.INSTANCE.d("ljxphone", "phone");
         return NetworkManager.INSTANCE.getApi().changePhone(request)
                 .retryWhen(errors -> errors
                         .flatMap(error -> {

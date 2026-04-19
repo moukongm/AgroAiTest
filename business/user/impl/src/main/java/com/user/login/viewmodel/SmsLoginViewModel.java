@@ -4,9 +4,11 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.agri.pest.client.api.ServiceCode;
 import com.agri.pest.client.model.response.ResultAuthResponse;
+import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.agri.pest.client.model.response.ResultVoid;
 import com.common.base.BaseViewModel;
 import com.user.login.data.LoginRepository;
+import com.user.profile.data.Repository;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,6 +35,9 @@ public class SmsLoginViewModel extends BaseViewModel {
     private Timer countdownTimer;
 
     private final LoginRepository repository = new LoginRepository();
+    private final Repository profileRepository = new Repository();
+
+    private final MutableLiveData<ResultUserProfileDto> userProfileLiveData = new MutableLiveData<>();
 
     public void loginBySms(String phone, String code) {
         String phoneError = repository.validatePhone(phone);
@@ -132,5 +137,28 @@ public class SmsLoginViewModel extends BaseViewModel {
 
     public MutableLiveData<String> getSendCodeBtnText() {
         return sendCodeBtnText;
+    }
+
+    public MutableLiveData<ResultUserProfileDto> getUserProfileLiveData() {
+        return userProfileLiveData;
+    }
+
+    public void getUserMes() {
+        Disposable disposable = profileRepository.getUserMes()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            if (response.getCode() == ServiceCode.SUCCESS && response.getData() != null) {
+                                userProfileLiveData.setValue(response);
+                            } else {
+                                userProfileLiveData.setValue(null);
+                            }
+                        },
+                        error -> {
+                            userProfileLiveData.setValue(null);
+                        }
+                );
+        addDisposable(disposable);
     }
 }

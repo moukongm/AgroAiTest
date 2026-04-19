@@ -24,6 +24,7 @@ class ImagePickerUtil(
 
     private var cameraImageUri: Uri? = null
     private var dialogPick: AlertDialog? = null
+    private var isReleased = false
 
     // 权限和Activity结果启动器
     private val cameraPermissionLauncher: ActivityResultLauncher<String>
@@ -117,7 +118,11 @@ class ImagePickerUtil(
     }
 
     private fun launchCamera() {
-        val imageFile = File(activity.cacheDir, "camera_${System.currentTimeMillis()}.jpg")
+        val cameraCacheDir = File(activity.cacheDir, "camera_cache")
+        if (!cameraCacheDir.exists()) {
+            cameraCacheDir.mkdirs()
+        }
+        val imageFile = File(cameraCacheDir, "camera_${System.currentTimeMillis()}.jpg")
         cameraImageUri = FileProvider.getUriForFile(
             activity,
             "${activity.packageName}.fileprovider",
@@ -146,5 +151,27 @@ class ImagePickerUtil(
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 .build()
         )
+    }
+
+    /**
+     * 释放所有注册的 ActivityResultLauncher，防止内存泄漏
+     * 在 Activity/Fragment 销毁时必须调用此方法
+     */
+    fun release() {
+        if (isReleased) return
+        isReleased = true
+
+        try {
+            cameraPermissionLauncher.unregister()
+            storagePermissionLauncher.unregister()
+            pickMediaLauncher.unregister()
+            takePictureLauncher.unregister()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        dialogPick?.dismiss()
+        dialogPick = null
+        cameraImageUri = null
     }
 }

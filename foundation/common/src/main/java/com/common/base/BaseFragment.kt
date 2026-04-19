@@ -1,11 +1,13 @@
 package com.common.base
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.common.NavigationController
 
 /**
  * Fragment 基类
@@ -15,6 +17,13 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
     private var _binding: VB? = null
     protected val binding get() = _binding!!
+    private var navController: NavigationController? = null
+
+    /**
+     * 安全获取 ViewBinding，在 onDestroyView 后可能为 null
+     * @return ViewBinding 实例或 null
+     */
+    protected fun getBindingSafe(): VB? = _binding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,6 +32,13 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     ): View? {
         _binding = getViewBinding(inflater, container)
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is NavigationController) {
+            navController = context
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,6 +52,13 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
         _binding = null
     }
 
+    protected fun hideBottomNav() {
+        navController?.hideBottomNavigation()
+    }
+
+    protected fun showBottomNav() {
+        navController?.showBottomNavigation()
+    }
     /**
      * 显示加载弹窗 (调用宿主 Activity 的方法)
      */

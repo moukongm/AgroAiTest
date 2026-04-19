@@ -45,8 +45,10 @@ dependencies {
     implementation(project(":foundation:storage"))
     implementation(project(":foundation:webview"))
     implementation(project(":foundation:uikit"))
-    // AMap Location
-    implementation("com.amap.api:location:latest.integration")
+    implementation(libs.location)
+    // Calendar - huanghaibin CalendarView (从Maven Central获取)
+    implementation(libs.calendarview)
+
     implementation(project(":business:main:api"))
     implementation(project(":business:detection:api"))
     implementation(project(":business:community:api"))

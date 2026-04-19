@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/selector_home_a11y"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/nav_community"
+        android:icon="@drawable/selector_community_a11y"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/nav_message"
+        android:icon="@drawable/selector_message_a11y"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/selector_profile_a11y"
+        android:checkable="true"/>
+
+</menu>

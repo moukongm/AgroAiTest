@@ -5,12 +5,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.common.base.BaseFragment;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
 import com.common.utils.LiveDataExtKt;
 import com.user.databinding.FragmentEditnameProfileBinding;
+import com.user.profile.Utils;
 import com.user.profile.viewmodel.ProfileViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,21 +33,15 @@ public class EditPasswordProfileFragment extends BaseFragment<FragmentEditnamePr
         binding = getBinding();
         binding.tvSettitleTitle.setText("修改密码");
         binding.tvSettitleHint.setText("请输入您的密码");
-        Fragment parent = requireParentFragment();
-        if (parent instanceof ProfileFragment) {
-            viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
-        } else {
-            // 兼容：尝试从爷爷辈获取
-            viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
-        }
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         binding.tvEditnameOk.setOnClickListener(view -> {
             binding.tvEditnameOk.setEnabled(false);
-            viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()),this);
+            viewModel.updatePassword(String.valueOf(binding.etSettitleEdit.getText()));
         });
 
         LiveDataExtKt.observeNonNull(viewModel.getPasswordLivedata(), this, mes -> {
             binding.tvEditnameOk.setEnabled(true);
-            viewModel.showDialog(getContext(), mes);
+            Utils.showDialog(getActivity(), mes);
             if ("修改成功".equals(mes)) {
                 getParentFragmentManager().popBackStack();
                 Log.d("xzr", mes);
@@ -54,9 +50,22 @@ public class EditPasswordProfileFragment extends BaseFragment<FragmentEditnamePr
             }
             return null;
         });
-        binding.cvSettitleBack.setOnClickListener(v -> {
+        LiveDataExtKt.observeNonNull(viewModel.getUnLogin(),this,mes ->{
+            if("yes".equals(mes)){
+                LiveDataBus.getInstance().with(BusKey.UNLOGIN).setValue(true);
+                if (isAdded()) requireActivity().finish();
+            }
+            return null;
+        });
+        binding.bg.cvInformationBack.setOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LiveDataBus.getInstance().with(BusKey.UNLOGIN).setValue(false);
     }
 
     @Override

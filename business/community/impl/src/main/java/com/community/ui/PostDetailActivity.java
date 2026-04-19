@@ -1,13 +1,15 @@
 package com.community.ui;
 
-import android.animation.ValueAnimator;
+import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ImageView;
+import android.view.animation.OvershootInterpolator;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.core.content.ContextCompat;
@@ -16,7 +18,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.common.notice.BusKey;
+import com.common.notice.LiveDataBus;
+import com.common.speech.VoiceRecognitionCallback;
+import com.common.speech.VoiceRecognitionManager;
+import com.common.utils.PermissionUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.permissionx.guolindev.callback.RequestCallback;
 
 import com.common.base.BaseActivity;
 import com.common.router.RouterPath;
@@ -29,11 +37,14 @@ import com.community.ui.adapter.PostDetailImageAdapter;
 import com.community.viewmodel.PostDetailViewModel;
 import com.agri.pest.client.model.response.PostResponseDto;
 
+import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import coil.Coil;
 import coil.target.Target;
 import coil.request.ImageRequest;
+import coil.transform.CircleCropTransformation;
 
 @Route(path = RouterPath.COMMUNITY_POST_DETAIL)
 public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> {
@@ -47,6 +58,9 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
 
     private long currentPostId = -1;
     private int maxImageHeight = 0;
+    private boolean isRecording = false;
+    private StringBuilder voiceInputBuffer = new StringBuilder();
+    private int voiceInputStartPosition = -1;
 
     @Override
     public ActivityPostDetailBinding getViewBinding() {
@@ -65,7 +79,9 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
 
         binding.btnLike.setOnClickListener(v -> toggleLike());
 
-        binding.btnCollect.setOnClickListener(v -> toggleCollect());
+        binding.btnCollect.setOnClickListener(v -> {
+            toggleCollect();
+        });
 
         binding.vpPostImages.setAdapter(imageAdapter);
         binding.vpPostImages.setOffscreenPageLimit(1);
@@ -80,12 +96,12 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         setupBottomSheet();
         setupCommentInput();
     }
+
     private void toggleLike() {
         if (currentPostId <= 0) {
             ToastUtils.INSTANCE.showShort(this, "帖子加载中");
             return;
         }
-        // 直接调用后端，UI 更新由 LiveData 监听处理
         viewModel.toggleLike(currentPostId);
     }
 
@@ -94,7 +110,6 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
             ToastUtils.INSTANCE.showShort(this, "帖子加载中");
             return;
         }
-        // 直接调用后端，UI 更新由 LiveData 监听处理
         viewModel.toggleCollect(currentPostId);
     }
 
@@ -137,24 +152,30 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(View bottomSheet, int newState) {
-                switch (newState) {
-                    case BottomSheetBehavior.STATE_EXPANDED:
-                        binding.btnToggleSheet.setRotation(180);
-                        expandContent();
-                        break;
-                    case BottomSheetBehavior.STATE_COLLAPSED:
-                        binding.btnToggleSheet.setRotation(0);
-                        collapseContent();
-                        break;
-                }
             }
 
             @Override
             public void onSlide(View bottomSheet, float slideOffset) {
+                float offset = Math.max(0f, Math.min(1f, slideOffset));
+                binding.btnToggleSheet.setRotation(offset * 180f);
+                int fullHeight = maxImageHeight > 0 ? maxImageHeight : dpToPx(300);
+                ViewGroup.LayoutParams params = binding.layoutViewPager.getLayoutParams();
+                params.height = (int) (fullHeight * (1f - offset));
+                binding.layoutViewPager.setLayoutParams(params);
+                binding.layoutViewPager.setAlpha(1f - offset);
             }
         });
 
         binding.btnToggleSheet.setOnClickListener(v -> {
+            v.animate()
+                    .scaleX(0.85f).scaleY(0.85f)
+                    .setDuration(100)
+                    .withEndAction(() -> v.animate()
+                            .scaleX(1f).scaleY(1f)
+                            .setDuration(200)
+                            .setInterpolator(new OvershootInterpolator(2f))
+                            .start())
+                    .start();
             if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else {
@@ -201,6 +222,128 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
             }
             return false;
         });
+
+        setupVoiceInput();
+    }
+
+    private void setupVoiceInput() {
+        binding.btnInputMic.setOnClickListener(v -> {
+            if (!VoiceRecognitionManager.INSTANCE.isInitialized()) {
+                ToastUtils.INSTANCE.showShort(this, "语音识别未初始化");
+                return;
+            }
+
+            if (isRecording) {
+                stopVoiceRecording();
+            } else {
+                showKeyboard();
+                startVoiceRecording();
+            }
+        });
+    }
+
+    private void startVoiceRecording() {
+        PermissionUtils.INSTANCE.requestRecordAudio(this, new RequestCallback() {
+            @Override
+            public void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList) {
+                runOnUiThread(() -> {
+                    if (allGranted) {
+                        isRecording = true;
+                        voiceInputBuffer.setLength(0);
+                        voiceInputStartPosition = binding.etComment.getSelectionStart();
+                        AnimationDrawable animation = (AnimationDrawable) ContextCompat.getDrawable(PostDetailActivity.this, R.drawable.voice_anim);
+                        binding.btnInputMic.setImageDrawable(animation);
+                        animation.start();
+                        ToastUtils.INSTANCE.showShort(PostDetailActivity.this, "开始说话...");
+
+                        VoiceRecognitionManager.INSTANCE.setCallback(new VoiceRecognitionCallback() {
+                            @Override
+                            public void onBeginOfSpeech() {
+                            }
+
+                            @Override
+                            public void onEndOfSpeech() {
+                                runOnUiThread(() -> {
+                                    binding.btnInputMic.setImageResource(R.drawable.ic_microphone);
+                                    isRecording = false;
+                                });
+                            }
+
+                            @Override
+                            public void onPartialResult(String text) {
+                                runOnUiThread(() -> {
+                                    if (text != null && !text.isEmpty()) {
+                                        // 科大讯飞 onPartialResult 返回实时片段结果
+                                        // 先清空之前的内容再加新的，避免重复
+                                        voiceInputBuffer.setLength(0);
+                                        voiceInputBuffer.append(text);
+                                        updateVoiceInputText();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFinalResult(String text) {
+                                runOnUiThread(() -> {
+                                    // onFinalResult 只返回标点符号确认，最终结果已在 onPartialResult 累积
+                                    // 如果有缓存内容，则保留；如果没有，则使用返回的文本
+                                    String existingText = voiceInputBuffer.toString();
+                                    if (existingText.isEmpty() && text != null && !text.isEmpty()) {
+                                        voiceInputBuffer.setLength(0);
+                                        voiceInputBuffer.append(text);
+                                        updateVoiceInputText();
+                                    }
+                                    // 如果 existingText 有内容，说明 onPartialResult 已经更新过了，不需要再处理
+                                    isRecording = false;
+                                    binding.btnInputMic.setImageResource(R.drawable.ic_microphone);
+                                });
+                            }
+
+                            @Override
+                            public void onError(int errorCode, String errorMsg) {
+                                runOnUiThread(() -> {
+                                    binding.btnInputMic.setImageResource(R.drawable.ic_microphone);
+                                    isRecording = false;
+                                    ToastUtils.INSTANCE.showShort(PostDetailActivity.this, "识别失败: " + errorMsg);
+                                });
+                            }
+
+                            @Override
+                            public void onVolumeChanged(int volume) {
+                            }
+                        });
+                        VoiceRecognitionManager.INSTANCE.startListening(PostDetailActivity.this);
+                    } else {
+                        ToastUtils.INSTANCE.showShort(PostDetailActivity.this, "需要麦克风权限才能使用语音输入");
+                    }
+                });
+            }
+        });
+    }
+
+    private void stopVoiceRecording() {
+        VoiceRecognitionManager.INSTANCE.stopListening();
+        isRecording = false;
+        if (binding.btnInputMic.getDrawable() instanceof AnimationDrawable) {
+            ((AnimationDrawable) binding.btnInputMic.getDrawable()).stop();
+        }
+        binding.btnInputMic.setImageResource(R.drawable.ic_microphone);
+        hideKeyboard();
+    }
+
+    private void updateVoiceInputText() {
+        EditText et = binding.etComment;
+        int cursorPos = voiceInputStartPosition;
+        if (cursorPos < 0) cursorPos = 0;
+
+        String currentText = et.getText() != null ? et.getText().toString() : "";
+        String beforeVoice = cursorPos <= currentText.length()
+                ? currentText.substring(0, cursorPos) : currentText;
+        String afterVoice = cursorPos < currentText.length()
+                ? currentText.substring(cursorPos) : "";
+
+        et.setText(beforeVoice + voiceInputBuffer.toString() + afterVoice);
+        et.setSelection(beforeVoice.length() + voiceInputBuffer.length());
     }
 
     private void sendComment() {
@@ -287,7 +430,14 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
 
             String authorAvatar = post.getAuthorAvatar();
             if (authorAvatar != null && !authorAvatar.isEmpty()) {
-                ImageLoader.INSTANCE.loadCircle(binding.ivAuthorAvatar, authorAvatar);
+                ImageRequest avatarRequest = new ImageRequest.Builder(this)
+                        .data(authorAvatar)
+                        .placeholder(R.drawable.bg_community_post_avatar)
+                        .error(R.drawable.bg_community_post_avatar)
+                        .target(binding.ivAuthorAvatar)
+                        .transformations(new CircleCropTransformation())
+                        .build();
+                Coil.imageLoader(this).enqueue(avatarRequest);
             }
 
             List<String> images = post.getImages();
@@ -303,11 +453,13 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
                     binding.layoutViewPager.setVisibility(View.GONE);
                     binding.layoutPageIndicator.removeAllViews();
                 } else {
-                    maxImageHeight = 0;
                     int screenWidth = getResources().getDisplayMetrics().widthPixels;
                     binding.layoutViewPager.setVisibility(View.VISIBLE);
                     binding.layoutPageIndicator.removeAllViews();
                     setupPageIndicator(validImages.size(), 0);
+                    maxImageHeight = (int) (screenWidth * 0.75f);
+                    applyViewPagerHeight(screenWidth);
+                    imageAdapter.setList(validImages);
                     calculateMaxImageHeight(validImages, 0, screenWidth);
                 }
             } else {
@@ -331,7 +483,8 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         String url = images.get(index);
         Target target = new Target() {
             @Override
-            public void onStart(Drawable placeholder) {}
+            public void onStart(Drawable placeholder) {
+            }
 
             @Override
             public void onSuccess(Drawable result) {
@@ -353,6 +506,8 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         };
         ImageRequest request = new ImageRequest.Builder(this)
                 .data(url)
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.placeholder_image)
                 .target(target)
                 .build();
         coil.ImageLoader imageLoader = coil.Coil.imageLoader(this);
@@ -397,10 +552,44 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
         }
     }
 
+    private void showKeyboard() {
+        // 让 EditText 获得焦点
+        binding.etComment.requestFocus();
+        // 弹出软键盘
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(binding.etComment, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        View currentFocus = getCurrentFocus();
+        if (currentFocus != null && imm != null) {
+            imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+        }
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
         int collapsedHeight = dpToPx(48) + dpToPx(80);
         bottomSheetBehavior.setPeekHeight(collapsedHeight);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isRecording) {
+            stopVoiceRecording();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        VoiceRecognitionManager.INSTANCE.stopListening();
+        VoiceRecognitionManager.INSTANCE.setCallback(null);
     }
 }

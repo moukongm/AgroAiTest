@@ -7,10 +7,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.agri.pest.client.api.ServiceCode;
 import com.agri.pest.client.model.request.PostCreateRequest;
 import com.agri.pest.client.model.response.ResultAuthResponse;
+import com.agri.pest.client.model.response.ResultUserProfileDto;
 import com.common.base.BaseViewModel;
-import com.common.utils.LogUtils;
-import com.network.NetworkManager;
 import com.user.login.data.LoginRepository;
+import com.user.profile.data.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,9 @@ public class LoginViewModel extends BaseViewModel {
     private MutableLiveData<Boolean> agreeChecked = new MutableLiveData<>(false);
 
     private final LoginRepository repository = new LoginRepository();
+    private final Repository profileRepository = new Repository();
+
+    private final MutableLiveData<ResultUserProfileDto> userProfileLiveData = new MutableLiveData<>();
 
 
     public void login(String usernameOrPhone, String password) {
@@ -107,5 +110,28 @@ public class LoginViewModel extends BaseViewModel {
 
     public void setAgreeChecked(Boolean checked) {
         agreeChecked.setValue(checked);
+    }
+
+    public MutableLiveData<ResultUserProfileDto> getUserProfileLiveData() {
+        return userProfileLiveData;
+    }
+
+    public void getUserMes() {
+        Disposable disposable = profileRepository.getUserMes()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            if (response.getCode() == ServiceCode.SUCCESS && response.getData() != null) {
+                                userProfileLiveData.setValue(response);
+                            } else {
+                                userProfileLiveData.setValue(null);
+                            }
+                        },
+                        error -> {
+                            userProfileLiveData.setValue(null);
+                        }
+                );
+        addDisposable(disposable);
     }
 }

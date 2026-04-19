@@ -37,6 +37,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/res/assets")
+        }
+    }
 }
 
 dependencies {
@@ -60,6 +65,9 @@ dependencies {
     api(libs.permissionx)
     
     api(libs.speechengine.tob)
-    
+
+    // 讯飞语音听写 SDK
+    implementation(fileTree("libs") { include("*.jar") })
+
     api(project(":foundation:storage"))
 }

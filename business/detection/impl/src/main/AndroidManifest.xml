@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.CAMERA" />
     <application>
-        <activity android:name=".ui.page.DetectionActivity" android:exported="false"/>
+        <activity android:name=".ui.page.DetectionActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"/>
+        <activity android:name=".ui.page.HistoryActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"/>
+
     </application>
 </manifest>

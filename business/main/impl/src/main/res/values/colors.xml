@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 日历日期颜色 -->
+    <color name="calendar_date_color">#333333</color>
+    <color name="calendar_weekday_color">#999999</color>
+    <!-- Tab文字颜色状态 -->
+    <color name="tab_text_normal">#999999</color>
+    <color name="tab_text_selected">#00CFAC</color>
+
+    <!-- 按钮颜色 -->
+    <color name="btn_gray">#E6E6E6</color>
+    <color name="btn_text_dark">#333333</color>
+    <color name="btn_icon_gray">#666666</color>
+    <color name="orange_selected">#FFB05D</color>
+
+    <!-- 主题颜色 -->
+    <color name="primary">#4CAF50</color>
+    <color name="primary_dark">#388E3C</color>
+    <color name="accent">#FF9800</color>
+
+    <!-- 页面背景色 -->
+    <color name="page_background">#F5F5F5</color>
+    <!-- 白色背景 -->
+    <color name="white">#FFFFFF</color>
+    <!-- 文字颜色 -->
+    <color name="text_primary">#333333</color>
+    <color name="text_secondary">#666666</color>
+    <color name="text_hint">#999999</color>
+    <!-- 搜索框背景 -->
+    <color name="search_input_background">#F0F0F0</color>
+    <!-- 热门城市标签背景 -->
+    <color name="hot_city_background">#E8F5E9</color>
+</resources>

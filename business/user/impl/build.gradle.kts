@@ -43,9 +43,14 @@ android {
 }
 
 dependencies {
+    implementation(project(":foundation:webview"))
+    implementation(project(":foundation:uikit"))
     implementation(project(":foundation:common"))
     implementation(project(":foundation:network"))
+    implementation(project(":foundation:storage"))
     api(project(":business:user:api"))
+    api(project(":business:detection:api"))
     implementation(project(":foundation:uikit"))
+    implementation(libs.blurview)
     kapt(libs.arouter.compiler)
 }

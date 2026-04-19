@@ -14,6 +14,7 @@ import com.agri.pest.client.model.request.ProfileUpdateRequest;
 import com.common.base.BaseFragment;
 import com.common.utils.LiveDataExtKt;
 import com.user.databinding.FragmentEditnameProfileBinding;
+import com.user.profile.Utils;
 import com.user.profile.viewmodel.ProfileViewModel;
 
 public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfileBinding> {
@@ -30,15 +31,7 @@ public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfil
     public void initView() {
         Log.d("ljx", "initview");
         binding = getBinding();
-        // 从 ProfileFragment 获取 ViewModel（而不是 EditProfileFragment）
-        Fragment parent = requireParentFragment();
-        if (parent instanceof ProfileFragment) {
-            viewModel = new ViewModelProvider(parent).get(ProfileViewModel.class);
-        } else {
-            // 兼容：尝试从爷爷辈获取
-            viewModel = new ViewModelProvider(parent.requireParentFragment()).get(ProfileViewModel.class);
-        }
-
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         //得到数据库中的数据后更换这里的电话
 
         binding.tvEditnameOk.setOnClickListener(view -> {
@@ -53,7 +46,7 @@ public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfil
         LiveDataExtKt.observeNonNull(viewModel.getMesEtnameLivedata(), this, mes -> {
             binding.editnameProfile.setVisibility(View.GONE);
             binding.tvEditnameOk.setEnabled(true);
-            viewModel.showDialog(getContext(), mes);
+            Utils.showDialog(getActivity(), mes);
 //            ToastUtils.INSTANCE.showShort(getActivity().getBaseContext(),mes);
             if ("修改成功".equals(mes)) {
                 getParentFragmentManager().popBackStack();
@@ -71,14 +64,15 @@ public class EditnameProfileFragment extends BaseFragment<FragmentEditnameProfil
                 binding.tvEditnameOk.setEnabled(false);
             } else {
                 binding.etSettitleEdit.setText("");
-                viewModel.showDialog(getContext(), mes);
+                if (getActivity() != null) Utils.showDialog(getActivity(), mes);
+//                viewModel.showDialog(getContext(), mes);
             }
 
             return null;
         });
 
 
-        binding.cvSettitleBack.setOnClickListener(v -> {
+        binding.bg.cvInformationBack.setOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
         });
 

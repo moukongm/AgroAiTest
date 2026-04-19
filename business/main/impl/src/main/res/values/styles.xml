@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 日历日期文字样式 -->
+    <style name="TextAppearance_PlantCalendar_Date" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/calendar_date_color</item>
+    </style>
+
+    <!-- 日历星期文字样式 -->
+    <style name="TextAppearance_PlantCalendar_WeekDay" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/calendar_weekday_color</item>
+    </style>
+
+    <!-- 卡片样式 -->
+    <style name="PlantInfoCard">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardBackgroundColor">#FFFFFF</item>
+    </style>
+</resources>

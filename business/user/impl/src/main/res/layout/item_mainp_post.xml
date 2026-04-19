@@ -109,35 +109,6 @@
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:paddingBottom="12dp">
-
-            <FrameLayout
-                android:id="@+id/fl_save_avatars"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/iv_save_avatar_1"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:background="@drawable/bg_circle_placeholder"
-                    android:contentDescription="@null"
-                    android:padding="1dp"
-                    android:scaleType="centerCrop" />
-
-                <ImageView
-                    android:id="@+id/iv_save_avatar_2"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_marginStart="14dp"
-                    android:background="@drawable/bg_circle_placeholder"
-                    android:contentDescription="@null"
-                    android:padding="1dp"
-                    android:scaleType="centerCrop" />
-            </FrameLayout>
-
             <TextView
                 android:id="@+id/tv_post_save_count"
                 android:layout_width="wrap_content"
@@ -146,7 +117,7 @@
                 android:textColor="#AAAAAA"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/fl_save_avatars"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="+25收藏" />
 

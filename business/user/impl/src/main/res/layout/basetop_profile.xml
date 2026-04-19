@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:id = "@+id/cons_basetop"
+    android:background="@drawable/bg_main_newheader"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/bg_mainp_header"
     android:layout_height="match_parent">
 
         <androidx.cardview.widget.CardView
@@ -11,7 +11,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="43dp"
+            android:layout_marginTop="50dp"
             android:backgroundTint="#60ffffff"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
@@ -36,29 +36,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <TextView
-            android:id="@+id/tv_information_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="我的收藏"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/cv_information_back"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/cv_information_back" />
-    <TextView
-        android:layout_marginRight="20dp"
-        android:id="@+id/tv_shaixuan_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="筛选"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/cv_information_back"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/cv_information_back" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

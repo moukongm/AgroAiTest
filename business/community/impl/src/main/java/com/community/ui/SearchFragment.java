@@ -2,8 +2,11 @@ package com.community.ui;
 
 
 import android.content.Context;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -15,10 +18,17 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.common.base.BaseFragment;
+import com.common.router.RouterPath;
+import com.community.R;
 import com.community.databinding.FragmentSearchBinding;
 import com.community.ui.adapter.SearchHistoryAdapter;
 import com.community.ui.adapter.SearchSuggestionAdapter;
@@ -33,17 +43,28 @@ import eightbitlab.com.blurview.RenderScriptBlur;
 public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
 
     private SearchListener searchListener;
+    private VoiceSearchListener voiceSearchListener;
     private SearchViewModel viewModel;
     private SearchHistoryAdapter historyAdapter;
     private SearchSuggestionAdapter suggestionAdapter;
+    private boolean hasSearched = false;
 
     public interface SearchListener {
         void onSearch(String keyword);
         void onClose();
+        void onShowSearchResult(String keyword);
+    }
+
+    public interface VoiceSearchListener {
+        void onOpenVoiceSearch();
     }
 
     public void setSearchListener(SearchListener listener) {
         this.searchListener = listener;
+    }
+
+    public void setVoiceSearchListener(VoiceSearchListener listener) {
+        this.voiceSearchListener = listener;
     }
 
     @Override
@@ -53,7 +74,8 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
 
     @Override
     public void initView() {
-        viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        if (!isAdded() || getActivity() == null) return;
+        viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         viewModel.init(requireActivity().getApplication());
 
         setupRecyclerViews();
@@ -75,6 +97,12 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     }
 
     private void setupRecyclerViews() {
+        LinearLayoutManager historyLayoutManager = new LinearLayoutManager(requireContext());
+        historyLayoutManager.setAutoMeasureEnabled(false);
+        getBinding().rvHistory.setLayoutManager(historyLayoutManager);
+        LinearLayoutManager suggestionLayoutManager = new LinearLayoutManager(requireContext());
+        suggestionLayoutManager.setAutoMeasureEnabled(false);
+        getBinding().rvSuggestions.setLayoutManager(suggestionLayoutManager);
         historyAdapter = new SearchHistoryAdapter();
         historyAdapter.setOnItemClickListener((keyword, position) -> {
             getBinding().etSearch.setText(keyword);
@@ -121,8 +149,14 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
             return false;
         });
         getBinding().btnCancel.setOnClickListener(v -> close());
+
+        getBinding().btnInputMic.setOnClickListener(v -> openVoiceSearch());
+
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            EditText et = getBinding().etSearch;
+            if (!isAdded() || getContext() == null) return;
+            FragmentSearchBinding b = getBindingSafe();
+            if (b == null) return;
+            EditText et = b.etSearch;
             et.requestFocus();
             InputMethodManager imm = (InputMethodManager) requireContext()
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -136,43 +170,50 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         getBinding().ivWantSearch.setVisibility(View.VISIBLE);
         getBinding().rvSuggestions.setVisibility(View.GONE);
     }
+
     private void showSuggestionView() {
-        getBinding().rvHistory.setVisibility(View.GONE);
+        getBinding().rvHistory.setVisibility(View.VISIBLE);
+        getBinding().ivWantSearch.setVisibility(View.VISIBLE);
         getBinding().rvSuggestions.setVisibility(View.VISIBLE);
     }
 
     private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) requireContext()
+        Context ctx = getContext();
+        if (ctx == null) return;
+        FragmentSearchBinding b = getBindingSafe();
+        if (b == null) return;
+        InputMethodManager imm = (InputMethodManager) ctx
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null && getBinding().etSearch != null) {
-            imm.hideSoftInputFromWindow(getBinding().etSearch.getWindowToken(), 0);
+        if (imm != null && b.etSearch != null) {
+            imm.hideSoftInputFromWindow(b.etSearch.getWindowToken(), 0);
         }
     }
     public void close() {
         hideKeyboard();
-        getBinding().etSearch.setText("");
+        FragmentSearchBinding b = getBindingSafe();
+        if (b != null) {
+            b.etSearch.setText("");
+        }
         if (searchListener != null) {
             searchListener.onClose();
         }
     }
     public String getSearchKeyword() {
-        return getBinding().etSearch.getText().toString().trim();
-    }
-    public void performSearch() {
-        String keyword = getSearchKeyword();
-        if (!keyword.isEmpty()) {
-            performSearch(keyword);
-        }
+        FragmentSearchBinding b = getBindingSafe();
+        if (b == null) return "";
+        return b.etSearch.getText().toString().trim();
     }
 
     private void performSearch(String keyword) {
         hideKeyboard();
+        hasSearched = true;
         viewModel.saveToHistory(keyword);
         if (searchListener != null) {
             searchListener.onSearch(keyword);
         }
     }
     private void setupBlurView() {
+        if (!isAdded() || getActivity() == null) return;
         BlurView blurView = getBinding().blurMask;
         ViewGroup rootView = requireActivity().findViewById(android.R.id.content);
 
@@ -181,5 +222,29 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         blurView.setupWith(rootView, new RenderScriptBlur(requireContext()))
                 .setBlurRadius(radius)
                 .setOverlayColor(0x40000000);
+    }
+    public void openVoiceSearch() {
+        if (voiceSearchListener != null) {
+            voiceSearchListener.onOpenVoiceSearch();
+            hideKeyboard();
+        }
+    }
+    @Override
+    public void onDestroyView() {
+        FragmentSearchBinding b = getBindingSafe();
+        if (b != null) {
+            if (b.rvHistory != null) {
+                b.rvHistory.setAdapter(null);
+            }
+            if (b.rvSuggestions != null) {
+                b.rvSuggestions.setAdapter(null);
+            }
+        }
+        if (!hasSearched && searchListener != null) {
+            searchListener.onClose();
+        }
+        historyAdapter = null;
+        suggestionAdapter = null;
+        super.onDestroyView();
     }
 }

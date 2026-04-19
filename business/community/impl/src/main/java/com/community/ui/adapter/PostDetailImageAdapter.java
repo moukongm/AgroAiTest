@@ -4,7 +4,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.common.utils.ImageLoader;
+import coil.Coil;
+import coil.request.ImageRequest;
 import com.community.R;
 import com.community.databinding.ItemPostDetailImageBinding;
 import com.uikit.base.BaseBindingAdapter;
@@ -20,7 +21,13 @@ public class PostDetailImageAdapter extends BaseBindingAdapter<String, ItemPostD
 
     public void convert(@NonNull ItemPostDetailImageBinding binding, @NonNull String imageUrl, int position) {
         if (imageUrl != null && !imageUrl.isEmpty()) {
-            ImageLoader.INSTANCE.load(binding.ivImage, imageUrl);
+            ImageRequest request = new ImageRequest.Builder(binding.getRoot().getContext())
+                    .data(imageUrl)
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.placeholder_image)
+                    .target(binding.ivImage)
+                    .build();
+            Coil.imageLoader(binding.getRoot().getContext()).enqueue(request);
         }
     }
 }

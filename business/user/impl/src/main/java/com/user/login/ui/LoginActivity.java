@@ -16,6 +16,7 @@ import com.user.databinding.ActivityLoginBinding;
 public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
 
     private static final int CONTAINER_ID = R.id.activity_main;
+    private volatile boolean isDestroyed = false;
 
     @Override
     public ActivityLoginBinding getViewBinding() {
@@ -45,15 +46,25 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
             ThreadUtils.INSTANCE.executeByIo(() -> {
                 boolean success = service.refreshToken();
 
+                if (isDestroyed) {
+                    return;
+                }
+
                 if (success) {
                     ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                        if (isDestroyed) {
+                            return;
+                        }
                         ARouter.getInstance()
                                 .build(RouterPath.APP_MAIN_ACTIVITY)
-                                .navigation(LoginActivity.this);
+                                .navigation(this.getApplicationContext());
                         finish();
                     });
                 } else {
                     ThreadUtils.INSTANCE.runOnUiThread(() -> {
+                        if (isDestroyed) {
+                            return;
+                        }
                         navigateToLogin();
                     });
                 }
@@ -68,5 +79,11 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
         if (current == null || !(current instanceof LoginFragment)) {
             replaceFragment(new LoginFragment());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isDestroyed = true;
     }
 }
