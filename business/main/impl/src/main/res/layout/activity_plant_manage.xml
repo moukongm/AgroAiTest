@@ -9,8 +9,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="@android:color/transparent"
+        android:layout_height="wrap_content"
+        android:background="#01CFAC"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
 
@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
+            app:contentScrim="#01CFAC"
             app:expandedTitleGravity="bottom|center_horizontal"
             app:expandedTitleMarginBottom="48dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.MaterialComponents.Headline5"
@@ -41,7 +42,7 @@
                 android:layout_height="80dp"
                 android:layout_gravity="end|bottom"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="55dp"
                 android:src="@drawable/ic_exchange_image"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7" />
@@ -51,10 +52,9 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:fitsSystemWindows="true"
+                android:fitsSystemWindows="false"
                 app:layout_collapseMode="pin"
-                app:contentInsetStart="0dp"
-                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light" />
+                app:contentInsetStart="0dp" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -67,6 +67,7 @@
         android:layout_marginStart="16dp"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="top|start"
+
         android:elevation="12dp">
 
         <ImageView

@@ -33,12 +33,13 @@
                 <ImageView
                     android:id="@+id/iv_star_post_cover"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:contentDescription="@null"
                     android:scaleType="centerCrop"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintDimensionRatio="1:0.9"
                     android:src="@drawable/bg_cover_loading"
                     tools:src="@drawable/ic_load" />
 

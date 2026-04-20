@@ -14,6 +14,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -75,15 +77,31 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     @Override
     public void initView() {
         if (!isAdded() || getActivity() == null) return;
+        hideBottomNav();
         viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         viewModel.init(requireActivity().getApplication());
 
         setupRecyclerViews();
         setupSearchInput();
         setupBlurView();
-        showHistoryView();
+        setupAnimations();
         getBinding().ivClear.setOnClickListener(v -> viewModel.clearHistory());
 
+    }
+
+    private void setupAnimations() {
+        // 搜索栏进入动画
+        Animation slideDown = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down);
+        slideDown.setDuration(300);
+        getBinding().layoutSearchBar.startAnimation(slideDown);
+
+        // 内容淡入动画
+        Animation fadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in);
+        fadeIn.setDuration(300);
+        getBinding().rvHistory.startAnimation(fadeIn);
+        getBinding().ivWantSearch.startAnimation(fadeIn);
+
+        showHistoryView();
     }
 
     @Override

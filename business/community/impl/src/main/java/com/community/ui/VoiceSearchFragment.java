@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -51,10 +53,24 @@ public class VoiceSearchFragment extends BaseFragment<FragmentVoiceSearchBinding
 
     @Override
     public void initView() {
+        hideBottomNav();
         getBinding().icBack.setOnClickListener(v -> close());
 
         setupVoiceInput();
         setupBlurView();
+        setupAnimations();
+    }
+
+    private void setupAnimations() {
+        // 搜索栏进入动画
+        Animation slideDown = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down);
+        slideDown.setDuration(300);
+        getBinding().layoutSearchBar.startAnimation(slideDown);
+
+        // 语音输入按钮淡入动画
+        Animation fadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in);
+        fadeIn.setDuration(300);
+        getBinding().icVoiceInput.startAnimation(fadeIn);
     }
 
     @Override
