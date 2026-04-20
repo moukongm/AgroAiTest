@@ -98,7 +98,7 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
     private void observeLiveData() {
         viewModel.getLocationLivedata().observe(getViewLifecycleOwner(), city -> {
             hideLoading();
-            if (city != null && !city.isEmpty()) {
+            if (city != null && !city.isEmpty() && cityListAdapter != null) {
                 cityListAdapter.updateLocatedCity(city);
                 // 定位成功后更新服务器并返回首页
                 viewModel.updateLocation(city);
@@ -107,7 +107,7 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
 
         LiveDataBus.getInstance().with(BusKey.LOCATION_CITY).observe(getViewLifecycleOwner(), city -> {
             hideLoading();
-            if (city != null && !((String) city).isEmpty()) {
+            if (city != null && !((String) city).isEmpty() && cityListAdapter != null) {
                 cityListAdapter.updateLocatedCity((String) city);
                 // 定位成功后更新服务器并返回首页
                 viewModel.updateLocation((String) city);
@@ -115,7 +115,7 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         });
 
         viewModel.getUpdateLocationResult().observe(getViewLifecycleOwner(), city -> {
-            if (city != null && !city.isEmpty()) {
+            if (city != null && !city.isEmpty() && cityListAdapter != null) {
                 LiveDataBus.getInstance().with(BusKey.LOCATION).setValue(city + "_" + System.currentTimeMillis());
                 cityListAdapter.updateCurrentCity(city);
                 // 更新成功后返回首页
