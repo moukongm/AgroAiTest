@@ -253,26 +253,18 @@
             android:layout_width="60dp"
             android:layout_height="25dp"
             android:src="@drawable/ic_confirm"
-            android:gravity="center"
-            android:text="确认"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp">
+            android:scaleType="centerInside">
 
         </ImageView>
+
         <ImageView
             android:id="@+id/tv_cancel"
-            android:layout_marginTop="1dp"
             android:layout_width="65dp"
             android:layout_height="30dp"
             android:layout_marginStart="6dp"
             android:background="@drawable/ic_rili_tvcancle"
-            android:gravity="center"
-            android:text="取消"
-            android:textColor="#FF7A00"
-            android:textSize="14sp" >
-
+            android:scaleType="centerCrop">
         </ImageView>
-
 
     </LinearLayout>
 
