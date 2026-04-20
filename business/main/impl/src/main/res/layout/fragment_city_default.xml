@@ -5,29 +5,25 @@
     android:layout_height="match_parent"
     android:layout_marginTop="10dp">
 
-    <!-- 城市列表主 RecyclerView（包含所有内容） -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCityList"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/rvLetterNav"
+        app:layout_constraintEnd_toStartOf="@id/sideBar"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- 右侧字母导航 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvLetterNav"
+    <com.main.ui.widget.SideBar
+        android:id="@+id/sideBar"
         android:layout_width="36dp"
         android:layout_height="0dp"
         android:layout_marginEnd="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:overScrollMode="never"
         android:paddingVertical="8dp" />
 
-    <!-- 中间悬浮字母提示 -->
     <TextView
         android:id="@+id/tvLetterHint"
         android:layout_width="80dp"

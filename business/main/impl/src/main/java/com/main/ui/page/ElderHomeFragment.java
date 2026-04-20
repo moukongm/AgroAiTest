@@ -270,6 +270,8 @@ public class ElderHomeFragment extends BaseFragment<ActivityHomeElderBinding> {
     @Override
     public void onResume() {
         super.onResume();
+        // 更新农历日期
+        binding.mainpageTime.setText(Utils.getTodayLunar());
         //viewModel.getMyCrops();
     }
 

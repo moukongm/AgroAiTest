@@ -3,7 +3,6 @@ package com.main.ui.page;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,7 +17,7 @@ import com.common.notice.BusKey;
 import com.common.notice.LiveDataBus;
 import com.main.impl.databinding.FragmentCityDefaultBinding;
 import com.main.ui.adapter.CityListAdapter;
-import com.main.ui.adapter.LetterNavAdapter;
+import com.main.ui.widget.SideBar;
 import com.main.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
@@ -29,16 +28,16 @@ import java.util.Map;
 public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding> {
 
     private CityListAdapter cityListAdapter;
-    private LetterNavAdapter letterNavAdapter;
     private HomeViewModel viewModel;
 
     private List<String> hotCityList = new ArrayList<>();
     private List<String> letterList = new ArrayList<>();
     private Map<String, List<String>> cityDataMap = null;
-    
+
     private Handler handler = new Handler(Looper.getMainLooper());
-    private boolean isNavigating = false;  // 是否正在通过字母导航
-    private String currentLetter = "";  // 当前选中的字母
+    private boolean isNavigating = false;
+    private String currentLetter = "";
+    private int targetScrollPosition = -1;
 
     @NonNull
     @Override
@@ -56,9 +55,6 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         initCityDataAsync();
     }
 
-    /**
-     * 异步加载城市数据
-     */
     private void initCityDataAsync() {
         new Thread(() -> {
             letterList = new ArrayList<>();
@@ -104,6 +100,8 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
             hideLoading();
             if (city != null && !city.isEmpty()) {
                 cityListAdapter.updateLocatedCity(city);
+                // 定位成功后更新服务器并返回首页
+                viewModel.updateLocation(city);
             }
         });
 
@@ -111,6 +109,8 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
             hideLoading();
             if (city != null && !((String) city).isEmpty()) {
                 cityListAdapter.updateLocatedCity((String) city);
+                // 定位成功后更新服务器并返回首页
+                viewModel.updateLocation((String) city);
             }
         });
 
@@ -118,26 +118,20 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
             if (city != null && !city.isEmpty()) {
                 LiveDataBus.getInstance().with(BusKey.LOCATION).setValue(city + "_" + System.currentTimeMillis());
                 cityListAdapter.updateCurrentCity(city);
+                // 更新成功后返回首页
+                if (getActivity() instanceof CitySelectorActivity) {
+                    ((CitySelectorActivity) getActivity()).onCitySelected(city);
+                }
             }
         });
     }
 
     private void initRecyclerView() {
-        // 城市列表（主 RecyclerView）
         cityListAdapter = new CityListAdapter();
         getBinding().rvCityList.setLayoutManager(new LinearLayoutManager(requireContext()));
         getBinding().rvCityList.setAdapter(cityListAdapter);
-
-        // 字母导航
-        letterNavAdapter = new LetterNavAdapter();
-        getBinding().rvLetterNav.setLayoutManager(new LinearLayoutManager(requireContext()));
-        getBinding().rvLetterNav.setAdapter(letterNavAdapter);
-        getBinding().rvLetterNav.setItemAnimator(null);
     }
 
-    /**
-     * 真正的初始化数据
-     */
     private void initDataInternal() {
         hotCityList.clear();
         hotCityList.add("北京");
@@ -153,153 +147,123 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         hotCityList.add("天津");
         hotCityList.add("苏州");
 
-        letterNavAdapter.setNewInstance(letterList);
-        letterNavAdapter.setSelectedLetter("");
+        // 过滤出有对应城市的字母
+        List<String> filteredLetters = new ArrayList<>();
+        for (String letter : letterList) {
+            List<String> cities = cityDataMap.get(letter);
+            if (cities != null && !cities.isEmpty()) {
+                filteredLetters.add(letter);
+            }
+        }
+        letterList = filteredLetters;
+
+        // 更新SideBar的字母列表
+        getBinding().sideBar.setLetters(letterList.toArray(new String[0]));
+        getBinding().sideBar.setSelectedLetter("");
         cityListAdapter.setData(letterList, cityDataMap, hotCityList, "", "");
     }
 
     private void initListeners() {
-        // 字母导航点击事件
-        letterNavAdapter.setOnItemClickListener(letter -> {
-            navigateToLetter(letter);
-        });
-
-        // 字母导航触摸滑动
-        getBinding().rvLetterNav.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                case MotionEvent.ACTION_MOVE:
-                    handleLetterTouch(event.getY());
-                    return true;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    hideLetterHintDelayed();
-                    return true;
+        getBinding().sideBar.setOnLetterSelectedListener(new SideBar.OnLetterSelectedListener() {
+            @Override
+            public void onLetterSelected(String letter) {
+                if (!letter.equals(currentLetter)) {
+                    currentLetter = letter;
+                    getBinding().sideBar.setSelectedLetter(letter);
+                }
+                showLetterHint(letter);
+                navigateToLetter(letter);
             }
-            return false;
+
+            @Override
+            public void onLetterReleased() {
+                hideLetterHintDelayed();
+            }
         });
 
-        // 城市列表滚动监听（左侧 → 右侧）
         getBinding().rvCityList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                
-                // 如果正在通过字母导航，就不更新字母选中状态，防止闪烁
                 if (isNavigating) {
                     return;
                 }
-                
-                // 获取第一个可见位置
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                if (layoutManager != null) {
-                    int firstVisible = layoutManager.findFirstVisibleItemPosition();
-                    String letter = cityListAdapter.getLetterForPosition(firstVisible);
-                    if (letter != null && !letter.equals(currentLetter)) {
-                        currentLetter = letter;
-                        letterNavAdapter.setSelectedLetter(letter);
+                updateLetterFromScroll();
+            }
+
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if (isNavigating) {
+                        isNavigating = false;
+                        targetScrollPosition = -1;
                     }
+                    updateLetterFromScroll();
                 }
             }
         });
 
-        // 城市点击事件
         cityListAdapter.setOnCityClickListener(cityName -> {
             viewModel.updateLocation(cityName);
             scrollToTop();
         });
-        
-        // 重新定位事件
+
         cityListAdapter.setOnRelocateListener(() -> {
             showLoading("定位中...");
             viewModel.getLocation(requireContext());
         });
     }
 
-    /**
-     * 处理字母导航触摸事件（精确计算）
-     */
-    private void handleLetterTouch(float touchY) {
-        if (letterList == null || letterList.isEmpty()) return;
-        
-        View letterNavView = getBinding().rvLetterNav;
-        int height = letterNavView.getHeight();
-        if (height <= 0) return;
-        
-        // 计算触摸位置对应的字母索引，增加边界检查
-        float ratio = touchY / height;
-        int position = (int) (ratio * letterList.size());
-        position = Math.max(0, Math.min(position, letterList.size() - 1));
-        
-        String letter = letterList.get(position);
+    private void updateLetterFromScroll() {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
+        if (layoutManager == null) return;
+
+        int firstVisible = layoutManager.findFirstCompletelyVisibleItemPosition();
+        if (firstVisible == RecyclerView.NO_POSITION) {
+            firstVisible = layoutManager.findFirstVisibleItemPosition();
+        }
+        if (firstVisible == RecyclerView.NO_POSITION) return;
+
+        String letter = cityListAdapter.getLetterForPosition(firstVisible);
         if (letter != null && !letter.equals(currentLetter)) {
             currentLetter = letter;
-            letterNavAdapter.setSelectedLetter(letter);
-            showLetterHint(letter);
-            navigateToLetter(letter);
+            getBinding().sideBar.setSelectedLetter(letter);
         }
     }
 
-    /**
-     * 导航到指定字母位置
-     */
     private void navigateToLetter(String letter) {
-        isNavigating = true;
-        
         int position = cityListAdapter.getPositionForLetter(letter);
-        if (position >= 0) {
-            LinearLayoutManager layoutManager = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
-            if (layoutManager != null) {
-                layoutManager.scrollToPositionWithOffset(position, 0);
-            }
+        if (position < 0) return;
+
+        isNavigating = true;
+        targetScrollPosition = position;
+
+        getBinding().rvCityList.stopScroll();
+
+        LinearLayoutManager layoutManager = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
+        if (layoutManager != null) {
+            layoutManager.scrollToPositionWithOffset(position, 0);
         }
-        
-        // 延迟重置导航状态
-        handler.removeCallbacks(resetNavigatingRunnable);
-        handler.postDelayed(resetNavigatingRunnable, 300);
     }
 
-    /**
-     * 显示中间悬浮字母提示
-     */
     private void showLetterHint(String letter) {
         getBinding().tvLetterHint.setText(letter);
         getBinding().tvLetterHint.setVisibility(View.VISIBLE);
         handler.removeCallbacks(hideHintRunnable);
     }
 
-    /**
-     * 延迟隐藏悬浮提示
-     */
     private void hideLetterHintDelayed() {
         handler.postDelayed(hideHintRunnable, 500);
     }
 
-    /**
-     * 立即隐藏悬浮提示
-     */
     private void hideLetterHint() {
         handler.removeCallbacks(hideHintRunnable);
         getBinding().tvLetterHint.setVisibility(View.GONE);
     }
 
-    private Runnable hideHintRunnable = new Runnable() {
-        @Override
-        public void run() {
-            getBinding().tvLetterHint.setVisibility(View.GONE);
-        }
-    };
+    private final Runnable hideHintRunnable = () -> getBinding().tvLetterHint.setVisibility(View.GONE);
 
-    private Runnable resetNavigatingRunnable = new Runnable() {
-        @Override
-        public void run() {
-            isNavigating = false;
-        }
-    };
-
-    /**
-     * 滚动到顶部
-     */
     private void scrollToTop() {
         LinearLayoutManager layoutManager = (LinearLayoutManager) getBinding().rvCityList.getLayoutManager();
         if (layoutManager != null) {
@@ -319,7 +283,6 @@ public class CityDefaultFragment extends BaseFragment<FragmentCityDefaultBinding
         handler.removeCallbacksAndMessages(null);
     }
 
-    // 空实现
     @Override
     public void initData() {
     }

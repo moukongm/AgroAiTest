@@ -51,45 +51,6 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- 标题 -->
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="18dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="#1A1A1A"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="通知"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/right_column"
-        app:layout_constraintStart_toEndOf="@+id/card_avatar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4"
-        />
-
-    <!-- 副标题 -->
-    <TextView
-        android:id="@+id/tv_subtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="#8C8C8C"
-        android:textSize="13sp"
-        android:text="欢迎使用植小保APP"
-        app:layout_constraintEnd_toStartOf="@+id/right_column"
-        app:layout_constraintStart_toEndOf="@+id/card_avatar"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title"
-         />
-
     <!-- 右侧：时间 + 缩略图 -->
     <LinearLayout
         android:id="@+id/right_column"
@@ -100,7 +61,8 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="1.0">
 
         <TextView
             android:id="@+id/tv_time"
@@ -153,6 +115,44 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
+
+    <!-- 标题 -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="18dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#1A1A1A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="通知"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/card_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4"
+        />
+
+    <!-- 副标题 -->
+    <TextView
+        android:id="@+id/tv_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="100dp"
+        android:maxLines="1"
+        android:textColor="#8C8C8C"
+        android:textSize="13sp"
+        android:text="欢迎使用植小保APP"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/card_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+         />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

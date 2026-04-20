@@ -156,6 +156,8 @@ public class HomeViewModel extends BaseViewModel {
                             if (response != null && response.getCode() == ServiceCode.SUCCESS) {
                                // 返回的是城市名称，用于更新 tv_currentCity
                                updateLocationResult.setValue(cityName);
+                               // 更新位置后，获取该位置的天气
+                               getGeoCode(cityName);
                             }else{
                                 cityError.setValue("更新失败");
                             }
@@ -433,6 +435,8 @@ public class HomeViewModel extends BaseViewModel {
                     ThreadUtils.INSTANCE.runOnUiThread(() -> {
                         locationLivedata.setValue(location);
                         LogUtils.INSTANCE.d("HomeViewModel", "location loaded from database: " + location);
+                        // 根据加载的位置获取天气
+                        getGeoCode(location);
                     });
                 }
             } catch (Exception e) {

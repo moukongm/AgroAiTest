@@ -167,7 +167,7 @@ public class CityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         void bind() {
-            binding.tvCurrentCity.setText(currentCity);
+//            binding.tvCurrentCity.setText(currentCity);
             binding.tvLocationCity.setText(locatedCity);
             hotCityAdapter.setData(hotCityList);
             hotCityAdapter.setSelectedCity("");

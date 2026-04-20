@@ -278,6 +278,8 @@ public class HomeFragment extends BaseFragment<ActivityHomeBinding> {
     @Override
     public void onResume() {
         super.onResume();
+        // 更新农历日期
+        binding.mainpageTime.setText(Utils.getTodayLunar());
         //viewModel.getMyCrops();
     }
 

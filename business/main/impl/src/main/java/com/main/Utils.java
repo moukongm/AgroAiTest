@@ -24,6 +24,7 @@ public class Utils {
         int day = lunar.get(ChineseCalendar.DAY_OF_MONTH);
         return "农历" + MONTH_NAMES[month ] + "月" + DAY_NAMES[day - 1];
     }
+
     public static String colorEnToZh(String en) {
         if (en == null || en.isEmpty()) {
             return "未知";

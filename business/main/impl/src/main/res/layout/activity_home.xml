@@ -246,7 +246,7 @@
                             android:textColor="#202020"
                             android:textSize="18sp"
                             android:textStyle="bold"
-                            android:visibility="gone"
+                            android:visibility="visible"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
@@ -258,7 +258,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="#90ffffff"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/mainpage_icon_warning"
@@ -275,7 +275,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="22dp"
-                            android:text="【橙色霜冻预警警报】"
                             android:textColor="#202020"
                             android:textSize="18sp"
                             android:textStyle="bold"
@@ -290,7 +289,6 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginRight="20dp"
                             android:maxLines="2"
-                            android:text="预计24小时内，我区地面最低温将降至-5℃以下，农作物面临严重冻害风险。请农户立即采取防寒防冻措施，对农作物、蔬菜、花卉、瓜果等进行覆盖、烟熏、灌水等防护处理，减轻冻害影响，确保农业生产安全。"
                             android:textColor="@android:color/black"
                             android:textSize="14sp"
                             app:layout_constraintLeft_toLeftOf="parent"
@@ -408,36 +406,45 @@
                     app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
                     app:layout_constraintTop_toBottomOf="@+id/mainpage_warning">
 
-                    <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginTop="12dp"
-                        android:src="@drawable/ic_main_shibie" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="75dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginEnd="2dp"
-                        android:text="识别记录"
-                        android:textColor="#373737"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
 
-                    <TextView
-                        android:id="@+id/mianpage_cnt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="75dp"
-                        android:layout_marginTop="40dp"
-                        android:layout_marginEnd="5dp"
-                        android:alpha="0.35"
-                        android:text=""
-                        android:textColor="#000000"
-                        android:textSize="12sp"
-                        tools:text="共13次识别记录" />
+                        <ImageView
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
+                            android:layout_marginTop="4dp"
+                            android:src="@drawable/ic_main_shibie" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="识别记录"
+                                android:textColor="#373737"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/mianpage_cnt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.35"
+                                android:text=""
+                                android:textColor="#000000"
+                                android:textSize="12sp"
+                                tools:text="共13次识别记录" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -452,34 +459,43 @@
                     app:layout_constraintStart_toStartOf="@+id/guideline_content_start"
                     app:layout_constraintTop_toBottomOf="@+id/mainpage_history">
 
-                    <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="12dp"
-                        android:src="@drawable/ic_main_ai" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="75dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginEnd="5dp"
-                        android:text="AI助手"
-                        android:textColor="#373737"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="75dp"
-                        android:layout_marginTop="40dp"
-                        android:layout_marginEnd="5dp"
-                        android:alpha="0.35"
-                        android:text="询问病虫害难题"
-                        android:textColor="#000000"
-                        android:textSize="12sp" />
+                        <ImageView
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
+                            android:layout_marginTop="4dp"
+                            android:src="@drawable/ic_main_ai" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="AI助手"
+                                android:textColor="#373737"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.35"
+                                android:text="询问病虫害难题"
+                                android:textColor="#000000"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
