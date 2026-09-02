@@ -2,11 +2,18 @@ package com.common.base
 
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
+import com.alibaba.android.arouter.BuildConfig
+import com.common.utils.HotAreaHelper
+import com.common.widget.HotAreaBorderView
 import com.common.widget.LoadingDialog
+import okhttp3.internal.http2.Http2Reader
+import java.util.logging.Handler
 
 /**
  * Activity 基类
@@ -17,6 +24,10 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
     protected lateinit var binding: VB
     private var loadingDialog: LoadingDialog? = null
 
+    private val hotAreaHighlights = mutableListOf<HotAreaBorderView>()
+    private var hotAreaEnabled = true
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initImmersiveStatusBar()
@@ -24,6 +35,51 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
         setContentView(binding.root)
         initView()
         initData()
+
+
+        binding.root.post {
+            performHotAreaDetection()
+        }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        showHotAreaHighlights()
+    }
+    override fun onPause() {
+        super.onPause()
+        hideHotAreaHighlights()
+    }
+
+    private fun showHotAreaHighlights() {
+        if (hotAreaEnabled) {
+            hotAreaHighlights.forEach { it.show() }
+        }
+    }
+    private fun hideHotAreaHighlights() {
+        hotAreaHighlights.forEach { it.hide() }
+    }
+
+    open fun setHotAreaEnabled(enabled: Boolean) {
+        hotAreaEnabled = enabled
+        if (enabled) {
+            showHotAreaHighlights()
+        } else {
+            hideHotAreaHighlights()
+        }
+    }
+
+    private fun performHotAreaDetection() {
+        val contentView = findViewById<ViewGroup>(android.R.id.content) ?: return
+        clearHotAreaHighlights()
+        val highlights = HotAreaHelper.highlight(binding.root as ViewGroup, contentView)
+        hotAreaHighlights.addAll(highlights)
+    }
+
+    protected fun clearHotAreaHighlights() {
+        hotAreaHighlights.forEach { it.detach() }
+        hotAreaHighlights.clear()
     }
 
     /**
@@ -66,6 +122,7 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         hideLoading()
+        clearHotAreaHighlights()
     }
 
     /**

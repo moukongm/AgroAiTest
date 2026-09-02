@@ -20,6 +20,7 @@ public class CommunityViewModel extends BaseViewModel {
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> toastLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> hasMoreLiveData = new MutableLiveData<>(true);
+    private final MutableLiveData<LikeUpdateEvent> likeUpdateLiveData = new MutableLiveData<>();
 
     private final CommunityRepository repository = new CommunityRepository();
     private List<PostResponseDto> currentPosts;
@@ -27,6 +28,19 @@ public class CommunityViewModel extends BaseViewModel {
     private int currentPage = 0;
     private static final int PAGE_SIZE = 10;
     private boolean hasLoadedMore = false;
+
+    public static class LikeUpdateEvent {
+
+        public final int position;
+        public final boolean isLiked;
+        public final int likeCount;
+
+        public LikeUpdateEvent(int position, boolean isLiked, int likeCount) {
+            this.position = position;
+            this.isLiked = isLiked;
+            this.likeCount = likeCount;
+        }
+    }
 
     public CommunityViewModel() {
         loadPosts();
@@ -131,66 +145,72 @@ public class CommunityViewModel extends BaseViewModel {
         addDisposable(disposable);
     }
 
-    public void toggleLike(long postId) {
-        toggleLike(postId, null);
-    }
-
-    public void toggleLike(long postId, SearchViewModel searchViewModel) {
+    public void toggleLike(long postId, int position, SearchViewModel searchViewModel) {
         if (currentPosts == null) {
             toastLiveData.setValue("数据加载中");
             return;
         }
-        boolean isLiked = false;
-        for (PostResponseDto post : currentPosts) {
-            if (post.getId() != null && post.getId().equals(postId)) {
-                isLiked = post.isLiked() != null && post.isLiked();
-                break;
-            }
-        }
+
+        boolean isLiked = getPostLikeStatus(postId);
         if (isLiked) {
-            unlikePost(postId, searchViewModel);
+            unlikePost(postId, position, searchViewModel);
         } else {
-            likePost(postId, searchViewModel);
+            likePost(postId, position, searchViewModel);
         }
     }
 
-    public void likePost(long postId) {
-        likePost(postId, null);
-    }
+    public void likePost(long postId, int position, SearchViewModel searchViewModel) {
 
-    public void likePost(long postId, SearchViewModel searchViewModel) {
+        int previousCount = getPostLikeCount(postId);
+        boolean wasLiked = getPostLikeStatus(postId);
+
+        updatePostInList(postId, true, previousCount + 1);
+        likeUpdateLiveData.setValue(new LikeUpdateEvent(position, true, previousCount + 1));
+
         Disposable d = repository.likePost(postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(success -> {
                     if (success) {
-                        refreshPosts();
                         if (searchViewModel != null) {
-                            searchViewModel.refreshSearchResults();
+                            searchViewModel.updatePostLikeStatus(postId, true, previousCount + 1);
                         }
+                    } else {
+                        updatePostInList(postId, wasLiked, previousCount);
+                        likeUpdateLiveData.setValue(new LikeUpdateEvent(position, wasLiked, previousCount));
+                        toastLiveData.setValue("点赞失败");
                     }
                 }, e -> {
+                    updatePostInList(postId, wasLiked, previousCount);
+                    likeUpdateLiveData.setValue(new LikeUpdateEvent(position, wasLiked,previousCount));
                     toastLiveData.setValue("点赞失败");
                 });
         addDisposable(d);
     }
 
-    public void unlikePost(long postId) {
-        unlikePost(postId, null);
-    }
 
-    public void unlikePost(long postId, SearchViewModel searchViewModel) {
+    public void unlikePost(long postId, int position, SearchViewModel searchViewModel) {
+        int previousCount = getPostLikeCount(postId);
+        boolean wasLiked = getPostLikeStatus(postId);
+        updatePostInList(postId, false, previousCount - 1);
+        likeUpdateLiveData.setValue(new LikeUpdateEvent(position, false, previousCount - 1));
+
         Disposable d = repository.unlikePost(postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(success -> {
                     if (success) {
-                        refreshPosts();
                         if (searchViewModel != null) {
-                            searchViewModel.refreshSearchResults();
+                            searchViewModel.updatePostLikeStatus(postId, false, previousCount - 1);
                         }
+                    } else {
+                        updatePostInList(postId, wasLiked, previousCount);
+                        likeUpdateLiveData.setValue(new LikeUpdateEvent(position, wasLiked, previousCount));
+                        toastLiveData.setValue("取消点赞失败");
                     }
                 }, e -> {
+                    updatePostInList(postId, wasLiked, previousCount);
+                    likeUpdateLiveData.setValue(new LikeUpdateEvent(position, wasLiked, previousCount));
                     toastLiveData.setValue("取消点赞失败");
                 });
         addDisposable(d);
@@ -238,6 +258,66 @@ public class CommunityViewModel extends BaseViewModel {
             }
         }, error -> {});
         addDisposable(disposable);
+    }
+
+    private void updatePostInList(long postId, boolean isLiked, int likeCount) {
+        if(currentPosts == null) return;
+        for(int i = 0; i < currentPosts.size(); i++) {
+            PostResponseDto post = currentPosts.get(i);
+            if(post.getId() != null && post.getId().equals(postId)) {
+                currentPosts.set(i,createLikeUpdatePost(post, isLiked,likeCount));
+                break;
+            }
+        }
+    }
+
+    private PostResponseDto createLikeUpdatePost(PostResponseDto item, boolean isLiked, int likeCount) {
+        return new PostResponseDto(
+                item.getId(),
+                item.getTitle(),
+                item.getContent(),
+                item.getImages(),
+                item.getImageSizes(),
+                item.getTags(),
+                item.getAuthorId(),
+                item.getAuthorName(),
+                item.getAuthorUsername(),
+                item.getAuthorAvatar(),
+                item.getAuthorAvatarWidth(),
+                item.getAuthorAvatarHeight(),
+                likeCount,
+                item.getFavoriteCount(),
+                item.getCommentCount(),
+                isLiked,
+                item.isFavorited(),
+                item.getCreatedAt(),
+                item.getUpdatedAt()
+        );
+    }
+
+    private boolean getPostLikeStatus(long postId) {
+        if(currentPosts == null) return false;
+        for(PostResponseDto post : currentPosts) {
+            if(post.getId() != null && post.getId().equals(postId)) {
+                return post.isLiked() != null && post.isLiked();
+            }
+        }
+        return false;
+    }
+
+    private int getPostLikeCount(long postId) {
+        if(currentPosts == null) return 0;
+        for(PostResponseDto post : currentPosts) {
+            if(post.getId() != null && post.getId().equals(postId)) {
+                Integer count = post.getLikeCount();
+                return count != null ? count : 0;
+            }
+        }
+        return 0;
+    }
+
+    public MutableLiveData<LikeUpdateEvent> getLikeUpdateLiveData() {
+        return likeUpdateLiveData;
     }
 
 

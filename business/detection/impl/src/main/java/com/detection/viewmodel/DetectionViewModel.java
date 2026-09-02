@@ -18,7 +18,7 @@ import com.agri.pest.client.model.response.AgentChatHistory;
 import com.agri.pest.client.model.response.DiagnosisItem;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
 import com.agri.pest.client.model.response.ResultListDiagnosisItem;
-import com.agri.pest.client.model.response.SseEmitter;
+//import com.agri.pest.client.model.response.SseEmitter;
 import com.common.base.BaseViewModel;
 import com.common.notice.BusKey;
 import com.common.notice.LiveDataBus;
@@ -301,7 +301,7 @@ public class DetectionViewModel extends BaseViewModel {
                         ));
     }
 
-    public void aiChatRecognize(String mes, String imageUrl) {
+    /*public void aiChatRecognize(String mes, String imageUrl) {
         ChatRequest chatRequest;
         chatRequest = new ChatRequest(mes, imageUrl, null, null, false);
         addDisposable(
@@ -315,7 +315,7 @@ public class DetectionViewModel extends BaseViewModel {
 
                                 }
                         ));
-    }
+    }*/
 
     public void recognize(String mes, String imageUrl, Boolean ischat) {
         ChatRequest chatRequest;

@@ -132,9 +132,9 @@ public class ElderCommunityFragment extends BaseFragment<FragmentCommunityElderB
         postAdapter.setOnLikeClickListener((item, position) -> {
             if (item != null && item.getId() != null) {
                 if (isSearchMode) {
-                    viewModel.toggleLike(item.getId(), searchViewModel);
+                    viewModel.toggleLike(item.getId(), position, searchViewModel);
                 } else {
-                    viewModel.toggleLike(item.getId(), null);
+                    viewModel.toggleLike(item.getId(), position, null);
                 }
             }
         });

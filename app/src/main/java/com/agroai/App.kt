@@ -2,7 +2,6 @@ package com.agroai
 
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import com.amap.api.location.AMapLocationClient
 import com.common.BaseApplication
 import com.network.NetworkManager
 

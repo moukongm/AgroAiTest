@@ -2,12 +2,18 @@ package com.common.base
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.alibaba.android.arouter.BuildConfig
 import com.common.NavigationController
+import com.common.utils.HotAreaHelper
+import com.common.utils.LogUtils
+import com.common.widget.HotAreaBorderView
 
 /**
  * Fragment 基类
@@ -18,6 +24,8 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     private var _binding: VB? = null
     protected val binding get() = _binding!!
     private var navController: NavigationController? = null
+
+    private val hotAreaHighlights = mutableListOf<HotAreaBorderView>()
 
     /**
      * 安全获取 ViewBinding，在 onDestroyView 后可能为 null
@@ -45,11 +53,54 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initData()
+        view.post {
+            performHotAreaDetection()
+        }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        clearHotAreaHighlights()
+        (activity as? BaseActivity<*>)?.setHotAreaEnabled(true)
         _binding = null
+        super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LogUtils.d("HotArea", "Fragment onResume: ${this::class.java.simpleName}")
+        (activity as? BaseActivity<*>)?.setHotAreaEnabled(false)
+        binding.root.post {
+            performHotAreaDetection()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        LogUtils.d("HotArea", "Fragment onPause: ${this::class.java.simpleName}")
+        clearHotAreaHighlights()
+        (activity as? BaseActivity<*>)?.setHotAreaEnabled(true)
+    }
+
+    private fun performHotAreaDetection() {
+        val view = getView() as? ViewGroup ?: return
+        if (!isAdded) return
+        clearHotAreaHighlights()
+        val highlights = HotAreaHelper.highlight(view, view)
+        hotAreaHighlights.addAll(highlights)
+    }
+
+    private fun showHotAreaHighlights() {
+        if (isAdded) {
+            hotAreaHighlights.forEach { it.show() }
+        }
+    }
+    private fun hideHotAreaHighlights() {
+        hotAreaHighlights.forEach { it.hide() }
+    }
+
+    protected fun clearHotAreaHighlights() {
+        hotAreaHighlights.forEach { it.detach() }
+        hotAreaHighlights.clear()
     }
 
     protected fun hideBottomNav() {

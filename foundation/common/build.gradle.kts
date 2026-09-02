@@ -66,6 +66,10 @@ dependencies {
     
     api(libs.speechengine.tob)
 
+    api(libs.gson)
+
+    api(libs.disklrucache)
+
     // 讯飞语音听写 SDK
     implementation(fileTree("libs") { include("*.jar") })
 

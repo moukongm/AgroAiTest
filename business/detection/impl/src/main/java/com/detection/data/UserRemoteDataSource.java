@@ -9,7 +9,7 @@ import com.agri.pest.client.model.response.ResultChatProfileResponse;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
 import com.agri.pest.client.model.response.ResultListDiagnosisItem;
 import com.agri.pest.client.model.response.ResultString;
-import com.agri.pest.client.model.response.SseEmitter;
+//import com.agri.pest.client.model.response.SseEmitter;
 import com.common.utils.LogUtils;
 import com.network.NetworkManager;
 import com.user.TokenService;
@@ -53,7 +53,7 @@ public class UserRemoteDataSource {
                             return Flowable.error(error);
                         }));
     }
-    public   Single<SseEmitter> getChatStream(ChatRequest chatRequest) {
+    /*public   Single<SseEmitter> getChatStream(ChatRequest chatRequest) {
 
         return NetworkManager.INSTANCE.getApi().chatStream(chatRequest)
                 .retryWhen(errors -> errors
@@ -63,7 +63,7 @@ public class UserRemoteDataSource {
                             }
                             return Flowable.error(error);
                         }));
-    }
+    }*/
     public Single<ResultListAgentChatHistory> getchatHistory() {
 
         return NetworkManager.INSTANCE.getApi().getHistory()

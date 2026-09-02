@@ -407,6 +407,12 @@ public class PostDetailActivity extends BaseActivity<ActivityPostDetailBinding> 
             ToastUtils.INSTANCE.showShort(this, "无效的帖子");
             finish();
         }
+
+        LiveDataBus.getInstance().with(BusKey.UNLOGIN).observe(this,mes -> {
+            if(mes instanceof Boolean && (Boolean) mes) {
+                viewModel.clearCache();
+            }
+        });
     }
 
     private void bindPost(PostResponseDto post) {

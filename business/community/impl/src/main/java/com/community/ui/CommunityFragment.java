@@ -131,9 +131,9 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
         postAdapter.setOnLikeClickListener((item, position) -> {
             if (item != null && item.getId() != null) {
                 if (isSearchMode) {
-                    viewModel.toggleLike(item.getId(), searchViewModel);
+                    viewModel.toggleLike(item.getId(), position, searchViewModel);
                 } else {
-                    viewModel.toggleLike(item.getId(), null);
+                    viewModel.toggleLike(item.getId(), position, null);
                 }
             }
         });
@@ -207,6 +207,12 @@ public class CommunityFragment extends BaseFragment<FragmentCommunityBinding> {
                     }
 
                 });
+
+        viewModel.getLikeUpdateLiveData().observe(getViewLifecycleOwner(), event -> {
+            if (event != null && event.position >= 0) {
+                postAdapter.updateItemLikeStatus(event.position, event.isLiked, event.likeCount);
+            }
+        });
     }
 
     private void launchPostPublish() {

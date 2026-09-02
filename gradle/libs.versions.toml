@@ -19,7 +19,7 @@ arouterCompiler = "1.5.2"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
 gson = "2.10.1"
-agriPestSdkVersion = "v1.0.110"
+agriPestSdkVersion = "v1.0.115"
 
 # markwon
 markwon = "4.6.2"
@@ -68,6 +68,8 @@ tfliteSupport = "0.4.4"
 
 # Blur
 blurview = "version-2.0.6"
+
+disklrucache = "2.0.2"
 
 # huanghaibin CalendarView (从Maven Central获取)
 calendarViewVersion = "3.7.1"
@@ -155,6 +157,8 @@ speechengine-tob = { group = "com.bytedance.speechengine", name = "speechengine_
 
 
 blurview = { group = "com.github.Dimezis", name = "BlurView", version.ref = "blurview" }
+
+disklrucache = { group = "com.jakewharton", name = "disklrucache", version.ref = "disklrucache" }
 
 # huanghaibin CalendarView (从Maven Central获取)
 calendarview = { group = "com.haibin", name = "calendarview", version.ref = "calendarViewVersion" }

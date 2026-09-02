@@ -56,4 +56,4 @@ abstract class BaseBindingAdapter<T, VB : ViewBinding>(
 /**
  * 包装 ViewBinding 的专属 ViewHolder
  */
-class BaseBindingViewHolder<VB : ViewBinding>(val binding: VB) : BaseViewHolder(binding.root)
+class BaseBindingViewHolder<VB : ViewBinding>(@JvmField val binding: VB) : BaseViewHolder(binding.root)

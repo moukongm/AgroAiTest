@@ -211,6 +211,41 @@ public class SearchViewModel extends BaseViewModel {
         );
     }
 
+    public void updatePostLikeStatus(long postId, boolean isLiked, int likeCount) {
+        if(currentSearchPosts == null) return;
+        for(int i = 0; i < currentSearchPosts.size(); i++) {
+            PostResponseDto post = currentSearchPosts.get(i);
+            if(post.getId() != null && post.getId().equals(postId)) {
+                currentSearchPosts.set(i, createLikeUpdatePost(post, isLiked ,likeCount));
+                break;
+            }
+        }
+    }
+
+    private PostResponseDto createLikeUpdatePost(PostResponseDto item, boolean isLiked, int likeCount) {
+        return new PostResponseDto(
+                item.getId(),
+                item.getTitle(),
+                item.getContent(),
+                item.getImages(),
+                item.getImageSizes(),
+                item.getTags(),
+                item.getAuthorId(),
+                item.getAuthorName(),
+                item.getAuthorUsername(),
+                item.getAuthorAvatar(),
+                item.getAuthorAvatarWidth(),
+                item.getAuthorAvatarHeight(),
+                likeCount,
+                item.getFavoriteCount(),
+                item.getCommentCount(),
+                isLiked,
+                item.isFavorited(),
+                item.getCreatedAt(),
+                item.getUpdatedAt()
+        );
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();

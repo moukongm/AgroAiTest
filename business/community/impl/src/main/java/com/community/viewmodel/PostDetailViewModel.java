@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.agri.pest.client.model.response.CommentResponseDto;
 import com.agri.pest.client.model.response.PostResponseDto;
 import com.common.base.BaseViewModel;
+import com.common.cache.CacheLoader;
+import com.common.cache.MemoryCache;
 import com.common.notice.BusKey;
 import com.common.notice.LiveDataBus;
 import com.community.data.CommunityRepository;
@@ -29,12 +31,24 @@ public class PostDetailViewModel extends BaseViewModel {
 
     private PostResponseDto currentPost;
 
+    private final CacheLoader<PostResponseDto> cache = CacheLoader.<PostResponseDto>create()
+            .memory(5)
+            .build();
+
     public void loadPost(long postId) {
         if (postId <= 0) {
             errorLiveData.setValue("无效的帖子");
             return;
         }
-        loadingLiveData.setValue(true);
+        String key = String.valueOf(postId);
+
+        PostResponseDto cached = cache.get(key);
+        if (cached != null) {
+            currentPost = cached;
+            postLiveData.setValue(cached);
+        }
+
+        loadingLiveData.setValue(cached == null);
 
         Disposable d = repository.getPostDetail(postId)
                 .subscribeOn(Schedulers.io())
@@ -43,6 +57,10 @@ public class PostDetailViewModel extends BaseViewModel {
                     loadingLiveData.setValue(false);
                     currentPost = post;
                     postLiveData.setValue(post);
+                    cache.put(key,post);
+                    if (cached == null || !post.equals(cached)) {
+                        postLiveData.setValue(post);
+                    }
                 }, e -> {
                     loadingLiveData.setValue(false);
                     e.printStackTrace();
@@ -53,6 +71,12 @@ public class PostDetailViewModel extends BaseViewModel {
                     errorLiveData.setValue(errorMsg);
                 });
         addDisposable(d);
+    }
+
+    public void clearCache() {
+        if (cache != null) {
+            cache.clear();
+        }
     }
 
     public void loadComments(long postId) {
@@ -200,6 +224,7 @@ public class PostDetailViewModel extends BaseViewModel {
                 .subscribe(post -> {
                     currentPost = post;
                     postLiveData.setValue(post);
+                    cache.put(String.valueOf(postId), post);
                 }, e -> {});
         addDisposable(d);
     }

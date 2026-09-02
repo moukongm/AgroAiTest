@@ -7,7 +7,7 @@ import com.agri.pest.client.model.response.ResultChatProfileResponse;
 import com.agri.pest.client.model.response.ResultListAgentChatHistory;
 import com.agri.pest.client.model.response.ResultListDiagnosisItem;
 import com.agri.pest.client.model.response.ResultString;
-import com.agri.pest.client.model.response.SseEmitter;
+//import com.agri.pest.client.model.response.SseEmitter;
 import com.common.storage.database.DetectionRecord;
 import com.network.NetworkManager;
 
@@ -48,8 +48,8 @@ public class Repository {
         return remoteDataSource.getAiChat(chatRequest);
     }
 
-    public   Single<SseEmitter> getChatStream(ChatRequest chatRequest) {
+   /* public   Single<SseEmitter> getChatStream(ChatRequest chatRequest) {
 
         return remoteDataSource.getChatStream(chatRequest);
-    }
+    }*/
 }
