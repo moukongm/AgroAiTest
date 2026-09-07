@@ -35,10 +35,13 @@ android {
         }
 
         named("debug") {
-            storeFile = file("keystore/my_app.jks")
-            storePassword = "123456"
-            keyAlias = "mt_app_key"
-            keyPassword = "123456"
+            val locationKeystore = file("keystore/my_app.jks")
+            if (locationKeystore.exists()) {
+                storeFile = locationKeystore
+                storePassword = "123456"
+                keyAlias = "mt_app_key"
+                keyPassword = "123456"
+            }
         }
     }
 

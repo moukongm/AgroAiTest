@@ -15,7 +15,7 @@ object ImageUtils {
     private const val TAG = "ImageUtils"
 
     /**
-     * 压缩图片，确保其大小不超过指定的最大值（默认10MB）
+     * 压缩图片，确保其大小不超过指定的最大值（默认 7.5MB）
      * @param bitmap 原始图片
      * @param maxSizeBytes 最大文件大小（字节）
      * @return 压缩后的图片
@@ -79,6 +79,7 @@ object ImageUtils {
     ): File? {
         if (!file.exists() || maxDimension <= 0) return null
 
+        var outputFile: File? = null
         return try {
             val bounds = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
@@ -112,15 +113,29 @@ object ImageUtils {
             }
 
             try {
-                FileOutputStream(file).use { fos ->
-                    scaledBitmap.compress(
+                val outputDirectory = file.parentFile ?: return null
+                val compressedFile = File.createTempFile(
+                    "${file.nameWithoutExtension}_compressed_",
+                    ".jpg",
+                    outputDirectory
+                )
+                outputFile = compressedFile
+
+                val compressedSuccessfully = FileOutputStream(compressedFile).use { fos ->
+                    val success = scaledBitmap.compress(
                         Bitmap.CompressFormat.JPEG,
                         quality.coerceIn(10, 100),
                         fos
                     )
                     fos.flush()
+                    success
                 }
-                file
+                if (!compressedSuccessfully) {
+                    compressedFile.delete()
+                    null
+                } else {
+                    compressedFile
+                }
             } finally {
                 bitmap.recycle()
                 if (scaledBitmap !== bitmap) {
@@ -128,6 +143,7 @@ object ImageUtils {
                 }
             }
         } catch (e: Exception) {
+            outputFile?.delete()
             LogUtils.e(TAG, "compressImageFile error: ${e.message}")
             null
         }

@@ -14,14 +14,16 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        // 阿里云镜像
+        // Prefer Google's authoritative repository for AndroidX/AGP artifacts.
+        google()
+
+        // Prefer the Central mirror on networks where Maven Central is unstable.
         maven { url = uri("https://maven.aliyun.com/repository/public") }
+        mavenCentral()
+
+        // Additional mirrors
         maven { url = uri("https://maven.aliyun.com/repository/google") }
         maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
-
-        // 官方仓库
-        google()
-        mavenCentral()
 
         // 第三方仓库
         maven { url = uri("https://jitpack.io") }

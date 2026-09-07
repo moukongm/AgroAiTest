@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import com.common.base.BaseViewModel;
 import com.common.notice.BusKey;
 import com.common.notice.LiveDataBus;
 import com.common.storage.database.DetectionRecord;
+import com.common.timedetect.TimeCostTracker;
 import com.common.utils.AvatarUtils;
 import com.common.utils.FileUtils;
 import com.common.utils.ImageUtils;
@@ -50,6 +52,11 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
 public class DetectionViewModel extends BaseViewModel {
+    private static final String SCENE_CAMERA_DETECTION = "crop_detection_camera";
+    private static final String SCENE_GALLERY_DETECTION = "crop_detection_gallery";
+    private static final String SCENE_AI_IMAGE_UPLOAD = "ai_image_upload";
+    private static final String SCENE_AI_CHAT = "ai_chat";
+
     private final SingleLiveEvent<Boolean> loadingState = new SingleLiveEvent<>();
     private final SingleLiveEvent<File> photoCaptured = new SingleLiveEvent<>();
     private final MutableLiveData<String> photoUriResult = new MutableLiveData<>();
@@ -68,8 +75,10 @@ public class DetectionViewModel extends BaseViewModel {
     private final MutableLiveData<String> finalPlan = new MutableLiveData<>();  // 完整方案
     private final MutableLiveData<Boolean> streamDone = new MutableLiveData<>();  // 流式结束标志
     private final Repository repository = new Repository();
+    private final TimeCostTracker timeCostTracker = TimeCostTracker.getInstance();
     private TFLiteClassifier localClassifier; 
     private final Application application;  // Application Context（用于访问 assets）
+    private volatile String currentTraceId;
     
     // 用于传递识别成功后的数据给结果页面保存
     public static class SaveRecordData {
@@ -86,6 +95,30 @@ public class DetectionViewModel extends BaseViewModel {
         super();
         this.application = application;
         initLocalClassifier();
+    }
+
+    private synchronized String beginTrace(String sceneName) {
+        if (currentTraceId != null) {
+            timeCostTracker.cancelSession(currentTraceId);
+        }
+        currentTraceId = timeCostTracker.startSession(sceneName);
+        return currentTraceId;
+    }
+
+    private void markTrace(String traceId, String nodeName) {
+        if (traceId != null) {
+            timeCostTracker.markNode(traceId, nodeName);
+        }
+    }
+
+    private synchronized void finishTrace(String traceId, String finalNodeName) {
+        if (traceId == null) {
+            return;
+        }
+        timeCostTracker.endSession(traceId, finalNodeName);
+        if (traceId.equals(currentTraceId)) {
+            currentTraceId = null;
+        }
     }
     
     
@@ -127,6 +160,8 @@ public class DetectionViewModel extends BaseViewModel {
 
     public void takePhoto(Context context, ImageCapture imageCapture) {
         loadingState.setValue(true);
+        final String traceId = beginTrace(SCENE_CAMERA_DETECTION);
+        markTrace(traceId, "camera_capture_start");
 
         File photoFile = new File(
                 context.getCacheDir(),
@@ -139,21 +174,19 @@ public class DetectionViewModel extends BaseViewModel {
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        markTrace(traceId, "image_captured");
                         photoCaptured.setValue(photoFile);
                         // 同时设置图片路径供结果显示使用
                         photoUriResult.setValue("file://" + photoFile.getAbsolutePath());
                         LogUtils.INSTANCE.d("uiuiui", "onimagesaved");
-                        File file = compressImage(photoFile);
-                        if (file == null) {
-                            file = photoFile;
-                        }
-                        LogUtils.INSTANCE.d("ljx", file + "");
                         // 改为双路识别
-                        recognizeImage(file);
+                        recognizeImage(photoFile, traceId);
                     }
 
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
+                        markTrace(traceId, "camera_capture_failed");
+                        finishTrace(traceId, "failed");
                         LogUtils.INSTANCE.d("ljx", exception.toString());
                         exception.printStackTrace();
                         loadingState.setValue(false);
@@ -212,27 +245,60 @@ public class DetectionViewModel extends BaseViewModel {
 
     public void uploadAndRecognizeFromGallery(Context context, String mes, File file) {
         loadingState.setValue(true);
-        File compressedFile = compressImage(file);
-        if (compressedFile == null) {
-            compressedFile = file;
-        }
-        uploadAndRecognize(context, mes, compressedFile);
+        String traceId = beginTrace(SCENE_AI_IMAGE_UPLOAD);
+        markTrace(traceId, "image_selected");
+        ThreadUtils.INSTANCE.executeByIo(() -> {
+            File compressedFile = compressImage(file);
+            boolean deleteAfterUse = compressedFile != null && !compressedFile.equals(file);
+            if (compressedFile == null) {
+                compressedFile = file;
+                markTrace(traceId, "compress_fallback");
+            } else {
+                markTrace(traceId, "compress_done");
+            }
+            uploadAndRecognize(context, mes, compressedFile, traceId, deleteAfterUse);
+        });
     }
 
     //双路识别
     public void recognizeImage(File imageFile) {
+        String traceId = beginTrace(SCENE_GALLERY_DETECTION);
+        markTrace(traceId, "image_selected");
+        recognizeImage(imageFile, traceId);
+    }
+
+    private void recognizeImage(File imageFile, String traceId) {
         loadingState.setValue(true);
         Application app = this.application;
-        
-        if (!NetworkUtil.isNetworkAvailable(app)) {
-            // 无网络，走本地
-            LogUtils.INSTANCE.d("Recognition", "使用本地模型识别");
-            recognizeLocally(imageFile);
-        } else {
-            // 有网络，走云端
-            LogUtils.INSTANCE.d("Recognition", "使用云端API识别");
-            uploadAndRecognize(app, "这个得了什么病", imageFile);
-        }
+
+        ThreadUtils.INSTANCE.executeByIo(() -> {
+            File compressedFile = compressImage(imageFile);
+            boolean deleteAfterUse = compressedFile != null && !compressedFile.equals(imageFile);
+            if (compressedFile == null) {
+                compressedFile = imageFile;
+                markTrace(traceId, "compress_fallback");
+            } else {
+                markTrace(traceId, "compress_done");
+            }
+
+            if (!NetworkUtil.isNetworkAvailable(app)) {
+                // 无网络，走本地
+                markTrace(traceId, "network_unavailable");
+                LogUtils.INSTANCE.d("Recognition", "使用本地模型识别");
+                recognizeLocally(compressedFile, traceId, deleteAfterUse);
+            } else {
+                // 有网络，走云端
+                markTrace(traceId, "network_available");
+                LogUtils.INSTANCE.d("Recognition", "使用云端API识别");
+                uploadAndRecognize(
+                        app,
+                        "这个得了什么病",
+                        compressedFile,
+                        traceId,
+                        deleteAfterUse
+                );
+            }
+        });
     }
 
     public void insertLocalDetectionHistory(Context context, SaveRecordData data) {
@@ -256,7 +322,14 @@ public class DetectionViewModel extends BaseViewModel {
         });
     }
 
-    private void uploadAndRecognize(Context context, String mes, File photoFile) {
+    private void uploadAndRecognize(
+            Context context,
+            String mes,
+            File photoFile,
+            String traceId,
+            boolean deleteAfterUse
+    ) {
+        markTrace(traceId, "upload_start");
         LogUtils.INSTANCE.d("ljx_upload", "upload start - file: " + photoFile + ", exists: " + photoFile.exists() + ", size: " + photoFile.length());
         RequestBody requestBody = RequestBody.create(
                 MediaType.parse(FileUtils.INSTANCE.getMimeType(photoFile)), photoFile);
@@ -269,16 +342,21 @@ public class DetectionViewModel extends BaseViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 response -> {
+                                    deleteTemporaryFile(photoFile, deleteAfterUse);
                                     if (response.getCode() == ServiceCode.SUCCESS) {
+                                        markTrace(traceId, "upload_done");
                                         String imageUrl = response.getData().toString();
                                         if (mes.isEmpty()) {
                                             photoNewUriResult.setValue(imageUrl);
+                                            finishTrace(traceId, "result_delivered");
                                         } else {
                                             photoUriResult.setValue(imageUrl);
                                             LogUtils.INSTANCE.d("ljx", "imageok");
-                                            recognize(mes, imageUrl, false);
+                                            recognize(mes, imageUrl, false, traceId);
                                         }
                                     } else {
+                                        markTrace(traceId, "upload_failed");
+                                        finishTrace(traceId, "failed");
                                         if (mes.isEmpty()) {
                                             errorChatMessage.setValue("图片上传失败，请重试");
                                         } else {
@@ -289,6 +367,9 @@ public class DetectionViewModel extends BaseViewModel {
                                     }
                                 },
                                 error -> {
+                                    deleteTemporaryFile(photoFile, deleteAfterUse);
+                                    markTrace(traceId, "upload_failed");
+                                    finishTrace(traceId, "failed");
                                     if (mes.isEmpty()) {
                                         errorChatMessage.setValue("图片上传失败，请重试");
                                     } else {
@@ -302,6 +383,9 @@ public class DetectionViewModel extends BaseViewModel {
     }
 
     public void aiChatRecognize(String mes, String imageUrl) {
+        String traceId = beginTrace(SCENE_AI_CHAT);
+        markTrace(traceId, "server_request_start");
+        long requestStartMs = SystemClock.uptimeMillis();
         ChatRequest chatRequest;
         chatRequest = new ChatRequest(mes, imageUrl, null, null, false);
         addDisposable(
@@ -310,29 +394,52 @@ public class DetectionViewModel extends BaseViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 response -> {
+                                    timeCostTracker.setServerCost(
+                                            traceId,
+                                            SystemClock.uptimeMillis() - requestStartMs
+                                    );
+                                    finishTrace(traceId, "server_stream_opened");
                                 },
                                 error -> {
-
+                                    timeCostTracker.setServerCost(
+                                            traceId,
+                                            SystemClock.uptimeMillis() - requestStartMs
+                                    );
+                                    markTrace(traceId, "server_error");
+                                    finishTrace(traceId, "failed");
                                 }
                         ));
     }
 
     public void recognize(String mes, String imageUrl, Boolean ischat) {
+        String traceId = beginTrace(Boolean.TRUE.equals(ischat) ? SCENE_AI_CHAT : SCENE_GALLERY_DETECTION);
+        recognize(mes, imageUrl, ischat, traceId);
+    }
+
+    private void recognize(String mes, String imageUrl, Boolean ischat, String traceId) {
+        boolean isChat = Boolean.TRUE.equals(ischat);
         ChatRequest chatRequest;
-        if (ischat) {
+        if (isChat) {
             chatRequest = new ChatRequest(  mes, imageUrl, null, null, false);
         } else {
             chatRequest = new ChatRequest(mes + "如果要存到历史记录里面，请在返回的agentResponse字段上返回List<DiagnosisItem>json供我们解析", imageUrl, null, null, true);
         }
 
+        markTrace(traceId, "server_request_start");
+        long requestStartMs = SystemClock.uptimeMillis();
         addDisposable(
                 repository.getchat(chatRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 response -> {
+                                    timeCostTracker.setServerCost(
+                                            traceId,
+                                            SystemClock.uptimeMillis() - requestStartMs
+                                    );
+                                    markTrace(traceId, "server_processing_done");
                                     if (response.getCode() == ServiceCode.SUCCESS) {
-                                        if (ischat) {
+                                        if (isChat) {
                                             if (response.getData() != null && !response.getData().isEmpty()) {
                                                 chatChatResult.setValue(response.getData().get(0).getDiseaseName().toString()+"\n\n"+response.getData().get(0).getControlPlan());
                                             } else {
@@ -346,7 +453,8 @@ public class DetectionViewModel extends BaseViewModel {
                                             saveRecordResult.setValue(new SaveRecordData(imageUrl, response.getData()));
                                         }
                                     } else {
-                                        if (ischat) {
+                                        markTrace(traceId, "server_rejected");
+                                        if (isChat) {
                                             errorChatMessage.setValue("AI连接错误");
                                         } else {
                                             errorMessage.setValue("AI连接错误");
@@ -354,10 +462,18 @@ public class DetectionViewModel extends BaseViewModel {
 
                                     }
 
+                                    markTrace(traceId, "result_delivered");
+                                    finishTrace(traceId, "session_end");
                                     loadingState.setValue(false);
                                 },
                                 error -> {
-                                    if (ischat) {
+                                    timeCostTracker.setServerCost(
+                                            traceId,
+                                            SystemClock.uptimeMillis() - requestStartMs
+                                    );
+                                    markTrace(traceId, "server_error");
+                                    finishTrace(traceId, "failed");
+                                    if (isChat) {
                                         errorChatMessage.setValue("AI 识别失败，请重试");
                                     } else {
                                         loadingState.setValue(false);
@@ -421,56 +537,72 @@ public class DetectionViewModel extends BaseViewModel {
     }
 
     //file转bitmap转buffer获取结果setvalue
-    private void recognizeLocally(File imageFile) {
+    private void recognizeLocally(File imageFile, String traceId, boolean deleteAfterUse) {
         if (localClassifier == null) {
+            deleteTemporaryFile(imageFile, deleteAfterUse);
+            markTrace(traceId, "local_model_unavailable");
+            finishTrace(traceId, "failed");
             postError("本地模型未加载，请检查模型文件");
             return;
         }
-        
+
+        markTrace(traceId, "local_inference_start");
         ThreadUtils.INSTANCE.executeByIo(() -> {
             try {
-                //压缩图片
-                File compressedFile = compressImage(imageFile);
-                if (compressedFile == null) compressedFile = imageFile;
-
                 BitmapFactory.Options opts = new BitmapFactory.Options();
 
                 //根据file计算图片采样率
-                opts.inSampleSize = calculateInSampleSize(compressedFile);
+                opts.inSampleSize = calculateInSampleSize(imageFile);
 
                 //把file加载bitmap，通过采样率来对file转换为bitmap，长度大是1024像素
                 Bitmap bitmap = BitmapFactory.decodeFile(
-                    compressedFile.getAbsolutePath(), 
+                    imageFile.getAbsolutePath(),
                     opts
                 );
-                
+
                 if (bitmap == null) {
+                    markTrace(traceId, "image_decode_failed");
+                    finishTrace(traceId, "failed");
                     postError("图片解码失败");
                     return;
                 }
-                
+
                 // 把bitmap转换成模型需要的；
                 ByteBuffer inputBuffer = convertBitmapToByteBuffer(bitmap);
                 bitmap.recycle();  // 及时回收
-                
+
                 // 本地推理
                 List<Recognition> localResults = localClassifier.recognizeImage(inputBuffer);
                 List<DiagnosisItem> diagnosisItems = convertRecognitionToDiagnosis(localResults);
 
                 AndroidSchedulers.mainThread().scheduleDirect(() -> {
+                    timeCostTracker.setServerCost(traceId, 0L);
+                    markTrace(traceId, "local_inference_done");
                     chatResult.setValue(diagnosisItems);
 //                    saveRecordResult.setValue(new SaveRecordData(
 //                        "local://" + imageFile.getAbsolutePath(),
 //                        diagnosisItems
 //                    ));
+                    markTrace(traceId, "result_delivered");
+                    finishTrace(traceId, "session_end");
                     loadingState.setValue(false);
                 });
-                
+
             } catch (Exception e) {
+                markTrace(traceId, "local_inference_failed");
+                finishTrace(traceId, "failed");
                 LogUtils.INSTANCE.e("TFLite", "本地识别异常", e);
                 postError("本地识别失败: " + e.getMessage());
+            } finally {
+                deleteTemporaryFile(imageFile, deleteAfterUse);
             }
         });
+    }
+
+    private void deleteTemporaryFile(File file, boolean deleteAfterUse) {
+        if (deleteAfterUse && file != null && file.exists() && !file.delete()) {
+            LogUtils.INSTANCE.w("ImageUtils", "临时压缩图片删除失败: " + file.getAbsolutePath(), null);
+        }
     }
     
     //计算图片采样率
@@ -544,6 +676,16 @@ public class DetectionViewModel extends BaseViewModel {
             errorMessage.setValue(msg);
             loadingState.setValue(false);
         });
+    }
+
+    @Override
+    protected void onCleared() {
+        String traceId = currentTraceId;
+        if (traceId != null) {
+            timeCostTracker.cancelSession(traceId);
+            currentTraceId = null;
+        }
+        super.onCleared();
     }
 
 }

@@ -70,4 +70,6 @@ dependencies {
     implementation(fileTree("libs") { include("*.jar") })
 
     api(project(":foundation:storage"))
+
+    testImplementation(libs.junit)
 }
